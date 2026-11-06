@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nam Nguyen Design CMS Full</title>
+<style>
+:root{--bg:#090909;--panel:#141414;--panel2:#0f0f0f;--line:#2b2b2b;--text:#f5f3ed;--muted:#8d8d8d;--accent:#4c6fff;--danger:#ff6970}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,Arial,sans-serif}
+.shell{display:grid;grid-template-columns:230px 1fr;min-height:100vh}aside{border-right:1px solid var(--line);padding:24px 16px;position:sticky;top:0;height:100vh;overflow:auto}.brand{font-size:19px;font-weight:800;margin-bottom:24px}.brand small{display:block;color:#777;font-weight:500;margin-top:3px}
+.nav{display:grid;gap:6px}.nav button{background:transparent;border:0;color:#929292;text-align:left;padding:10px 12px;border-radius:12px;cursor:pointer}.nav button.active{background:#1b1b1b;color:#fff}
+main{padding:26px}.top{display:flex;justify-content:space-between;gap:14px;align-items:center;margin-bottom:18px}.top h1{margin:0;font-size:26px}.actions{display:flex;gap:8px;flex-wrap:wrap}
+button{border:0;border-radius:999px;padding:10px 14px;cursor:pointer;background:#fff;color:#000;font-weight:700}.primary{background:var(--accent);color:#fff}.ghost{background:#242424;color:#fff}.danger{background:#342024;color:#ff9da2}
+.status{font-size:13px;color:#9eabff;margin-bottom:15px}.tab{display:none}.tab.active{display:block}.card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:18px;margin-bottom:14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{margin-bottom:12px}label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+input,textarea,select{width:100%;background:var(--panel2);color:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 11px;font:inherit}textarea{min-height:100px;resize:vertical}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}.switch{display:flex;align-items:center;gap:8px;color:#bbb}.switch input{width:auto}
+.image-field{display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:start}.image-preview{width:120px;height:82px;object-fit:cover;border-radius:12px;border:1px solid var(--line);background:#0b0b0b}.image-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+.list{display:grid;gap:10px}.item{background:#101010;border:1px solid var(--line);border-radius:15px;padding:12px}.item-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}.row-actions{display:flex;gap:6px;flex-wrap:wrap}
+.projects .item{padding:0}.projects .item-head{padding:12px;margin:0}.project-body{display:none;padding:0 12px 12px}.item.open .project-body{display:block}.drag{cursor:grab;color:#666}
+.media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}.media{background:#111;border:1px solid var(--line);border-radius:14px;overflow:hidden}.media img{width:100%;aspect-ratio:1/1;object-fit:cover}.media .info{padding:9px}.media small{display:block;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.modal{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;padding:20px;z-index:9999}.modal.open{display:flex}.modal-box{width:min(900px,96vw);max-height:86vh;overflow:auto;background:#111;border:1px solid var(--line);border-radius:20px;padding:16px}.picker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}.picker-card{cursor:pointer;border:1px solid var(--line);border-radius:12px;overflow:hidden}.picker-card img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block}
+.preview{height:78vh;width:100%;border:1px solid var(--line);border-radius:18px;background:#fff}.backup-row{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:11px 0;border-top:1px solid var(--line)}.backup-row:first-child{border-top:0}
+@media(max-width:900px){.shell{grid-template-columns:1fr}aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}.nav{grid-template-columns:repeat(4,1fr)}main{padding:16px}.grid2,.image-field{grid-template-columns:1fr}.image-preview{width:100%;height:180px}}
+</style>
+</head>
+<body>
+<div class="shell">
+<aside>
+<div class="brand">Nam Nguyen Design<small>CMS Full</small></div>
+<div class="nav">
+<button class="active" data-tab="home">Home</button>
+<button data-tab="navigation">Navigation</button>
+<button data-tab="clients">Clients</button>
+<button data-tab="projects">Projects</button>
+<button data-tab="journal">Journal</button>
+<button data-tab="contact">Contact</button>
+<button data-tab="footer">Footer</button>
+<button data-tab="media">Media</button>
+<button data-tab="preview">Live Preview</button>
+<button data-tab="backup">Backup</button>
+</div>
+</aside>
+<main>
+<div class="top"><h1 id="title">Home</h1><div class="actions"><button class="ghost" id="reloadBtn">Reload</button><button class="primary" id="saveBtn">Save</button></div></div>
+<div class="status" id="status">Loading...</div>
+
+<section class="tab active" id="tab-home">
+  <div class="card"><div class="section-head"><strong>Hero</strong><label class="switch"><input type="checkbox" id="heroVisible"> Visible</label></div>
+    <div class="grid2">
+      <div class="field"><label>Eyebrow</label><input id="heroEyebrow"></div><div class="field"><label>Index label</label><input id="heroIndex"></div>
+      <div class="field"><label>Title</label><input id="heroTitle"></div><div class="field"><label>CTA</label><input id="heroCTA"></div>
+    </div>
+    <div class="field"><label>Description</label><textarea id="heroDesc"></textarea></div>
+    <div class="field"><label>Hero image</label><div class="image-field"><img id="heroPreview" class="image-preview"><div><input id="heroImage"><div class="image-actions"><button class="ghost pick" data-target="heroImage">Choose from Media</button><button class="ghost upload" data-target="heroImage">Upload image</button><button class="danger clear" data-target="heroImage">Remove</button></div></div></div></div>
+  </div>
+
+  <div class="card"><div class="section-head"><strong>Clear Ideas / Intro</strong><label class="switch"><input type="checkbox" id="introVisible"> Visible</label></div>
+    <div class="grid2"><div class="field"><label>Eyebrow</label><input id="introEyebrow"></div><div class="field"><label>Location</label><input id="introLocation"></div></div>
+    <div class="field"><label>Heading</label><input id="introTitle"></div><div class="field"><label>Description</label><textarea id="introDesc"></textarea></div>
+    <div class="field"><label>Services — mỗi dòng 1 service</label><textarea id="introServices"></textarea></div>
+    <div class="field"><label>Image</label><div class="image-field"><img id="introPreview" class="image-preview"><div><input id="introImage"><div class="image-actions"><button class="ghost pick" data-target="introImage">Choose from Media</button><button class="ghost upload" data-target="introImage">Upload image</button><button class="danger clear" data-target="introImage">Remove</button></div></div></div></div>
+  </div>
+
+  <div class="card"><div class="section-head"><strong>About</strong><label class="switch"><input type="checkbox" id="aboutVisible"> Visible</label></div>
+    <div class="grid2"><div class="field"><label>Eyebrow</label><input id="aboutEyebrow"></div><div class="field"><label>Title</label><input id="aboutTitle"></div></div>
+    <div class="field"><label>Description</label><textarea id="aboutDesc"></textarea></div>
+    <div class="field"><label>Image</label><div class="image-field"><img id="aboutPreview" class="image-preview"><div><input id="aboutImage"><div class="image-actions"><button class="ghost pick" data-target="aboutImage">Choose from Media</button><button class="ghost upload" data-target="aboutImage">Upload image</button><button class="danger clear" data-target="aboutImage">Remove</button></div></div></div></div>
+  </div>
+</section>
+
+<section class="tab" id="tab-navigation">
+<div class="card"><div class="section-head"><strong>Navigation</strong><label class="switch"><input type="checkbox" id="navVisible"> Visible</label></div>
+<div class="grid2"><div class="field"><label>Brand</label><input id="navBrand"></div><div class="field"><label>CTA label</label><input id="navCTA"></div><div class="field"><label>CTA href</label><input id="navCTAHref"></div></div>
+<div id="navItems" class="list"></div><button id="addNavBtn">+ Add navigation item</button></div>
+</section>
+
+<section class="tab" id="tab-clients">
+<div class="card"><div class="section-head"><strong>Clients</strong><label class="switch"><input type="checkbox" id="clientsVisible"> Visible</label></div>
+<div class="grid2"><div class="field"><label>Eyebrow</label><input id="clientsEyebrow"></div><div class="field"><label>Title</label><input id="clientsTitle"></div></div>
+<div id="clientItems" class="list"></div><button id="addClientBtn">+ Add Client</button></div>
+</section>
+
+<section class="tab" id="tab-projects"><div class="card"><div class="section-head"><div><strong>Projects</strong><div style="color:#777;font-size:12px;margin-top:4px">Add, duplicate, delete, reorder, images and gallery.</div></div><button id="addProjectBtn">+ Add Project</button></div></div><div id="projectItems" class="list projects"></div></section>
+
+<section class="tab" id="tab-journal">
+<div class="card"><div class="section-head"><strong>Journal</strong><label class="switch"><input type="checkbox" id="journalVisible"> Visible</label></div>
+<div class="grid2"><div class="field"><label>Eyebrow</label><input id="journalEyebrow"></div><div class="field"><label>Title</label><input id="journalTitle"></div></div>
+<div class="field"><label>Description</label><textarea id="journalDesc"></textarea></div>
+<div id="journalItems" class="list"></div><button id="addJournalBtn">+ Add Journal Item</button></div>
+</section>
+
+<section class="tab" id="tab-contact">
+<div class="card"><div class="section-head"><strong>Get in touch</strong><label class="switch"><input type="checkbox" id="contactVisible"> Visible</label></div>
+<div class="grid2"><div class="field"><label>Eyebrow</label><input id="contactEyebrow"></div><div class="field"><label>Title</label><input id="contactTitle"></div><div class="field"><label>Email</label><input id="contactEmail"></div><div class="field"><label>Phone</label><input id="contactPhone"></div><div class="field"><label>CTA label</label><input id="contactCTA"></div><div class="field"><label>CTA href</label><input id="contactCTAHref"></div></div>
+<div class="field"><label>Description</label><textarea id="contactDesc"></textarea></div>
+<div class="field"><label>Image</label><div class="image-field"><img id="contactPreview" class="image-preview"><div><input id="contactImage"><div class="image-actions"><button class="ghost pick" data-target="contactImage">Choose from Media</button><button class="ghost upload" data-target="contactImage">Upload image</button><button class="danger clear" data-target="contactImage">Remove</button></div></div></div></div>
+</div></section>
+
+<section class="tab" id="tab-footer">
+<div class="card"><div class="section-head"><strong>Footer</strong><label class="switch"><input type="checkbox" id="footerVisible"> Visible</label></div>
+<div class="grid2"><div class="field"><label>Brand</label><input id="footerBrand"></div><div class="field"><label>Copyright</label><input id="footerCopyright"></div></div>
+<div class="field"><label>Description</label><textarea id="footerDesc"></textarea></div>
+<div id="footerLinks" class="list"></div><button id="addFooterLinkBtn">+ Add Footer Link</button></div>
+</section>
+
+<section class="tab" id="tab-media">
+<div class="card"><strong>Media Library</strong><div style="color:#777;font-size:12px;margin:5px 0 12px">Upload ảnh một lần, sau đó chọn trực tiếp từ mọi image field.</div><input id="mediaUpload" type="file" accept="image/*" multiple><button class="primary" id="uploadMediaBtn" style="margin-top:10px">Upload Selected</button></div>
+<div id="mediaGrid" class="media-grid"></div>
+</section>
+
+<section class="tab" id="tab-preview"><iframe id="previewFrame" class="preview" src="/"></iframe></section>
+
+<section class="tab" id="tab-backup"><div class="card"><div class="section-head"><div><strong>Backup / Restore</strong><div style="color:#777;font-size:12px;margin-top:4px">Auto backup trước mỗi Save.</div></div><button id="backupNowBtn">Create Backup</button></div><div id="backupList"></div></div></section>
+</main>
+</div>
+
+<div class="modal" id="mediaModal"><div class="modal-box"><div class="section-head"><strong>Choose from Media Library</strong><button class="ghost" id="closeModal">Close</button></div><div id="pickerGrid" class="picker-grid"></div></div></div>
+<input id="hiddenUpload" type="file" accept="image/*" style="display:none">
+
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+let state=null, media=[], mediaTarget=null, dragProject=null;
+
+const esc=v=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+const status=m=>$("#status").textContent=m;
+async function api(url,opt={}){const r=await fetch(url,opt);const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||("HTTP "+r.status));return d}
+function setImg(inputId,previewId){const v=$("#"+inputId).value;const img=$("#"+previewId);img.src=v||"";img.style.visibility=v?"visible":"hidden"}
+
+async function load(){state=await api("/api/content");fill();status("Content loaded.");}
+function fill(){
+  const h=state.home||{}, hero=h.hero||{}, intro=h.intro||{}, about=h.about||{}, cl=h.clients||{}, j=h.journal||{}, ct=h.contact||{}, nav=state.navigation||{}, ft=state.footer||{};
+  $("#heroVisible").checked=hero.visible!==false;$("#heroEyebrow").value=hero.eyebrow||"";$("#heroIndex").value=hero.indexLabel||"";$("#heroTitle").value=hero.title||"";$("#heroDesc").value=hero.description||"";$("#heroImage").value=hero.image||"";$("#heroCTA").value=hero.ctaLabel||"";
+  $("#introVisible").checked=intro.visible!==false;$("#introEyebrow").value=intro.eyebrow||"";$("#introTitle").value=intro.title||"";$("#introDesc").value=intro.description||"";$("#introServices").value=(intro.services||[]).join("\n");$("#introLocation").value=intro.location||"";$("#introImage").value=intro.image||"";
+  $("#aboutVisible").checked=about.visible!==false;$("#aboutEyebrow").value=about.eyebrow||"";$("#aboutTitle").value=about.title||"";$("#aboutDesc").value=about.description||"";$("#aboutImage").value=about.image||"";
+  $("#navVisible").checked=nav.visible!==false;$("#navBrand").value=nav.brand||"";$("#navCTA").value=nav.ctaLabel||"";$("#navCTAHref").value=nav.ctaHref||"";renderNav();
+  $("#clientsVisible").checked=cl.visible!==false;$("#clientsEyebrow").value=cl.eyebrow||"";$("#clientsTitle").value=cl.title||"";renderClients();
+  $("#journalVisible").checked=j.visible!==false;$("#journalEyebrow").value=j.eyebrow||"";$("#journalTitle").value=j.title||"";$("#journalDesc").value=j.description||"";renderJournal();
+  $("#contactVisible").checked=ct.visible!==false;$("#contactEyebrow").value=ct.eyebrow||"";$("#contactTitle").value=ct.title||"";$("#contactDesc").value=ct.description||"";$("#contactImage").value=ct.image||"";$("#contactEmail").value=ct.email||"";$("#contactPhone").value=ct.phone||"";$("#contactCTA").value=ct.ctaLabel||"";$("#contactCTAHref").value=ct.ctaHref||"";
+  $("#footerVisible").checked=ft.visible!==false;$("#footerBrand").value=ft.brand||"";$("#footerDesc").value=ft.description||"";$("#footerCopyright").value=ft.copyright||"";renderFooter();
+  renderProjects();
+  ["hero","intro","about","contact"].forEach(x=>setImg(x+"Image",x+"Preview"));
+}
+function collect(){
+  const h=state.home||(state.home={});
+  h.hero={...(h.hero||{}),visible:$("#heroVisible").checked,eyebrow:$("#heroEyebrow").value,indexLabel:$("#heroIndex").value,title:$("#heroTitle").value,description:$("#heroDesc").value,image:$("#heroImage").value,ctaLabel:$("#heroCTA").value};
+  h.intro={...(h.intro||{}),visible:$("#introVisible").checked,eyebrow:$("#introEyebrow").value,title:$("#introTitle").value,description:$("#introDesc").value,services:$("#introServices").value.split("\n").map(x=>x.trim()).filter(Boolean),location:$("#introLocation").value,image:$("#introImage").value};
+  h.about={...(h.about||{}),visible:$("#aboutVisible").checked,eyebrow:$("#aboutEyebrow").value,title:$("#aboutTitle").value,description:$("#aboutDesc").value,image:$("#aboutImage").value};
+  h.clients={...(h.clients||{}),visible:$("#clientsVisible").checked,eyebrow:$("#clientsEyebrow").value,title:$("#clientsTitle").value,items:collectGeneric("#clientItems",["name","logo","href"],["visible"])};
+  h.journal={...(h.journal||{}),visible:$("#journalVisible").checked,eyebrow:$("#journalEyebrow").value,title:$("#journalTitle").value,description:$("#journalDesc").value,items:collectGeneric("#journalItems",["title","date","category","thumbnail","href"],["published"])};
+  h.contact={...(h.contact||{}),visible:$("#contactVisible").checked,eyebrow:$("#contactEyebrow").value,title:$("#contactTitle").value,description:$("#contactDesc").value,image:$("#contactImage").value,email:$("#contactEmail").value,phone:$("#contactPhone").value,ctaLabel:$("#contactCTA").value,ctaHref:$("#contactCTAHref").value};
+  state.navigation={...(state.navigation||{}),visible:$("#navVisible").checked,brand:$("#navBrand").value,ctaLabel:$("#navCTA").value,ctaHref:$("#navCTAHref").value,items:collectGeneric("#navItems",["label","href"],["visible"])};
+  state.footer={...(state.footer||{}),visible:$("#footerVisible").checked,brand:$("#footerBrand").value,description:$("#footerDesc").value,copyright:$("#footerCopyright").value,links:collectGeneric("#footerLinks",["label","href"],[])};
+  collectProjects();
+}
+function collectGeneric(host,fields,checks){return $$(host+" .item").map(el=>{const o={};fields.forEach(k=>o[k]=el.querySelector(`[data-k="${k}"]`)?.value||"");checks.forEach(k=>o[k]=!!el.querySelector(`[data-k="${k}"]`)?.checked);return o})}
+function renderNav(){const a=state.navigation?.items||[];$("#navItems").innerHTML=a.map((x,i)=>`<div class="item"><div class="grid2"><div class="field"><label>Label</label><input data-k="label" value="${esc(x.label)}"></div><div class="field"><label>Href</label><input data-k="href" value="${esc(x.href)}"></div></div><div class="item-head"><label class="switch"><input type="checkbox" data-k="visible" ${x.visible!==false?"checked":""}> Visible</label><button class="danger remove-generic" data-type="nav" data-i="${i}">Delete</button></div></div>`).join("")}
+function renderClients(){const a=state.home?.clients?.items||[];$("#clientItems").innerHTML=a.map((x,i)=>`<div class="item"><div class="grid2"><div class="field"><label>Name</label><input data-k="name" value="${esc(x.name)}"></div><div class="field"><label>Link</label><input data-k="href" value="${esc(x.href)}"></div></div><div class="field"><label>Logo / image</label><input data-k="logo" value="${esc(x.logo)}"><div class="image-actions"><button class="ghost pick-generic" data-host="clientItems" data-i="${i}" data-k="logo">Choose from Media</button><button class="ghost upload-generic" data-host="clientItems" data-i="${i}" data-k="logo">Upload</button></div></div><div class="item-head"><label class="switch"><input type="checkbox" data-k="visible" ${x.visible!==false?"checked":""}> Visible</label><button class="danger remove-generic" data-type="client" data-i="${i}">Delete</button></div></div>`).join("")}
+function renderJournal(){const a=state.home?.journal?.items||[];$("#journalItems").innerHTML=a.map((x,i)=>`<div class="item"><div class="grid2"><div class="field"><label>Title</label><input data-k="title" value="${esc(x.title)}"></div><div class="field"><label>Date</label><input data-k="date" value="${esc(x.date)}"></div><div class="field"><label>Category</label><input data-k="category" value="${esc(x.category)}"></div><div class="field"><label>Link</label><input data-k="href" value="${esc(x.href)}"></div></div><div class="field"><label>Thumbnail</label><input data-k="thumbnail" value="${esc(x.thumbnail)}"><div class="image-actions"><button class="ghost pick-generic" data-host="journalItems" data-i="${i}" data-k="thumbnail">Choose from Media</button><button class="ghost upload-generic" data-host="journalItems" data-i="${i}" data-k="thumbnail">Upload</button></div></div><div class="item-head"><label class="switch"><input type="checkbox" data-k="published" ${x.published!==false?"checked":""}> Published</label><button class="danger remove-generic" data-type="journal" data-i="${i}">Delete</button></div></div>`).join("")}
+function renderFooter(){const a=state.footer?.links||[];$("#footerLinks").innerHTML=a.map((x,i)=>`<div class="item"><div class="grid2"><div class="field"><label>Label</label><input data-k="label" value="${esc(x.label)}"></div><div class="field"><label>Href</label><input data-k="href" value="${esc(x.href)}"></div></div><button class="danger remove-generic" data-type="footer" data-i="${i}">Delete</button></div>`).join("")}
+function renderProjects(){const a=state.projects||[];$("#projectItems").innerHTML=a.map((p,i)=>`<div class="item project" draggable="true" data-i="${i}"><div class="item-head"><div><span class="drag">☰</span> <strong>${esc(p.title||"Untitled")}</strong><div style="color:#777;font-size:12px">${esc(p.category||"")} · ${esc(p.year||"")}</div></div><div class="row-actions"><button class="ghost toggle-project">Edit</button><button class="ghost duplicate-project">Duplicate</button><button class="danger delete-project">Delete</button></div></div><div class="project-body"><div class="grid2"><div class="field"><label>Title</label><input data-k="title" value="${esc(p.title)}"></div><div class="field"><label>Slug</label><input data-k="slug" value="${esc(p.slug)}"></div><div class="field"><label>Category</label><input data-k="category" value="${esc(p.category)}"></div><div class="field"><label>Year</label><input data-k="year" value="${esc(p.year)}"></div><div class="field"><label>Client</label><input data-k="client" value="${esc(p.client)}"></div><div class="field"><label>Role</label><input data-k="role" value="${esc(p.role)}"></div><div class="field"><label>Page link</label><input data-k="link" value="${esc(p.link)}"></div></div><div class="field"><label>Cover</label><input data-k="cover" value="${esc(p.cover)}"><div class="image-actions"><button class="ghost project-pick" data-i="${i}" data-k="cover">Choose from Media</button><button class="ghost project-upload" data-i="${i}" data-k="cover">Upload</button></div></div><div class="field"><label>Description</label><textarea data-k="description">${esc(p.description)}</textarea></div><div class="field"><label>Statement</label><textarea data-k="statement">${esc(p.statement)}</textarea></div><div class="field"><label>Gallery — mỗi dòng 1 image path</label><textarea data-k="gallery">${esc((p.gallery||[]).join("\n"))}</textarea><div class="image-actions"><button class="ghost gallery-pick" data-i="${i}">Add from Media</button><button class="ghost gallery-upload" data-i="${i}">Upload to Gallery</button></div></div><div class="row-actions"><label class="switch"><input type="checkbox" data-k="published" ${p.published!==false?"checked":""}> Published</label><label class="switch"><input type="checkbox" data-k="featured" ${p.featured?"checked":""}> Featured</label></div></div></div>`).join("")}
+function collectProjects(){state.projects=$$("#projectItems .project").map((el,i)=>{const p={...(state.projects[i]||{})};el.querySelectorAll("[data-k]").forEach(f=>{const k=f.dataset.k;p[k]=f.type==="checkbox"?f.checked:(k==="gallery"?f.value.split("\n").map(x=>x.trim()).filter(Boolean):f.value)});return p})}
+
+async function save(){collect();const d=await api("/api/content",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(state)});state=d.content;status("Saved. Backup created.");refreshPreview()}
+$("#saveBtn").onclick=()=>save().catch(e=>status("Error: "+e.message));$("#reloadBtn").onclick=()=>load().catch(e=>status("Error: "+e.message));
+
+$$(".nav button").forEach(b=>b.onclick=async()=>{$$(".nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");$$(".tab").forEach(x=>x.classList.remove("active"));$("#tab-"+b.dataset.tab).classList.add("active");$("#title").textContent=b.textContent;if(b.dataset.tab==="media")await loadMedia();if(b.dataset.tab==="backup")await loadBackups();if(b.dataset.tab==="preview")refreshPreview()});
+
+$("#addNavBtn").onclick=()=>{collect();state.navigation.items.push({label:"New Item",href:"#",visible:true});renderNav()}
+$("#addClientBtn").onclick=()=>{collect();state.home.clients.items.push({name:"NEW CLIENT",logo:"",href:"",visible:true});renderClients()}
+$("#addJournalBtn").onclick=()=>{collect();state.home.journal.items.push({title:"New Journal Item",date:"2026",category:"JOURNAL",thumbnail:"",href:"#",published:true});renderJournal()}
+$("#addFooterLinkBtn").onclick=()=>{collect();state.footer.links.push({label:"New Link",href:"#"});renderFooter()}
+$("#addProjectBtn").onclick=()=>{collect();state.projects.push({id:"project-"+Date.now(),slug:"new-project",title:"NEW PROJECT",category:"ART DIRECTION",year:new Date().getFullYear().toString(),client:"",role:"",cover:"",description:"",statement:"",gallery:[],published:true,featured:false,link:"projects/new-project.html"});renderProjects();$$("#projectItems .project").at(-1)?.classList.add("open")}
+
+document.addEventListener("click",e=>{
+  const t=e.target;
+  if(t.classList.contains("remove-generic")){collect();const i=Number(t.dataset.i);if(t.dataset.type==="nav")state.navigation.items.splice(i,1);if(t.dataset.type==="client")state.home.clients.items.splice(i,1);if(t.dataset.type==="journal")state.home.journal.items.splice(i,1);if(t.dataset.type==="footer")state.footer.links.splice(i,1);fill()}
+  if(t.classList.contains("toggle-project"))t.closest(".project").classList.toggle("open");
+  if(t.classList.contains("delete-project")){collectProjects();const i=Number(t.closest(".project").dataset.i);if(confirm("Delete project?")){state.projects.splice(i,1);renderProjects()}}
+  if(t.classList.contains("duplicate-project")){collectProjects();const i=Number(t.closest(".project").dataset.i);const cp=JSON.parse(JSON.stringify(state.projects[i]));cp.id=(cp.id||"project")+"-"+Date.now();cp.slug=(cp.slug||"project")+"-copy";cp.title=(cp.title||"PROJECT")+" COPY";state.projects.splice(i+1,0,cp);renderProjects()}
+});
+
+$("#projectItems").addEventListener("dragstart",e=>{const el=e.target.closest(".project");if(el){collectProjects();dragProject=Number(el.dataset.i)}});$("#projectItems").addEventListener("dragover",e=>e.preventDefault());$("#projectItems").addEventListener("drop",e=>{e.preventDefault();const el=e.target.closest(".project");if(!el||dragProject===null)return;const to=Number(el.dataset.i);const [m]=state.projects.splice(dragProject,1);state.projects.splice(to,0,m);dragProject=null;renderProjects()});
+
+async function uploadFile(file){const base64=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result).split(",")[1]||"");r.onerror=reject;r.readAsDataURL(file)});return api("/api/media/upload",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:file.name,type:file.type,base64})})}
+async function loadMedia(){const d=await api("/api/media");media=d.media||[];renderMedia();renderPicker()}
+function renderMedia(){$("#mediaGrid").innerHTML=media.map(m=>`<div class="media"><img src="${m.url}"><div class="info"><small>${esc(m.name)}</small><div class="image-actions"><button class="ghost copy-media" data-url="${m.url}">Copy URL</button><button class="danger delete-media" data-name="${esc(m.name)}">Delete</button></div></div></div>`).join("")}
+function renderPicker(){$("#pickerGrid").innerHTML=media.map(m=>`<div class="picker-card" data-url="${m.url}"><img src="${m.url}"></div>`).join("")}
+$("#uploadMediaBtn").onclick=async()=>{const files=[...$("#mediaUpload").files];for(const f of files)await uploadFile(f);$("#mediaUpload").value="";await loadMedia();status("Media uploaded.")}
+$("#mediaGrid").addEventListener("click",async e=>{if(e.target.classList.contains("copy-media")){await navigator.clipboard.writeText(e.target.dataset.url);status("Copied "+e.target.dataset.url)}if(e.target.classList.contains("delete-media")){if(confirm("Delete media?")){await api("/api/media/"+encodeURIComponent(e.target.dataset.name),{method:"DELETE"});await loadMedia()}}})
+
+async function openPicker(target){mediaTarget=target;await loadMedia();$("#mediaModal").classList.add("open")}
+$("#closeModal").onclick=()=>$("#mediaModal").classList.remove("open");
+$("#pickerGrid").addEventListener("click",e=>{const c=e.target.closest(".picker-card");if(!c||!mediaTarget)return;mediaTarget(c.dataset.url);$("#mediaModal").classList.remove("open")})
+
+document.addEventListener("click",e=>{
+  const t=e.target;
+  if(t.classList.contains("pick"))openPicker(url=>{const id=t.dataset.target;$("#"+id).value=url;const pv=id.replace("Image","Preview");if($("#"+pv))setImg(id,pv)});
+  if(t.classList.contains("clear")){const id=t.dataset.target;$("#"+id).value="";const pv=id.replace("Image","Preview");if($("#"+pv))setImg(id,pv)}
+  if(t.classList.contains("upload")){$("#hiddenUpload").onchange=async()=>{const f=$("#hiddenUpload").files[0];if(!f)return;const d=await uploadFile(f);const id=t.dataset.target;$("#"+id).value=d.url;const pv=id.replace("Image","Preview");if($("#"+pv))setImg(id,pv);$("#hiddenUpload").value=""};$("#hiddenUpload").click()}
+  if(t.classList.contains("pick-generic"))openPicker(url=>{document.querySelector("#"+t.dataset.host+" .item:nth-child("+(Number(t.dataset.i)+1)+") [data-k='"+t.dataset.k+"']").value=url});
+  if(t.classList.contains("upload-generic")){$("#hiddenUpload").onchange=async()=>{const f=$("#hiddenUpload").files[0];if(!f)return;const d=await uploadFile(f);document.querySelector("#"+t.dataset.host+" .item:nth-child("+(Number(t.dataset.i)+1)+") [data-k='"+t.dataset.k+"']").value=d.url;$("#hiddenUpload").value=""};$("#hiddenUpload").click()}
+  if(t.classList.contains("project-pick"))openPicker(url=>{$$("#projectItems .project")[Number(t.dataset.i)].querySelector(`[data-k="${t.dataset.k}"]`).value=url});
+  if(t.classList.contains("project-upload")){$("#hiddenUpload").onchange=async()=>{const f=$("#hiddenUpload").files[0];if(!f)return;const d=await uploadFile(f);$$("#projectItems .project")[Number(t.dataset.i)].querySelector(`[data-k="${t.dataset.k}"]`).value=d.url;$("#hiddenUpload").value=""};$("#hiddenUpload").click()}
+  if(t.classList.contains("gallery-pick"))openPicker(url=>{const ta=$$("#projectItems .project")[Number(t.dataset.i)].querySelector('[data-k="gallery"]');ta.value+=(ta.value.trim()?"\n":"")+url});
+  if(t.classList.contains("gallery-upload")){$("#hiddenUpload").onchange=async()=>{const f=$("#hiddenUpload").files[0];if(!f)return;const d=await uploadFile(f);const ta=$$("#projectItems .project")[Number(t.dataset.i)].querySelector('[data-k="gallery"]');ta.value+=(ta.value.trim()?"\n":"")+d.url;$("#hiddenUpload").value=""};$("#hiddenUpload").click()}
+});
+
+["heroImage","introImage","aboutImage","contactImage"].forEach(id=>$("#"+id).addEventListener("input",()=>{const pv=id.replace("Image","Preview");setImg(id,pv)}));
+
+function refreshPreview(){$("#previewFrame").src="/?cms="+Date.now()}
+async function loadBackups(){const d=await api("/api/backups");$("#backupList").innerHTML=(d.backups||[]).map(b=>`<div class="backup-row"><div><strong>${esc(b.name)}</strong><div style="color:#777;font-size:12px">${Math.round(b.size/1024)} KB · ${new Date(b.modified).toLocaleString()}</div></div><button class="ghost restore" data-name="${esc(b.name)}">Restore</button></div>`).join("")||'<div style="color:#777">No backups yet.</div>'}
+$("#backupNowBtn").onclick=async()=>{await api("/api/backups/create",{method:"POST"});await loadBackups();status("Backup created.")}
+$("#backupList").addEventListener("click",async e=>{if(!e.target.classList.contains("restore"))return;if(!confirm("Restore this backup?"))return;const d=await api("/api/backups/restore/"+encodeURIComponent(e.target.dataset.name),{method:"POST"});state=d.content;fill();refreshPreview();status("Backup restored.")})
+
+load().catch(e=>status("Error: "+e.message));
+</script>
+</body>
+</html>

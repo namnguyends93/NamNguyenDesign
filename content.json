@@ -1,0 +1,217 @@
+{
+  "site": {
+    "name": "Nam Nguyen Design",
+    "role": "Independent Visual Designer",
+    "location": "Ho Chi Minh City, Vietnam",
+    "email": "hello@namnguyen.design",
+    "accent": "#4c6fff",
+    "seoTitle": "Nam Nguyen Design — Visual Designer",
+    "seoDescription": "Independent visual design practice focused on brand identity, campaign systems and art direction.",
+    "favicon": ""
+  },
+  "navigation": {
+    "visible": true,
+    "brand": "Nam Nguyen Design",
+    "items": [
+      {
+        "label": "Home",
+        "href": "#home",
+        "visible": true
+      },
+      {
+        "label": "About",
+        "href": "#about",
+        "visible": true
+      },
+      {
+        "label": "Projects",
+        "href": "#projects",
+        "visible": true
+      },
+      {
+        "label": "Skillset",
+        "href": "#journal",
+        "visible": true
+      },
+      {
+        "label": "Contact",
+        "href": "#contact",
+        "visible": true
+      }
+    ],
+    "ctaLabel": "Start a Project +",
+    "ctaHref": "#contact"
+  },
+  "home": {
+    "hero": {
+      "visible": true,
+      "eyebrow": "Visual Designer",
+      "indexLabel": "2026",
+      "title": "Nam Nguyen Design",
+      "description": "Brand identities, campaign visuals and digital experiences built with clarity, edge and intent.",
+      "image": "/uploads/ava-1787077972159-488571.jpg",
+      "ctaLabel": "Tìm hiểu thêm",
+      "ctaHref": "#projects"
+    },
+    "intro": {
+      "visible": true,
+      "eyebrow": "Visual Designer / Art Direction",
+      "title": "Clear ideas. Bold visual direction.",
+      "description": "",
+      "services": [
+        "Brand Identity",
+        "Campaign Design",
+        "Art Direction"
+      ],
+      "location": "Ho Chi Minh City, Vietnam",
+      "image": "/uploads/554572611_1893148574968600_5562284692063288802_n-1787077987020-e5bd75.jpg"
+    },
+    "about": {
+      "visible": true,
+      "eyebrow": "Profile.26",
+      "title": "About",
+      "description": "Nam Nguyen Design is an independent visual design practice focused on brand identity, campaign systems and art direction. Every project is shaped around a clear idea, a strong visual point of view and execution that feels precise, contemporary and memorable.",
+      "image": ""
+    },
+    "clients": {
+      "visible": true,
+      "eyebrow": "Selected Clients",
+      "title": "BRAND CONNECT",
+      "items": [
+        {
+          "name": "NGOC DUNG",
+          "logo": "",
+          "href": "",
+          "visible": true
+        },
+        {
+          "name": "VINAHOUSE",
+          "logo": "",
+          "href": "",
+          "visible": true
+        },
+        {
+          "name": "COLARELLA",
+          "logo": "",
+          "href": "",
+          "visible": true
+        }
+      ]
+    },
+    "projectsSection": {
+      "visible": true,
+      "eyebrow": "Selected Work.26",
+      "title": "Projects",
+      "description": "Selected identity, campaign and digital projects shaped through concept, art direction and disciplined visual systems."
+    },
+    "journal": {
+      "visible": true,
+      "eyebrow": "Journal.26",
+      "title": "Journal",
+      "description": "Notes on visual culture, process and creative direction.",
+      "items": [
+        {
+          "title": "Building clearer campaign systems",
+          "date": "2026",
+          "category": "PROCESS",
+          "thumbnail": "",
+          "href": "#",
+          "published": true
+        },
+        {
+          "title": "Balancing premium and contemporary",
+          "date": "2026",
+          "category": "ART DIRECTION",
+          "thumbnail": "",
+          "href": "#",
+          "published": true
+        }
+      ]
+    },
+    "contact": {
+      "visible": true,
+      "eyebrow": "Start a Project.26",
+      "title": "Get in touch",
+      "description": "If you are building a brand, campaign or visual system and need a clear creative direction, send over the brief. I am open to selected freelance and collaborative projects.",
+      "image": "",
+      "email": "hello@namnguyen.design",
+      "phone": "",
+      "ctaLabel": "Start a Project +",
+      "ctaHref": "mailto:hello@namnguyen.design"
+    }
+  },
+  "footer": {
+    "visible": true,
+    "brand": "Nam Nguyen Design",
+    "description": "Independent visual design practice.",
+    "copyright": "© 2026 Nam Nguyen Design",
+    "links": [
+      {
+        "label": "Instagram",
+        "href": "#"
+      },
+      {
+        "label": "Behance",
+        "href": "#"
+      },
+      {
+        "label": "LinkedIn",
+        "href": "#"
+      },
+      {
+        "label": "Email",
+        "href": "mailto:hello@namnguyen.design"
+      }
+    ]
+  },
+  "projects": [
+    {
+      "id": "ngoc-dung-campaign",
+      "slug": "ngoc-dung-campaign",
+      "title": "NGOC DUNG CAMPAIGN",
+      "category": "BRAND IDENTITY",
+      "year": "2026",
+      "client": "Ngoc Dung",
+      "role": "Visual Design / Art Direction",
+      "cover": "",
+      "description": "A campaign system built to feel premium, contemporary and unmistakably beauty-led.",
+      "statement": "Beauty communication can feel premium without becoming predictable.",
+      "gallery": [],
+      "published": true,
+      "featured": true,
+      "link": "projects/ngoc-dung-campaign.html"
+    },
+    {
+      "id": "beauty-visual-system",
+      "slug": "beauty-visual-system",
+      "title": "BEAUTY VISUAL SYSTEM",
+      "category": "ART DIRECTION",
+      "year": "2026",
+      "client": "",
+      "role": "Art Direction / Visual System",
+      "cover": "",
+      "description": "A flexible visual language for beauty content across campaign, social and digital formats.",
+      "statement": "A strong visual system gives every execution room to change without losing the brand.",
+      "gallery": [],
+      "published": true,
+      "featured": true,
+      "link": "projects/beauty-visual-system.html"
+    },
+    {
+      "id": "future-campaign",
+      "slug": "future-campaign",
+      "title": "FUTURE CAMPAIGN",
+      "category": "CAMPAIGN DESIGN",
+      "year": "2026",
+      "client": "",
+      "role": "Campaign Design / Creative Direction",
+      "cover": "",
+      "description": "A concept-driven campaign exploring a more futuristic visual tone.",
+      "statement": "Future-facing design works best when the concept stays simple and the execution stays precise.",
+      "gallery": [],
+      "published": true,
+      "featured": true,
+      "link": "projects/future-campaign.html"
+    }
+  ]
+}

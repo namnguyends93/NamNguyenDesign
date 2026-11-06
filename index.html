@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Nam Nguyen Design — Visual Designer & Art Direction</title>
+<meta name="description" content="Nam Nguyen Design — independent visual design practice for brand identity, campaign design and art direction." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Kode+Mono:wght@500&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --black:#080808;
+  --dark:#141414;
+  --white:#f7f5ef;
+  --soft:#ebe8e1;
+  --muted:#9a9a96;
+  --line:#343434;
+  --accent:#4c6fff;
+  --accent-soft:#8ea1ff;
+  --radius-xl:156px;
+  --radius-lg:72px;
+  --radius-md:46px;
+  --page-pad:8px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;background:#fff}
+body{
+  margin:0;
+  font-family:Inter,Arial,sans-serif;
+  background:#fff;
+  color:#111;
+  overflow-x:hidden;
+}
+a{color:inherit;text-decoration:none}
+img{display:block;width:100%;height:100%;object-fit:cover}
+button,input,textarea{font:inherit}
+main{width:100%}
+
+.mono{font-family:"Kode Mono",monospace;text-transform:uppercase;letter-spacing:-.04em}
+.display{
+  font-family:"Space Grotesk",Inter,sans-serif;
+  text-transform:uppercase;
+  letter-spacing:-.065em;
+  line-height:.92;
+  font-weight:600;
+}
+.section-shell{
+  background:#000;
+  padding:var(--page-pad);
+  overflow:hidden;
+}
+.dark-card{
+  background:var(--dark);
+  border-radius:var(--radius-xl);
+  overflow:hidden;
+}
+.big-title{
+  margin:0;
+  font-size:clamp(52px,6.8vw,98px);
+}
+.copy{
+  font-size:16px;
+  line-height:1.35;
+  color:var(--soft);
+}
+.muted{color:var(--muted)}
+.glass{
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.32);
+  backdrop-filter:blur(32px);
+  -webkit-backdrop-filter:blur(32px);
+}
+.pill{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:11px 16px;
+  border-radius:999px;
+  background:var(--white);
+  color:var(--black);
+  font-size:14px;
+}
+.pill b{font-family:"Kode Mono",monospace;letter-spacing:.1em}
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  min-height:48px;
+  padding:0 22px;
+  border-radius:20px;
+  border:1px solid rgba(255,255,255,.3);
+  background:rgba(0,0,0,.24);
+  backdrop-filter:blur(24px);
+  color:#fff;
+  font-size:14px;
+  transition:.25s ease;
+}
+.btn:hover{background:#fff;color:#000;transform:translateY(-2px)}
+.btn.light{background:#fff;color:#000;border-color:#fff}
+.plus{font-size:22px;line-height:1}
+
+/* floating nav */
+.nav-wrap{
+  position:fixed;
+  z-index:100;
+  left:50%;
+  bottom:32px;
+  transform:translateX(-50%);
+  width:min(760px,calc(100vw - 32px));
+}
+.nav{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 12px;
+  border-radius:34px;
+  background:rgba(0,0,0,.34);
+  backdrop-filter:blur(38px);
+  -webkit-backdrop-filter:blur(38px);
+  color:#fff;
+  border:1px solid rgba(255,255,255,.08);
+}
+.brand-badge{
+  width:95px;height:52px;border-radius:25px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--white);color:var(--black);
+  font-family:"Kode Mono",monospace;
+  font-size:11px;text-align:center;line-height:1.05;
+}
+.nav-links{display:flex;gap:8px;align-items:center}
+.nav-links a{
+  padding:14px 10px;
+  font-family:"Kode Mono",monospace;
+  font-size:12px;text-transform:uppercase;
+  opacity:.9;
+}
+.nav-links a:hover{opacity:1}
+.nav-contact{
+  padding:13px 18px;
+  border-radius:22px;
+  background:var(--accent);
+  color:#fff;
+  font-family:"Kode Mono",monospace;
+  font-size:12px;
+  text-transform:uppercase;
+}
+
+/* hero */
+.hero{
+  padding:8px;
+  background:#fff;
+}
+.hero-card{
+  min-height:min(100vh,1080px);
+  max-width:1920px;
+  margin:auto;
+  position:relative;
+  border-radius:var(--radius-xl);
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#111;
+}
+.hero-card:after{
+  content:"";
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(0,0,0,.08),rgba(0,0,0,.34));
+}
+.hero-bg{position:absolute;inset:0}
+.hero-copy{
+  width:100%;
+  padding:0 6vw;
+  position:relative;
+  z-index:2;
+  color:#fff;
+  display:grid;
+  grid-template-columns:1.2fr .8fr;
+  gap:40px;
+  align-items:end;
+}
+.hero-copy h1{
+  font-size:clamp(58px,8vw,120px);
+  margin:0;
+  max-width:1050px;
+}
+.hero-copy p{
+  max-width:390px;
+  justify-self:end;
+  margin:0 0 12px;
+  font-size:18px;
+  line-height:1.35;
+}
+.hero-kicker{
+  position:absolute;
+  top:54px;left:6vw;z-index:3;color:white;
+  font-size:13px;
+}
+.hero-index{
+  position:absolute;
+  top:54px;right:6vw;z-index:3;color:white;
+  font-size:13px;
+}
+
+/* intro grid */
+.intro-grid{
+  max-width:1920px;margin:auto;
+  padding:16px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+  background:#fff;
+}
+.intro-panel{
+  min-height:760px;
+  border-radius:100px;
+  overflow:hidden;
+  position:relative;
+}
+.intro-panel.image img{position:absolute;inset:0}
+.intro-panel.text{
+  background:#efede7;
+  padding:64px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+.intro-panel.text h2{
+  font-size:clamp(48px,5vw,84px);
+  margin:0;
+  max-width:700px;
+}
+.intro-meta{display:flex;justify-content:space-between;gap:30px;color:#707070}
+
+/* about */
+.about-shell{
+  background:linear-gradient(#fff,#000);
+  padding:8px;
+}
+.about{
+  min-height:656px;
+  max-width:1920px;margin:auto;
+  border-radius:var(--radius-xl);
+  overflow:hidden;
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:10vw;
+}
+.about-bg{position:absolute;inset:0}
+.about:after{content:"";position:absolute;inset:0;background:rgba(0,0,0,.18)}
+.about-box{
+  position:relative;z-index:2;color:white;
+  width:min(1040px,100%);
+  border-radius:var(--radius-md);
+  padding:46px;
+  display:grid;
+  grid-template-columns:1.2fr .8fr;
+  gap:80px;
+  align-items:center;
+}
+.about-box h2{font-size:clamp(58px,7vw,98px);margin:12px 0 0}
+.about-box p{margin:0;font-size:16px;line-height:1.4}
+
+/* clients */
+.clients{
+  min-height:100vh;
+  max-height:1080px;
+  padding:96px 64px;
+  display:flex;flex-direction:column;
+  justify-content:center;
+  gap:50px;
+}
+.section-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:40px;
+  color:white;
+}
+.section-head .copy{width:min(420px,100%)}
+.client-strip{
+  display:flex;
+  overflow:hidden;
+  gap:16px;
+  mask-image:linear-gradient(to right,transparent,#000 10%,#000 90%,transparent);
+  -webkit-mask-image:linear-gradient(to right,transparent,#000 10%,#000 90%,transparent);
+}
+.client-track{
+  display:flex;gap:16px;
+  width:max-content;
+  animation:marquee 22s linear infinite;
+}
+.client-card{
+  width:366px;height:357px;
+  border-radius:72px;
+  background:rgba(99,99,99,.24);
+  backdrop-filter:blur(44px);
+  display:flex;align-items:center;justify-content:center;
+  color:rgba(255,255,255,.35);
+  font-size:42px;font-weight:600;
+}
+@keyframes marquee{to{transform:translateX(calc(-50% - 8px))}}
+
+/* projects */
+.projects{
+  min-height:816px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  max-width:1920px;
+  margin:auto;
+}
+.project-info,
+.project-stage{
+  min-height:800px;
+  border-radius:var(--radius-xl);
+  background:var(--dark);
+  color:white;
+}
+.project-info{
+  padding:84px 64px;
+  display:flex;flex-direction:column;
+  justify-content:center;
+  gap:28px;
+}
+.project-info p{max-width:440px}
+.stats{
+  margin-top:20px;
+  display:flex;flex-wrap:wrap;gap:10px
+}
+.stat{
+  flex:1;min-width:180px;
+  border-radius:29px;
+  padding:24px;
+  background:rgba(255,255,255,.045);
+}
+.stat strong{display:block;font-size:46px;margin-bottom:10px}
+.project-stage{
+  position:relative;
+  display:flex;
+  align-items:center;justify-content:center;
+  overflow:hidden;
+}
+.deck{
+  width:462px;height:420px;
+  perspective:1200px;
+  position:relative;
+}
+.deck-card{
+  width:214px;height:284px;
+  border-radius:20px;
+  overflow:hidden;
+  position:absolute;
+  top:56px;left:124px;
+  box-shadow:0 25px 50px rgba(0,0,0,.35);
+  transition:transform .6s cubic-bezier(.2,.7,.2,1);
+}
+.deck-card:nth-child(1){transform:translate3d(-105px,-24px,-220px) rotateY(54deg)}
+.deck-card:nth-child(2){transform:translate3d(-35px,0,-100px) rotateY(26deg)}
+.deck-card:nth-child(3){transform:translate3d(35px,0,-20px) rotateY(-12deg)}
+.deck-card:nth-child(4){transform:translate3d(105px,22px,-180px) rotateY(-55deg)}
+.project-stage:hover .deck-card:nth-child(1){transform:translate3d(-150px,-30px,-100px) rotateY(42deg)}
+.project-stage:hover .deck-card:nth-child(2){transform:translate3d(-55px,-6px,10px) rotateY(14deg)}
+.project-stage:hover .deck-card:nth-child(3){transform:translate3d(55px,-6px,18px) rotateY(-14deg)}
+.project-stage:hover .deck-card:nth-child(4){transform:translate3d(150px,-30px,-100px) rotateY(-42deg)}
+.tags{position:absolute;bottom:70px;display:flex;gap:8px}
+
+
+/* interactive project showcase */
+.project-stage{
+  padding:0;
+}
+.project-showcase{
+  width:100%;
+  height:100%;
+  min-height:800px;
+  position:relative;
+  border-radius:var(--radius-xl);
+  overflow:hidden;
+  background:#111;
+  color:#fff;
+}
+.project-slide{
+  position:absolute;
+  inset:0;
+  opacity:0;
+  visibility:hidden;
+  transition:opacity .7s cubic-bezier(.2,.8,.2,1),visibility .7s;
+}
+.project-slide.active{
+  opacity:1;
+  visibility:visible;
+}
+.project-image{
+  position:absolute;
+  inset:0;
+  background-image:var(--project-bg);
+  background-size:cover;
+  background-position:center;
+  transform:scale(1.04);
+  transition:transform 1.4s cubic-bezier(.2,.8,.2,1);
+}
+.project-slide.active .project-image{
+  transform:scale(1);
+}
+.project-overlay{
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0,0,0,.18) 0%,
+      rgba(0,0,0,.02) 40%,
+      rgba(0,0,0,.74) 100%
+    );
+}
+.project-top{
+  position:absolute;
+  top:42px;
+  left:48px;
+  right:48px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-family:"Kode Mono",monospace;
+  font-size:11px;
+  letter-spacing:.05em;
+  z-index:3;
+}
+.project-info-showcase{
+  position:absolute;
+  left:48px;
+  right:48px;
+  bottom:115px;
+  z-index:3;
+}
+.project-meta{
+  display:flex;
+  gap:22px;
+  margin-bottom:14px;
+  font-family:"Kode Mono",monospace;
+  font-size:11px;
+  letter-spacing:.06em;
+  opacity:.75;
+}
+.project-info-showcase h2{
+  margin:0;
+  font-family:"Space Grotesk",Inter,sans-serif;
+  font-size:clamp(50px,6vw,92px);
+  line-height:.88;
+  letter-spacing:-.06em;
+  text-transform:uppercase;
+}
+.project-link{
+  display:inline-flex;
+  align-items:center;
+  gap:12px;
+  margin-top:28px;
+  padding:13px 18px;
+  border-radius:999px;
+  background:var(--white);
+  color:var(--black);
+  font-family:"Kode Mono",monospace;
+  font-size:11px;
+  transition:.3s;
+}
+.project-link span{
+  font-size:16px;
+}
+.project-link:hover{
+  transform:translateY(-3px);
+  background:var(--accent);
+  color:#fff;
+}
+.project-controls{
+  position:absolute;
+  z-index:10;
+  left:48px;
+  right:48px;
+  bottom:38px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.project-prev,
+.project-next{
+  width:46px;
+  height:46px;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,.35);
+  background:rgba(0,0,0,.2);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  color:#fff;
+  cursor:pointer;
+  transition:.25s;
+}
+.project-prev:hover,
+.project-next:hover{
+  background:#fff;
+  color:#000;
+}
+.project-progress{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-family:"Kode Mono",monospace;
+  font-size:10px;
+}
+.progress-line{
+  width:110px;
+  height:1px;
+  background:rgba(255,255,255,.3);
+  overflow:hidden;
+}
+.progress-active{
+  height:100%;
+  width:33.333%;
+  background:#fff;
+  transition:width .45s ease;
+}
+@media(max-width:700px){
+  .project-showcase{
+    min-height:620px;
+    border-radius:70px;
+  }
+  .project-top{
+    top:28px;
+    left:26px;
+    right:26px;
+  }
+  .project-info-showcase{
+    left:26px;
+    right:26px;
+    bottom:105px;
+  }
+  .project-info-showcase h2{
+    font-size:50px;
+  }
+  .project-controls{
+    left:26px;
+    right:26px;
+    bottom:28px;
+  }
+}
+
+/* journal */
+.journal{padding:80px 64px 110px}
+.journal-grid{
+  margin-top:54px;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:20px;
+}
+.article{
+  height:642px;
+  border-radius:100px;
+  overflow:hidden;
+  position:relative;
+  color:#fff;
+}
+.article:after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 35%,rgba(0,0,0,.7));
+}
+.article-copy{
+  position:absolute;z-index:2;left:0;right:0;bottom:0;
+  padding:44px;
+  text-align:center;
+}
+.article h3{font-size:28px;margin:0 0 12px}
+.article small{text-transform:uppercase;letter-spacing:.05em}
+.article img{transition:transform .6s ease}
+.article:hover img{transform:scale(1.05)}
+
+/* contact */
+.contact{
+  min-height:800px;
+  max-width:1920px;margin:auto;
+  border-radius:var(--radius-xl);
+  overflow:hidden;
+  position:relative;
+  display:grid;
+  grid-template-columns:.8fr 1.2fr;
+  gap:64px;
+  padding:10vw;
+  align-items:center;
+  color:white;
+}
+.contact-bg{position:absolute;inset:0}
+.contact:after{content:"";position:absolute;inset:0;background:rgba(0,0,0,.32)}
+.contact-copy,.contact-form{position:relative;z-index:2}
+.contact-copy h2{font-size:clamp(58px,7vw,98px);margin:0 0 28px}
+.contact-form{
+  border-radius:46px;
+  padding:46px;
+}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.field{display:flex;flex-direction:column;gap:8px}
+.field.full{grid-column:1/-1}
+label{font-size:13px}
+input,textarea{
+  width:100%;
+  color:#fff;
+  background:rgba(0,0,0,.24);
+  border:1px solid rgba(255,255,255,.3);
+  border-radius:18px;
+  padding:14px;
+  outline:none;
+}
+textarea{min-height:130px;resize:vertical}
+input:focus,textarea:focus{border-color:#fff}
+
+/* footer */
+.footer{
+  padding:54px 64px 150px;
+  color:white;
+  background:#000;
+}
+.footer-inner{
+  border-radius:72px;
+  background:var(--dark);
+  padding:64px;
+}
+.footer-top{
+  display:grid;
+  grid-template-columns:1.2fr .8fr;
+  gap:60px;
+}
+.footer-links{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:12px 50px;
+}
+.footer-links a{
+  display:flex;justify-content:space-between;
+  padding:12px 0;border-bottom:1px solid rgba(255,255,255,.12)
+}
+.footer-word{
+  margin-top:70px;
+  font-size:clamp(56px,8vw,120px);
+  color:#c2c2c2;
+}
+.footer-bottom{
+  margin-top:18px;color:#9ba1a5;
+  display:flex;justify-content:space-between;gap:20px
+}
+
+
+/* Nam Nguyen Design identity accents */
+.hero-kicker,.hero-index,.section-head .mono,.contact-copy .mono{color:var(--accent-soft)}
+.brand-badge{box-shadow:inset 0 0 0 1px rgba(8,8,8,.08)}
+.nav-contact:hover{background:var(--white);color:var(--black)}
+.intro-panel.text .mono,.project-info>.mono,.footer .mono{color:#6f79b8}
+.pill b{color:var(--accent)}
+.stat strong{color:var(--white)}
+.article small{color:#c8d0ff}
+input:focus,textarea:focus{border-color:var(--accent-soft);box-shadow:0 0 0 3px rgba(76,111,255,.12)}
+::selection{background:var(--accent);color:#fff}
+
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .8s ease,transform .8s ease}
+.reveal.in{opacity:1;transform:none}
+
+@media (max-width:900px){
+  :root{--radius-xl:106px}
+  .nav-wrap{bottom:16px}
+  .nav-links{display:none}
+  .nav{padding:8px}
+  .hero-copy{grid-template-columns:1fr;align-items:center;text-align:center}
+  .hero-copy p{justify-self:center}
+  .intro-grid,.projects,.contact,.footer-top{grid-template-columns:1fr}
+  .intro-panel{min-height:620px}
+  .about-box{grid-template-columns:1fr;gap:28px;text-align:center}
+  .clients{padding:100px 24px;height:auto;max-height:none}
+  .section-head{flex-direction:column;align-items:flex-start}
+  .project-info,.project-stage{min-height:680px}
+  .journal{padding:80px 16px 110px}
+  .journal-grid{grid-template-columns:1fr}
+  .article{height:560px}
+  .contact{padding:110px 24px}
+  .form-grid{grid-template-columns:1fr}
+  .field.full{grid-column:auto}
+  .footer{padding:20px 16px 120px}
+  .footer-inner{padding:34px 24px}
+}
+@media (max-width:520px){
+  .hero-card{border-radius:72px}
+  .hero-copy{padding:0 22px}
+  .hero-copy h1{font-size:52px}
+  .hero-kicker,.hero-index{top:34px}
+  .hero-kicker{left:28px}.hero-index{right:28px}
+  .intro-panel{border-radius:70px}
+  .intro-panel.text{padding:38px 26px}
+  .about{padding:50px 24px;border-radius:72px}
+  .about-box{padding:30px 22px}
+  .clients{border-radius:72px}
+  .client-card{width:300px;height:300px}
+  .project-info,.project-stage{border-radius:72px}
+  .project-info{padding:64px 28px}
+  .deck{transform:scale(.8)}
+  .article{border-radius:70px}
+  .contact{border-radius:72px}
+}
+
+/* Nam Nguyen Design page transition */
+.page-transition-overlay{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  pointer-events:none;
+  background:var(--black,#080808);
+  opacity:0;
+  transform:translateY(14px);
+  transition:
+    opacity .42s cubic-bezier(.22,.75,.24,1),
+    transform .42s cubic-bezier(.22,.75,.24,1);
+}
+html.page-enter body{
+  opacity:0;
+  transform:translateY(14px);
+}
+body{
+  transition:
+    opacity .52s cubic-bezier(.22,.75,.24,1),
+    transform .52s cubic-bezier(.22,.75,.24,1);
+}
+html.page-ready body{
+  opacity:1;
+  transform:none;
+}
+html.page-leaving .page-transition-overlay{
+  opacity:1;
+  transform:none;
+}
+html.page-leaving body{
+  opacity:.18;
+  transform:translateY(-10px);
+}
+@media (prefers-reduced-motion:reduce){
+  body,.page-transition-overlay{
+    transition:none!important;
+    transform:none!important;
+  }
+}
+
+</style>
+</head>
+
+<body>
+<div class="nav-wrap">
+  <nav class="nav">
+    <a class="brand-badge" href="#home">NAM<br>NGUYEN</a>
+    <div class="nav-links">
+      <a href="#home">Home</a>
+      <a href="#about">About</a>
+      <a href="#projects">Projects</a>
+      <a href="#journal">Journal</a>
+    </div>
+    <a class="nav-contact" href="#contact">Contact +</a>
+  </nav>
+</div>
+
+<main id="home">
+  <section class="hero">
+    <div class="hero-card">
+      <div class="hero-bg">
+        <img src="https://framerusercontent.com/images/oLgLgkii4zPO6MtMuUuI0yO4MM.jpg?width=1600" alt="Nam Nguyen Design hero">
+      </div>
+      <div class="hero-kicker mono">Independent Visual Designer</div>
+      <div class="hero-index mono">Selected Work.26</div>
+      <div class="hero-copy reveal">
+        <h1 class="display">Nam Nguyen<br>Design</h1>
+        <p>Brand identities, campaign visuals and digital experiences built with clarity, edge and intent.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="intro-grid">
+    <div class="intro-panel image reveal">
+      <img src="https://framerusercontent.com/images/PWNFxFRREdvfApytv3KFyOq9fcQ.jpg?width=1200" alt="Selected portrait">
+    </div>
+    <div class="intro-panel text reveal">
+      <div>
+        <span class="mono muted">Visual Designer / Art Direction</span>
+        <h2 class="display">Clear ideas. Bold visual direction.</h2>
+      </div>
+      <div class="intro-meta">
+        <span>Brand Identity<br>Campaign Design<br>Art Direction</span>
+        <span>Ho Chi Minh City<br>Vietnam</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="about-shell" id="about">
+    <div class="about">
+      <div class="about-bg">
+        <img src="https://framerusercontent.com/images/7bhFM0Tg87FLW68G52hNOm91gg.webp?width=2008&height=1174" alt="About Nam Nguyen Design">
+      </div>
+      <div class="about-box glass reveal">
+        <div>
+          <span class="mono">Profile.26</span>
+          <h2 class="display">About</h2>
+        </div>
+        <p>Nam Nguyen Design is an independent visual design practice focused on brand identity, campaign systems and art direction. Every project is shaped around a clear idea, a strong visual point of view and execution that feels precise, contemporary and memorable.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-shell">
+    <div class="clients dark-card" id="clients">
+      <div class="section-head reveal">
+        <h2 class="display big-title">Clients</h2>
+        <p class="copy">Working with brands and creative teams that value sharp thinking, strong systems and visuals with a clear point of view.</p>
+      </div>
+
+      <div class="client-strip reveal">
+        <div class="client-track">
+          <div class="client-card">ND</div>
+          <div class="client-card">BRAND</div>
+          <div class="client-card">STUDIO</div>
+          <div class="client-card">CREATIVE</div>
+          <div class="client-card">ND</div>
+          <div class="client-card">BRAND</div>
+          <div class="client-card">STUDIO</div>
+          <div class="client-card">CREATIVE</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-shell" id="projects">
+    <div class="projects">
+      <div class="project-info reveal">
+        <span class="mono muted">Selected Work.26</span>
+        <h2 class="display big-title">Projects</h2>
+        <p class="copy">Selected identity, campaign and digital projects shaped through concept, art direction and disciplined visual systems.</p>
+        <div class="stats">
+          <div class="stat"><strong class="display">20+</strong><span class="muted">Campaign directions</span></div>
+          <div class="stat"><strong class="display">50+</strong><span class="muted">Design outputs</span></div>
+        </div>
+      </div>
+
+      <div class="project-stage reveal">
+        <div class="project-showcase">
+
+          <!-- PROJECT 01 -->
+          <article class="project-slide active"
+            style="--project-bg:url('https://framerusercontent.com/images/H3KNH97QuI3MqCMMrAfkRwWSDAc.jpg?width=1080&height=1347')">
+
+            <div class="project-image"></div>
+            <div class="project-overlay"></div>
+
+            <div class="project-top">
+              <span>NAM NGUYEN DESIGN</span>
+              <span>PROJECT / 01</span>
+            </div>
+
+            <div class="project-info-showcase">
+              <div class="project-meta">
+                <span>BRAND IDENTITY</span>
+                <span>2026</span>
+              </div>
+
+              <h2>NGOC DUNG<br>CAMPAIGN</h2>
+
+              <a href="projects/ngoc-dung-campaign.html" class="project-link">
+                VIEW PROJECT
+                <span>↗</span>
+              </a>
+            </div>
+          </article>
+
+          <!-- PROJECT 02 -->
+          <article class="project-slide"
+            style="--project-bg:url('https://framerusercontent.com/images/BYTBcqFikmPNhvjQYU7pi3ciyI.jpg?width=1200&height=1500')">
+
+            <div class="project-image"></div>
+            <div class="project-overlay"></div>
+
+            <div class="project-top">
+              <span>NAM NGUYEN DESIGN</span>
+              <span>PROJECT / 02</span>
+            </div>
+
+            <div class="project-info-showcase">
+              <div class="project-meta">
+                <span>ART DIRECTION</span>
+                <span>2026</span>
+              </div>
+
+              <h2>BEAUTY<br>VISUAL SYSTEM</h2>
+
+              <a href="projects/beauty-visual-system.html" class="project-link">
+                VIEW PROJECT
+                <span>↗</span>
+              </a>
+            </div>
+          </article>
+
+          <!-- PROJECT 03 -->
+          <article class="project-slide"
+            style="--project-bg:url('https://framerusercontent.com/images/r1Q4APz4TNMV5x9oKRYscAL06c.jpg?width=1200')">
+
+            <div class="project-image"></div>
+            <div class="project-overlay"></div>
+
+            <div class="project-top">
+              <span>NAM NGUYEN DESIGN</span>
+              <span>PROJECT / 03</span>
+            </div>
+
+            <div class="project-info-showcase">
+              <div class="project-meta">
+                <span>CAMPAIGN DESIGN</span>
+                <span>2026</span>
+              </div>
+
+              <h2>FUTURE<br>CAMPAIGN</h2>
+
+              <a href="projects/future-campaign.html" class="project-link">
+                VIEW PROJECT
+                <span>↗</span>
+              </a>
+            </div>
+          </article>
+
+          <div class="project-controls">
+            <button class="project-prev" type="button" aria-label="Previous project">←</button>
+
+            <div class="project-progress">
+              <span class="current-project">01</span>
+
+              <div class="progress-line">
+                <div class="progress-active"></div>
+              </div>
+
+              <span class="total-project">03</span>
+            </div>
+
+            <button class="project-next" type="button" aria-label="Next project">→</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-shell" id="journal">
+    <div class="journal dark-card">
+      <div class="section-head reveal">
+        <h2 class="display big-title">Journal</h2>
+        <p class="copy">Notes on visual direction, design systems, creative process and practical AI workflows for sharper execution.</p>
+      </div>
+      <div class="journal-grid">
+        <article class="article reveal">
+          <img src="https://framerusercontent.com/images/r1Q4APz4TNMV5x9oKRYscAL06c.jpg?width=1200" alt="AI design">
+          <div class="article-copy"><h3>AI in the Design Process</h3><small>AI Design</small></div>
+        </article>
+        <article class="article reveal">
+          <img src="https://framerusercontent.com/images/BYTBcqFikmPNhvjQYU7pi3ciyI.jpg?width=1200" alt="Color">
+          <div class="article-copy"><h3>Building Distinct Visual Systems</h3><small>Visual Design</small></div>
+        </article>
+        <article class="article reveal">
+          <img src="https://framerusercontent.com/images/ZNnj2toPGisdyf6eClzPnuV72fM.jpg?width=1200" alt="Design trends">
+          <div class="article-copy"><h3>What Makes Visual Work Last</h3><small>Trends</small></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-shell" id="contact">
+    <div class="contact">
+      <div class="contact-bg">
+        <img src="https://framerusercontent.com/images/WDp2Zq4B8pE5m242xYYTOrQA4.webp?width=1900" alt="Contact background">
+      </div>
+      <div class="contact-copy reveal">
+        <span class="mono">Start a Project.26</span>
+        <h2 class="display">Get in touch</h2>
+        <p class="copy">If you are building a brand, campaign or visual system and need a clear creative direction, send over the brief. I am open to selected freelance and collaborative projects.</p>
+      </div>
+      <form class="contact-form glass reveal" onsubmit="event.preventDefault(); alert('Demo form — connect this to Formspree, EmailJS or your backend.');">
+        <div class="form-grid">
+          <div class="field"><label>First name</label><input required placeholder="Nam"></div>
+          <div class="field"><label>Last name</label><input required placeholder="Nguyen"></div>
+          <div class="field"><label>Email</label><input type="email" required placeholder="hello@example.com"></div>
+          <div class="field"><label>Project scope</label><input placeholder="Identity / Campaign / Art Direction"></div>
+          <div class="field full"><label>Message</label><textarea placeholder="Tell me what you are building, the timeline and what you need..."></textarea></div>
+          <div class="field full"><button class="btn light" type="submit">Send brief <span class="plus">+</span></button></div>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="reveal">
+          <span class="mono muted">Nam Nguyen Design</span>
+          <h3 style="font-size:32px;margin:18px 0 8px">Independent visual design practice.</h3>
+          <p class="copy muted">Brand Identity · Campaign Design · Art Direction · Visual Systems</p>
+        </div>
+        <div class="footer-links reveal">
+          <a href="#home"><span>Home</span><span>01</span></a>
+          <a href="#about"><span>About</span><span>02</span></a>
+          <a href="#projects"><span>Projects</span><span>03</span></a>
+          <a href="#journal"><span>Journal</span><span>04</span></a>
+          <a href="#contact"><span>Contact</span><span>05</span></a>
+          <a href="mailto:hello@namnguyen.design"><span>Email</span><span>→</span></a>
+        </div>
+      </div>
+      <div class="footer-word display reveal">Nam Nguyen Design</div>
+      <div class="footer-bottom">
+        <span>©2026 NAM NGUYEN DESIGN.</span>
+        <span>Independent · Ho Chi Minh City</span>
+      </div>
+    </div>
+  </footer>
+</main>
+
+<script>
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach((entry)=>{
+    if(entry.isIntersecting){
+      entry.target.classList.add('in');
+      io.unobserve(entry.target);
+    }
+  });
+},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    const id=a.getAttribute('href');
+    const target=document.querySelector(id);
+    if(target){
+      e.preventDefault();
+      target.scrollIntoView({behavior:'smooth',block:'start'});
+    }
+  });
+});
+
+const projectSlides = document.querySelectorAll(".project-slide");
+const prevProject = document.querySelector(".project-prev");
+const nextProject = document.querySelector(".project-next");
+const currentProject = document.querySelector(".current-project");
+const progressActive = document.querySelector(".progress-active");
+
+let projectIndex = 0;
+
+function showProject(index){
+  projectSlides.forEach(slide => slide.classList.remove("active"));
+  projectSlides[index].classList.add("active");
+
+  if(currentProject){
+    currentProject.textContent = String(index + 1).padStart(2,"0");
+  }
+
+  if(progressActive){
+    progressActive.style.width = (((index + 1) / projectSlides.length) * 100) + "%";
+  }
+}
+
+if(nextProject){
+  nextProject.addEventListener("click",()=>{
+    projectIndex = (projectIndex + 1) % projectSlides.length;
+    showProject(projectIndex);
+  });
+}
+
+if(prevProject){
+  prevProject.addEventListener("click",()=>{
+    projectIndex = (projectIndex - 1 + projectSlides.length) % projectSlides.length;
+    showProject(projectIndex);
+  });
+}
+
+if(projectSlides.length){
+  showProject(0);
+}
+
+</script>
+<script>
+
+(function(){
+  const root = document.documentElement;
+  root.classList.add("page-enter");
+
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      root.classList.remove("page-enter");
+      root.classList.add("page-ready");
+    });
+  });
+
+  const isInternalHtmlLink = (a)=>{
+    if(!a || !a.href) return false;
+    if(a.target && a.target !== "_self") return false;
+    if(a.hasAttribute("download")) return false;
+
+    const url = new URL(a.href, window.location.href);
+    if(url.origin !== window.location.origin) return false;
+
+    const samePageHashOnly =
+      url.pathname === window.location.pathname &&
+      url.search === window.location.search &&
+      url.hash;
+
+    if(samePageHashOnly) return false;
+
+    return /\.html$/i.test(url.pathname);
+  };
+
+  document.addEventListener("click",(event)=>{
+    if(event.defaultPrevented) return;
+    if(event.button !== 0) return;
+    if(event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+    const a = event.target.closest("a");
+    if(!isInternalHtmlLink(a)) return;
+
+    event.preventDefault();
+    const destination = a.href;
+
+    root.classList.add("page-leaving");
+
+    window.setTimeout(()=>{
+      window.location.href = destination;
+    }, 390);
+  });
+
+  window.addEventListener("pageshow",()=>{
+    root.classList.remove("page-leaving","page-enter");
+    root.classList.add("page-ready");
+  });
+})();
+
+</script>
+</body>
+</html>
