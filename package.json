@@ -1,0 +1,14 @@
+{
+  "name": "namnguyendesign",
+  "private": true,
+  "scripts": {
+    "dev": "node server.js",
+    "build": "node build.js",
+    "preview": "node tools/preview-dist.js"
+  },
+  "devDependencies": {
+    "html-minifier-terser": "^7.2.0",
+    "jsdom": "^25.0.1",
+    "sharp": "^0.33.5"
+  }
+}

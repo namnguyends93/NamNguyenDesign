@@ -1,12 +1,15 @@
 /* Nam Nguyen Design CMS runtime — shared by server.js (local) and build.js (static) */
-(async function(){
-  // Base URL of the site (works on localhost:3000 and on GitHub Pages sub-paths)
-  const BASE=(document.currentScript&&document.currentScript.src)?new URL(".",document.currentScript.src).href:location.origin+"/";
+window.__CMS_DONE__=(async function(){
+  // Base URL of the site (works on localhost:3000 and on GitHub Pages sub-paths).
+  // build.js sets __CMS_BASE__ / __CMS_CONTENT__ to prerender pages without fetching.
+  const BASE=window.__CMS_BASE__!==undefined?window.__CMS_BASE__:(document.currentScript&&document.currentScript.src)?new URL(".",document.currentScript.src).href:location.origin+"/";
   try{
-    const raw=await (await fetch(BASE+"content.json",{cache:"no-store"})).json();
+    const raw=window.__CMS_CONTENT__||await (await fetch(BASE+"content.json",{cache:"no-store"})).json();
     // Rewrite root-absolute paths like /uploads/x.jpg so they resolve under BASE
     const fix=v=>typeof v==="string"?(/^\/(uploads|projects)\//.test(v)?BASE+v.slice(1):v):Array.isArray(v)?v.map(fix):(v&&typeof v==="object")?Object.fromEntries(Object.entries(v).map(([k,x])=>[k,fix(x)])):v;
     const c=fix(raw);
+    // Home-section images must not overwrite images on project detail pages
+    const isHome=!/\/projects\/[^/]+\.html$/i.test(location.pathname);
     const q=(s,r=document)=>r.querySelector(s), qa=(s,r=document)=>[...r.querySelectorAll(s)];
     const txtNodes=()=>{const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);const a=[];let n;while(n=w.nextNode())a.push(n);return a};
     const replaceExact=(from,to,all=false)=>{if(to===undefined||to===null||!from)return;let done=false;for(const n of txtNodes()){if((n.nodeValue||'').trim()===String(from).trim()){n.nodeValue=String(to);done=true;if(!all)break}}return done};
@@ -28,7 +31,7 @@
     replaceExact('Nam Nguyen Design',c.home?.hero?.title);
     replaceExact('NAM NGUYEN DESIGN',(c.home?.hero?.title||'').toUpperCase());
     replaceExact('Brand identities, campaign visuals and digital experiences built with clarity, edge and intent.',c.home?.hero?.description);
-    if(c.home?.hero?.image){const hero=q('.hero img')||q('[class*="hero"] img')||q('main img');if(hero)hero.src=c.home.hero.image}
+    if(isHome&&c.home?.hero?.image){const hero=q('.hero img')||q('[class*="hero"] img')||q('main img');if(hero)hero.src=c.home.hero.image}
     hideByIdOrText('home','Independent Visual Designer',c.home?.hero?.visible);
 
     // INTRO / CLEAR IDEAS
@@ -38,14 +41,14 @@
     const serviceText=['Brand Identity','Campaign Design','Art Direction'];
     (c.home?.intro?.services||[]).forEach((v,i)=>{if(serviceText[i])replaceExact(serviceText[i],v)});
     if(c.home?.intro?.location)replaceExact('Ho Chi Minh City, Vietnam',c.home.intro.location);
-    if(c.home?.intro?.image){const imgs=qa('img');const target=imgs.find(x=>/PWNFx|intro|about/i.test(x.src||''))||imgs[1];if(target)target.src=c.home.intro.image}
+    if(isHome&&c.home?.intro?.image){const imgs=qa('img');const target=imgs.find(x=>/PWNFx|intro|about/i.test(x.src||''))||imgs[1];if(target)target.src=c.home.intro.image}
     hideByIdOrText('intro','Clear ideas. Bold visual direction.',c.home?.intro?.visible);
 
     // ABOUT
     replaceExact('Profile.26',c.home?.about?.eyebrow);
     replaceExact('About',c.home?.about?.title);
     replaceExact('Nam Nguyen Design is an independent visual design practice focused on brand identity, campaign systems and art direction. Every project is shaped around a clear idea, a strong visual point of view and execution that feels precise, contemporary and memorable.',c.home?.about?.description);
-    if(c.home?.about?.image){const imgs=qa('img');const target=imgs.find(x=>/7bhFM|about/i.test(x.src||''))||imgs[2];if(target)target.src=c.home.about.image}
+    if(isHome&&c.home?.about?.image){const imgs=qa('img');const target=imgs.find(x=>/7bhFM|about/i.test(x.src||''))||imgs[2];if(target)target.src=c.home.about.image}
     hideByIdOrText('about','Profile.26',c.home?.about?.visible);
 
     // CLIENTS
@@ -67,7 +70,7 @@
     if(host&&slides.length&&projects.length){
       while(slides.length<projects.length){const cl=slides[0].cloneNode(true);host.appendChild(cl);slides.push(cl)}
       while(slides.length>projects.length){slides.pop().remove()}
-      slides.forEach((slide,i)=>{const p=projects[i];const img=q('img',slide);if(img&&p.cover)img.src=p.cover;const a=q('a[href]',slide);if(a)a.href=p.link||(BASE+'projects/'+p.slug+'.html');const titles=qa('h1,h2,h3,h4,strong,[class*="title"]',slide);const te=titles.find(x=>/CAMPAIGN|SYSTEM|PROJECT/i.test(x.textContent||''))||titles[0];if(te&&p.title)te.textContent=p.title;const texts=qa('p,span,small,[class*="category"],[class*="year"]',slide);const cat=texts.find(x=>/BRAND IDENTITY|ART DIRECTION|CAMPAIGN DESIGN/i.test(x.textContent||''));if(cat&&p.category)cat.textContent=p.category;const y=texts.find(x=>/^\s*20\d{2}\s*$/.test(x.textContent||''));if(y&&p.year)y.textContent=p.year});
+      slides.forEach((slide,i)=>{const p=projects[i];const img=q('img',slide);if(img&&p.cover)img.src=p.cover;if(p.cover)slide.style.setProperty('--project-bg',"url('"+p.cover+"')");const a=q('a[href]',slide);if(a)a.href=p.link||(BASE+'projects/'+p.slug+'.html');const titles=qa('h1,h2,h3,h4,strong,[class*="title"]',slide);const te=titles.find(x=>/CAMPAIGN|SYSTEM|PROJECT/i.test(x.textContent||''))||titles[0];if(te&&p.title)te.textContent=p.title;const texts=qa('p,span,small,[class*="category"],[class*="year"]',slide);const cat=texts.find(x=>/BRAND IDENTITY|ART DIRECTION|CAMPAIGN DESIGN/i.test(x.textContent||''));if(cat&&p.category)cat.textContent=p.category;const y=texts.find(x=>/^\s*20\d{2}\s*$/.test(x.textContent||''));if(y&&p.year)y.textContent=p.year});
       if(typeof window.showProject==='function')try{window.showProject(0)}catch(e){}
     }
     hideByIdOrText('projects','Selected Work.26',c.home?.projectsSection?.visible);
@@ -88,7 +91,7 @@
     replaceExact('Start a Project.26',c.home?.contact?.eyebrow);
     replaceExact('Get in touch',c.home?.contact?.title);
     replaceExact('If you are building a brand, campaign or visual system and need a clear creative direction, send over the brief. I am open to selected freelance and collaborative projects.',c.home?.contact?.description);
-    if(c.home?.contact?.image){const imgs=qa('img');const target=imgs.find(x=>/WDp2|contact/i.test(x.src||''))||imgs.at(-1);if(target)target.src=c.home.contact.image}
+    if(isHome&&c.home?.contact?.image){const imgs=qa('img');const target=imgs.find(x=>/WDp2|contact/i.test(x.src||''))||imgs.at(-1);if(target)target.src=c.home.contact.image}
     if(c.home?.contact?.email)replaceExact('hello@namnguyen.design',c.home.contact.email,true);
     hideByIdOrText('contact','Start a Project.26',c.home?.contact?.visible);
 

@@ -1,4 +1,5 @@
-dist/
-backups/
 *.tmp
+.cache/
+backups/
+dist/
 node_modules/
