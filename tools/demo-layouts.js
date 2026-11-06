@@ -1,12 +1,12 @@
 // npm run demo — after npm run build. Writes dist/projects/demo-<layout>.html for each of the 5 layouts with sample text + 7 images.
 const path = require('path'), fs = require('fs');
 const site = path.join(__dirname, '..');
-const { renderProjectPage, LAYOUTS } = require(path.join(site, 'project-template.js'));
+const { renderProjectPage, PRESETS } = require(path.join(site, 'project-template.js'));
 const content = JSON.parse(fs.readFileSync(path.join(site, 'content.json'), 'utf8'));
 const F = 'https://framerusercontent.com/images/';
 const imgs = ['H3KNH97QuI3MqCMMrAfkRwWSDAc', 'BYTBcqFikmPNhvjQYU7pi3ciyI', 'r1Q4APz4TNMV5x9oKRYscAL06c', 'ZNnj2toPGisdyf6eClzPnuV72fM'].map(x => F + x + '.jpg?width=1600');
 const gallery = [1, 2, 3, 0, 1, 2, 3].map(i => imgs[i]);
-const demo = LAYOUTS.map(([k], i) => ({
+const demo = PRESETS.map(([k], i) => ({
   slug: 'demo-' + k, title: 'Demo ' + k, category: 'Brand Identity', year: '2026', client: 'Sample Client',
   role: 'Art Direction / Visual Design', scope: 'Concept / Key Visual / System', layout: k, cover: imgs[i % 4],
   headline: 'Direction\n& System', published: true, gallery: k === 'minimal' ? gallery.slice(0, 3) : k === 'compact' ? gallery.slice(0, 4) : k === 'standard' ? gallery.slice(0, 5) : gallery,

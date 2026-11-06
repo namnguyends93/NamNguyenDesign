@@ -22,21 +22,18 @@
 - Nén HTML, CSS và JS inline.
 - `admin.html`, `server.js`, `backups/`, `content.json` không bao giờ được đưa vào `dist/`.
 
-## Trang chi tiết project — 5 mẫu
+## Trang chi tiết project — module
 
-Trang `projects/<slug>.html` được **tự tạo từ `content.json`** (file `project-template.js`), không còn file HTML viết tay.
-Mỗi project chọn 1 mẫu trong admin (ô "Mẫu trang"):
+Trang `projects/<slug>.html` được **tự tạo từ `content.json`** (file `project-template.js`).
+Mỗi trang = Hero + danh sách **module** + "Next project". Project mới mặc định là mẫu 3 · Tiêu chuẩn
+(Overview → Gallery → Statement); cần gì thì **+ Thêm module**, đổi thứ tự bằng ↑ ↓, xoá bằng ✕.
 
-| Mẫu | Độ dài | Gồm |
-|---|---|---|
-| 1 · Tối giản | ~3 màn hình | Hero thấp, đoạn giới thiệu, ảnh lưới 3 cột |
-| 2 · Gọn | ~4 | Hero thấp, Overview, ảnh 2 cột |
-| 3 · Tiêu chuẩn | ~7 | Hero, Overview, gallery (2 ảnh + 1 ảnh lớn), Statement |
-| 4 · Câu chuyện | ~8 | Như Tiêu chuẩn + 3 chương Challenge / Approach / Result xen ảnh |
-| 5 · Trưng bày | ~10 | Ảnh tràn màn hình, 3 thẻ quy trình, gallery nhiều nhịp, credits |
+Module có sẵn: Overview · Giới thiệu ngắn · Gallery ảnh (4 kiểu lưới) · Ảnh tràn màn hình ·
+Chữ + ảnh (2 cột) · Đoạn chữ · 3 thẻ quy trình · Statement · Credits.
 
-Phần nào trống (không có chữ / ảnh) sẽ tự ẩn. Thêm project mới trong admin là có trang ngay:
-xem live ở `http://127.0.0.1:3000/projects/<slug>.html`.
+5 mẫu dựng sẵn (nút **Áp mẫu**, giữ lại ảnh + chữ đang có): 1 Tối giản (~3 màn hình) · 2 Gọn (~4) ·
+3 Tiêu chuẩn (~7) · 4 Câu chuyện (~8) · 5 Trưng bày (~10).
 
-Xem cả 5 mẫu cạnh nhau: `npm run build`, `npm run demo`, `npm run preview` →
+Module trống tự ẩn. Xem live: nút **Xem trang ↗** trong admin (Save trước).
+Xem 5 mẫu cạnh nhau: `npm run build`, `npm run demo`, `npm run preview` →
 http://127.0.0.1:4000/NamNguyenDesign/demo-overview.html
