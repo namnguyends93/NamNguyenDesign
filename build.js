@@ -91,6 +91,81 @@ function optimizeImage(src, pageFile) {
   return job;
 }
 
+// ---------- share previews, favicon, SEO ----------
+// Absolute site address: used by link previews (Facebook, Zalo, Messenger), canonical and sitemap.
+const SITE_URL = (content.site?.siteUrl || 'https://namnguyends93.github.io/NamNguyenDesign/').replace(/\/?$/, '/');
+const pageUrl = rel => SITE_URL + (rel === 'index.html' ? '' : rel);
+
+// 1200x630 JPEG for link previews (JPEG is the safest format for every chat app)
+const ogJobs = new Map();
+function ogImage(src, pageFile, name) {
+  if (!src) return null;
+  if (!ogJobs.has(name)) ogJobs.set(name, (async () => {
+    const source = await loadSource(/^https?:/i.test(src) ? canonicalRemote(src) : src, pageFile);
+    if (!source) return null;
+    const rel = `${IMG_OUT}/og-${name}.jpg`;
+    // Portrait photos: keep the band around 30% from the top, where faces usually are
+    const upright = await sharp(source.buf).rotate().toBuffer();
+    const { width: W, height: H } = await sharp(upright).metadata();
+    let img = sharp(upright);
+    const bandH = Math.round(W * 630 / 1200);
+    if (bandH < H) img = img.extract({ left: 0, width: W, height: bandH, top: Math.round(Math.max(0, Math.min(H - bandH, H * 0.3 - bandH / 2))) });
+    await img.resize(1200, 630, { fit: 'cover' }).jpeg({ quality: 82, mozjpeg: true }).toFile(path.join(DIST, rel));
+    return rel;
+  })().catch(e => { console.warn('  ! og image skipped:', src, '-', e.message); return null; }));
+  return ogJobs.get(name);
+}
+
+// Favicon: the uploaded site.favicon if set, otherwise an "N" monogram in the accent colour
+async function buildFavicons() {
+  const accent = /^#[0-9a-f]{3,8}$/i.test(content.site?.accent || '') ? content.site.accent : '#4c6fff';
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="${accent}"/><path fill="#fff" d="M18 46V18h6.5L40 37.5V18h6v28h-6.5L24 26.5V46z"/></svg>`;
+  let buf = Buffer.from(svg);
+  const custom = content.site?.favicon && await loadSource(content.site.favicon, path.join(ROOT, 'index.html')).catch(() => null);
+  if (custom) buf = custom.buf;
+  else await fsp.writeFile(path.join(DIST, 'favicon.svg'), svg);
+  await sharp(buf, { density: 300 }).resize(32, 32).png().toFile(path.join(DIST, 'favicon-32.png'));
+  await sharp(buf, { density: 300 }).resize(180, 180).flatten({ background: accent }).png().toFile(path.join(DIST, 'apple-touch-icon.png'));
+  return { svg: !custom };
+}
+let favicons;
+
+async function addHeadMeta(doc, relPath, base, file) {
+  const head = doc.head;
+  const add = (tag, attrs) => { const el = doc.createElement(tag); for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v); head.appendChild(el); };
+  const slug = relPath.startsWith('projects/') ? path.basename(relPath, '.html') : null;
+  const project = slug && (content.projects || []).find(p => (p.slug || p.id) === slug);
+  const title = doc.title || content.site?.seoTitle || '';
+  const desc = doc.querySelector('meta[name="description"]')?.getAttribute('content') || content.site?.seoDescription || '';
+  const imgRel = await ogImage(project ? project.cover : content.home?.hero?.image, file, slug || 'home');
+  const url = pageUrl(relPath);
+
+  if (favicons.svg) add('link', { rel: 'icon', type: 'image/svg+xml', href: base + 'favicon.svg' });
+  add('link', { rel: 'icon', type: 'image/png', sizes: '32x32', href: base + 'favicon-32.png' });
+  add('link', { rel: 'apple-touch-icon', href: base + 'apple-touch-icon.png' });
+  add('meta', { name: 'theme-color', content: '#000000' });
+  add('link', { rel: 'canonical', href: url });
+  add('meta', { property: 'og:type', content: project ? 'article' : 'website' });
+  add('meta', { property: 'og:site_name', content: content.site?.name || 'Nam Nguyen Design' });
+  add('meta', { property: 'og:title', content: title });
+  add('meta', { property: 'og:description', content: desc });
+  add('meta', { property: 'og:url', content: url });
+  if (imgRel) {
+    add('meta', { property: 'og:image', content: SITE_URL + imgRel });
+    add('meta', { property: 'og:image:width', content: '1200' });
+    add('meta', { property: 'og:image:height', content: '630' });
+    add('meta', { property: 'og:image:alt', content: project ? project.title : title });
+  }
+  add('meta', { name: 'twitter:card', content: 'summary_large_image' });
+}
+
+async function writeSeoFiles(pages) {
+  const today = new Date().toISOString().slice(0, 10);
+  const urls = pages.map(rel => `  <url><loc>${pageUrl(rel)}</loc><lastmod>${today}</lastmod></url>`).join('\n');
+  await fsp.writeFile(path.join(DIST, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`);
+  await fsp.writeFile(path.join(DIST, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${SITE_URL}sitemap.xml\n`);
+}
+
 // ---------- pages ----------
 async function prerender(file, html, useRuntime = true) {
   const relPath = path.relative(ROOT, file).split(path.sep).join('/');
@@ -133,6 +208,8 @@ async function prerender(file, html, useRuntime = true) {
     el.setAttribute('style', style);
   }
 
+  await addHeadMeta(doc, relPath, base, file);
+
   const out = '<!DOCTYPE html>\n' + doc.documentElement.outerHTML;
   window.close();
   return minify(out, {
@@ -155,8 +232,11 @@ async function copyStatic(src, dst) {
   await fsp.mkdir(path.join(DIST, IMG_OUT), { recursive: true });
   await fsp.mkdir(path.join(DIST, 'projects'), { recursive: true });
 
+  favicons = await buildFavicons();
+  const pages = [];
   let htmlIn = 0, htmlOut = 0, count = 0;
   const write = async (rel, html, useRuntime) => {
+    pages.push(rel);
     const out = await prerender(path.join(ROOT, rel), html, useRuntime);
     await fsp.writeFile(path.join(DIST, rel), out);
     htmlIn += Buffer.byteLength(html); htmlOut += Buffer.byteLength(out); count++;
@@ -171,6 +251,7 @@ async function copyStatic(src, dst) {
   }
   for (const s of STATIC) if (fs.existsSync(path.join(ROOT, s))) await copyStatic(path.join(ROOT, s), path.join(DIST, s));
   if (!fs.existsSync(path.join(DIST, '.nojekyll'))) await fsp.writeFile(path.join(DIST, '.nojekyll'), '');
+  await writeSeoFiles(pages);
 
   console.log(`\nBuilt ${count} pages in ${((Date.now() - t0) / 1000).toFixed(1)}s -> ${DIST}`);
   console.log(`HTML   : ${kb(htmlIn)} -> ${kb(htmlOut)}`);
