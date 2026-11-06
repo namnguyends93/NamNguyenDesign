@@ -30,6 +30,7 @@ const EAGER_IMAGES = 2;              // first N images load eagerly (above the f
 // Static folders/files copied as-is when they exist
 const STATIC = ['assets', 'css', 'js', '.nojekyll', 'CNAME', 'favicon.ico'];
 
+const { renderProjectPage } = require('./project-template');
 const runtime = fs.readFileSync(path.join(ROOT, 'cms-runtime.js'), 'utf8');
 const content = JSON.parse(fs.readFileSync(path.join(ROOT, 'content.json'), 'utf8'));
 const hash = s => crypto.createHash('sha1').update(s).digest('hex').slice(0, 10);
@@ -91,19 +92,17 @@ function optimizeImage(src, pageFile) {
 }
 
 // ---------- pages ----------
-async function prerender(file) {
+async function prerender(file, html, useRuntime = true) {
   const relPath = path.relative(ROOT, file).split(path.sep).join('/');
   const depth = relPath.split('/').length - 1;
   const base = '../'.repeat(depth);
-  const html = await fsp.readFile(file, 'utf8');
 
   const dom = new JSDOM(html, { url: 'http://localhost/' + relPath, runScripts: 'outside-only', pretendToBeVisual: true });
   const { window } = dom;
   window.__CMS_BASE__ = base;
   window.__CMS_CONTENT__ = JSON.parse(JSON.stringify(content));
   window.console.warn = (...a) => console.warn('  runtime:', ...a);
-  window.eval(runtime);
-  await window.__CMS_DONE__;
+  if (useRuntime) { window.eval(runtime); await window.__CMS_DONE__; }
   const doc = window.document;
 
   // Images
@@ -156,19 +155,24 @@ async function copyStatic(src, dst) {
   await fsp.mkdir(path.join(DIST, IMG_OUT), { recursive: true });
   await fsp.mkdir(path.join(DIST, 'projects'), { recursive: true });
 
-  const pages = ['index.html', ...fs.readdirSync(path.join(ROOT, 'projects')).filter(f => f.endsWith('.html')).map(f => 'projects/' + f)];
-  let htmlIn = 0, htmlOut = 0;
-  for (const p of pages) {
-    const src = path.join(ROOT, p);
-    const out = await prerender(src);
-    await fsp.writeFile(path.join(DIST, p), out);
-    htmlIn += fs.statSync(src).size; htmlOut += Buffer.byteLength(out);
-    console.log('  page', p);
+  let htmlIn = 0, htmlOut = 0, count = 0;
+  const write = async (rel, html, useRuntime) => {
+    const out = await prerender(path.join(ROOT, rel), html, useRuntime);
+    await fsp.writeFile(path.join(DIST, rel), out);
+    htmlIn += Buffer.byteLength(html); htmlOut += Buffer.byteLength(out); count++;
+    console.log('  page', rel);
+  };
+  await write('index.html', await fsp.readFile(path.join(ROOT, 'index.html'), 'utf8'), true);
+  // Project pages are generated from content.json with project-template.js (layout per project)
+  for (const p of (content.projects || []).filter(x => x.published !== false)) {
+    const slug = p.slug || p.id;
+    if (!/^[\w-]+$/.test(slug)) { console.warn('  skip project with invalid slug:', slug); continue; }
+    await write('projects/' + slug + '.html', renderProjectPage(content, slug), false);
   }
   for (const s of STATIC) if (fs.existsSync(path.join(ROOT, s))) await copyStatic(path.join(ROOT, s), path.join(DIST, s));
   if (!fs.existsSync(path.join(DIST, '.nojekyll'))) await fsp.writeFile(path.join(DIST, '.nojekyll'), '');
 
-  console.log(`\nBuilt ${pages.length} pages in ${((Date.now() - t0) / 1000).toFixed(1)}s -> ${DIST}`);
+  console.log(`\nBuilt ${count} pages in ${((Date.now() - t0) / 1000).toFixed(1)}s -> ${DIST}`);
   console.log(`HTML   : ${kb(htmlIn)} -> ${kb(htmlOut)}`);
   console.log(`Images : ${stats.count} files, ${kb(stats.inBytes)} -> ${kb(stats.outBytes)} (largest variant)`);
 })().catch(e => { console.error(e); process.exit(1); });

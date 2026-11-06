@@ -88,7 +88,7 @@ window.__CMS_DONE__=(async function(){
     if(host&&slides.length&&projects.length){
       while(slides.length<projects.length){const cl=slides[0].cloneNode(true);host.appendChild(cl);slides.push(cl)}
       while(slides.length>projects.length){slides.pop().remove()}
-      slides.forEach((slide,i)=>{const p=projects[i];const img=q('img',slide);if(img&&p.cover)img.src=p.cover;if(p.cover)slide.style.setProperty('--project-bg',"url('"+p.cover+"')");const a=q('a[href]',slide);if(a)a.href=p.link||(BASE+'projects/'+p.slug+'.html');const titles=qa('h1,h2,h3,h4,strong,[class*="title"]',slide);const te=titles.find(x=>/CAMPAIGN|SYSTEM|PROJECT/i.test(x.textContent||''))||titles[0];if(te&&p.title)te.textContent=p.title;const texts=qa('p,span,small,[class*="category"],[class*="year"]',slide);const cat=texts.find(x=>/BRAND IDENTITY|ART DIRECTION|CAMPAIGN DESIGN/i.test(x.textContent||''));if(cat&&p.category)cat.textContent=p.category;const y=texts.find(x=>/^\s*20\d{2}\s*$/.test(x.textContent||''));if(y&&p.year)y.textContent=p.year});
+      slides.forEach((slide,i)=>{const p=projects[i];const img=q('img',slide);if(img&&p.cover)img.src=p.cover;if(p.cover)slide.style.setProperty('--project-bg',"url('"+p.cover+"')");const a=q('a[href]',slide);if(a)a.href=(p.link&&!/^\/?projects\//.test(p.link))?p.link:(BASE+'projects/'+(p.slug||p.id)+'.html');const titles=qa('h1,h2,h3,h4,strong,[class*="title"]',slide);const te=titles.find(x=>/CAMPAIGN|SYSTEM|PROJECT/i.test(x.textContent||''))||titles[0];if(te&&p.title)te.textContent=p.title;const texts=qa('p,span,small,[class*="category"],[class*="year"]',slide);const cat=texts.find(x=>/BRAND IDENTITY|ART DIRECTION|CAMPAIGN DESIGN/i.test(x.textContent||''));if(cat&&p.category)cat.textContent=p.category;const y=texts.find(x=>/^\s*20\d{2}\s*$/.test(x.textContent||''));if(y&&p.year)y.textContent=p.year});
       if(typeof window.showProject==='function')try{window.showProject(0)}catch(e){}
     }
     hideByIdOrText('projects','Selected Work.26',c.home?.projectsSection?.visible);
@@ -122,17 +122,5 @@ window.__CMS_DONE__=(async function(){
       if(c.footer?.visible===false)footer.style.display='none';
     }
 
-    // PROJECT DETAIL PAGE
-    const m=location.pathname.match(/\/projects\/([^/]+)\.html$/i);
-    if(m){
-      const slug=decodeURIComponent(m[1]);const p=(c.projects||[]).find(x=>(x.slug||x.id)===slug);
-      if(p){
-        const titleEls=qa('h1,h2,[class*="title"]');const title=titleEls.find(x=>/CAMPAIGN|SYSTEM|PROJECT/i.test(x.textContent||''))||titleEls[0];if(title&&p.title)title.textContent=p.title;
-        const hero=q('.hero-media img')||q('[class*="hero"] img');if(hero&&p.cover)hero.src=p.cover;
-        const st=q('.statement p')||q('[class*="statement"] p');if(st&&p.statement)st.textContent=p.statement;
-        const gallery=qa('.gallery-item img,[class*="gallery"] img');(p.gallery||[]).forEach((src,i)=>{if(gallery[i])gallery[i].src=src});
-        const years=qa('span,p,small').filter(x=>/^\s*20\d{2}\s*$/.test(x.textContent||''));if(years[0]&&p.year)years[0].textContent=p.year;
-      }
-    }
   }catch(e){console.warn('CMS Full runtime:',e)}
 })();

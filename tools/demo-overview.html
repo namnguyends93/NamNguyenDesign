@@ -1,0 +1,18 @@
+<!doctype html><meta charset="utf-8"><title>5 layouts</title>
+<style>
+body{margin:0;background:#0d0d0d;color:#eee;font:13px "Kode Mono",monospace;padding:24px}
+.row{display:flex;gap:22px;align-items:flex-start}
+.col{width:216px;flex:none}
+.col h3{margin:0 0 10px;font:600 14px Inter,sans-serif;text-transform:uppercase}
+.col small{display:block;opacity:.6;margin-bottom:10px}
+.frame{width:216px;overflow:hidden;border-radius:10px;outline:1px solid #333}
+iframe{width:1440px;border:0;transform:scale(.15);transform-origin:0 0;display:block;pointer-events:none}
+</style>
+<div class="row" id="row"></div>
+<script>
+const L=[["minimal","1 · Tối giản"],["compact","2 · Gọn"],["standard","3 · Tiêu chuẩn"],["story","4 · Câu chuyện"],["showcase","5 · Trưng bày"]];
+const row=document.getElementById('row');
+L.forEach(([k,n])=>{const c=document.createElement('div');c.className='col';c.innerHTML=`<h3>${n}</h3><small></small><div class="frame"><iframe src="projects/demo-${k}.html" height="900"></iframe></div>`;row.appendChild(c);
+ const f=c.querySelector('iframe');f.onload=()=>{const d=f.contentDocument;d.documentElement.classList.remove('page-enter');d.documentElement.classList.add('page-ready');d.querySelectorAll('img').forEach(i=>i.loading='eager');const s=d.createElement('style');s.textContent='.hero{min-height:884px!important}.hero.short{min-height:702px!important}.bleed{height:828px!important}.gallery.grand .g-row.tall .g-item{min-height:828px!important}.project-nav{position:absolute!important}.to-top{display:none!important}';d.head.appendChild(s);
+  const fit=()=>{const h=d.documentElement.scrollHeight;f.height=h;c.querySelector('.frame').style.height=(h*.15)+'px';c.querySelector('small').textContent=Math.round(h/900*10)/10+' màn hình'};fit();setTimeout(fit,1500);setTimeout(fit,4000)}});
+</script>

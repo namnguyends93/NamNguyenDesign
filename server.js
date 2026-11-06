@@ -37,6 +37,8 @@ function safePath(urlPath){let d;try{d=decodeURIComponent(urlPath)}catch{return 
 async function listMedia(){await ensureDirs();const out=[];for(const name of await fsp.readdir(UPLOADS)){const full=path.join(UPLOADS,name);const st=await fsp.stat(full);if(st.isFile())out.push({name,url:'/uploads/'+encodeURIComponent(name),size:st.size,modified:st.mtime.toISOString()})}return out.sort((a,b)=>b.modified.localeCompare(a.modified))}
 async function listBackups(){await ensureDirs();const files=(await fsp.readdir(BACKUPS)).filter(x=>x.endsWith('.json')).sort().reverse();const out=[];for(const name of files){const st=await fsp.stat(path.join(BACKUPS,name));out.push({name,size:st.size,modified:st.mtime.toISOString()})}return out}
 
+const TEMPLATE_FILE=path.join(ROOT,'project-template.js');
+async function serveProject(res,slug){delete require.cache[require.resolve(TEMPLATE_FILE)];const {renderProjectPage}=require(TEMPLATE_FILE);const html=renderProjectPage(await readContent(),slug);return html?send(res,200,html,MIME['.html']):send(res,404,'Project not found (or unpublished): '+slug)}
 const CMS_RUNTIME_FILE=path.join(ROOT,'cms-runtime.js');
 
 
@@ -71,4 +73,4 @@ async function handleAPI(req,res,u){
   return sendJSON(res,404,{ok:false,error:'API route not found'});
 }
 
-(async()=>{await ensureDirs();http.createServer(async(req,res)=>{try{const u=new URL(req.url,'http://127.0.0.1');if(u.pathname.startsWith('/api/'))return await handleAPI(req,res,u);if(u.pathname==='/cms-runtime.js')return send(res,200,await fsp.readFile(CMS_RUNTIME_FILE),'application/javascript; charset=utf-8');if(u.pathname==='/admin')return await serveStatic(res,'/admin.html');return await serveStatic(res,u.pathname)}catch(e){console.error(e);return sendJSON(res,500,{ok:false,error:e.message||'Server error'})}}).listen(PORT,HOST,()=>{console.log('');console.log('NAM NGUYEN DESIGN CMS FULL');console.log('Website : http://127.0.0.1:'+PORT+'/');console.log('CMS     : http://127.0.0.1:'+PORT+'/admin');console.log('')})})();
+(async()=>{await ensureDirs();http.createServer(async(req,res)=>{try{const u=new URL(req.url,'http://127.0.0.1');if(u.pathname.startsWith('/api/'))return await handleAPI(req,res,u);if(u.pathname==='/cms-runtime.js')return send(res,200,await fsp.readFile(CMS_RUNTIME_FILE),'application/javascript; charset=utf-8');{const pm=u.pathname.match(/^\/projects\/([^/]+)\.html$/i);if(pm)return await serveProject(res,decodeURIComponent(pm[1]))}if(u.pathname==='/admin')return await serveStatic(res,'/admin.html');return await serveStatic(res,u.pathname)}catch(e){console.error(e);return sendJSON(res,500,{ok:false,error:e.message||'Server error'})}}).listen(PORT,HOST,()=>{console.log('');console.log('NAM NGUYEN DESIGN CMS FULL');console.log('Website : http://127.0.0.1:'+PORT+'/');console.log('CMS     : http://127.0.0.1:'+PORT+'/admin');console.log('')})})();

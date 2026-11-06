@@ -222,13 +222,23 @@
       "year": "2026",
       "client": "Ngoc Dung",
       "role": "Visual Design / Art Direction",
-      "cover": "",
-      "description": "A campaign system built to feel premium, contemporary and unmistakably beauty-led.",
+      "cover": "https://framerusercontent.com/images/H3KNH97QuI3MqCMMrAfkRwWSDAc.jpg?width=1600",
+      "description": "A campaign system built to feel premium, contemporary and unmistakably beauty-led — balancing elegance with a sharper, more editorial attitude.",
       "statement": "Beauty communication can feel premium without becoming predictable.",
-      "gallery": [],
+      "gallery": [
+        "https://framerusercontent.com/images/BYTBcqFikmPNhvjQYU7pi3ciyI.jpg?width=1600",
+        "https://framerusercontent.com/images/r1Q4APz4TNMV5x9oKRYscAL06c.jpg?width=1600",
+        "https://framerusercontent.com/images/ZNnj2toPGisdyf6eClzPnuV72fM.jpg?width=1600"
+      ],
       "published": true,
       "featured": true,
-      "link": "projects/ngoc-dung-campaign.html"
+      "link": "projects/ngoc-dung-campaign.html",
+      "layout": "standard",
+      "headline": "Direction\n& System",
+      "scope": "Concept / Key Visual / System",
+      "challenge": "",
+      "approach": "",
+      "result": ""
     },
     {
       "id": "beauty-visual-system",
@@ -238,13 +248,23 @@
       "year": "2026",
       "client": "",
       "role": "Art Direction / Visual System",
-      "cover": "",
-      "description": "A flexible visual language for beauty content across campaign, social and digital formats.",
+      "cover": "https://framerusercontent.com/images/BYTBcqFikmPNhvjQYU7pi3ciyI.jpg?width=1600",
+      "description": "A flexible visual language for beauty content across campaign, social and digital formats, designed around consistency without losing expression.",
       "statement": "A strong visual system gives every execution room to change without losing the brand.",
-      "gallery": [],
+      "gallery": [
+        "https://framerusercontent.com/images/ZNnj2toPGisdyf6eClzPnuV72fM.jpg?width=1600",
+        "https://framerusercontent.com/images/H3KNH97QuI3MqCMMrAfkRwWSDAc.jpg?width=1600",
+        "https://framerusercontent.com/images/r1Q4APz4TNMV5x9oKRYscAL06c.jpg?width=1600"
+      ],
       "published": true,
       "featured": true,
-      "link": "projects/beauty-visual-system.html"
+      "link": "projects/beauty-visual-system.html",
+      "layout": "standard",
+      "headline": "Direction\n& System",
+      "scope": "Concept / Key Visual / System",
+      "challenge": "",
+      "approach": "",
+      "result": ""
     },
     {
       "id": "future-campaign",
@@ -254,13 +274,23 @@
       "year": "2026",
       "client": "",
       "role": "Campaign Design / Creative Direction",
-      "cover": "",
-      "description": "A concept-driven campaign exploring a more futuristic visual tone.",
+      "cover": "https://framerusercontent.com/images/r1Q4APz4TNMV5x9oKRYscAL06c.jpg?width=1600",
+      "description": "A concept-driven campaign exploring a more futuristic visual tone through bold composition, clean typography and controlled image treatment.",
       "statement": "Future-facing design works best when the concept stays simple and the execution stays precise.",
-      "gallery": [],
+      "gallery": [
+        "https://framerusercontent.com/images/H3KNH97QuI3MqCMMrAfkRwWSDAc.jpg?width=1600",
+        "https://framerusercontent.com/images/BYTBcqFikmPNhvjQYU7pi3ciyI.jpg?width=1600",
+        "https://framerusercontent.com/images/ZNnj2toPGisdyf6eClzPnuV72fM.jpg?width=1600"
+      ],
       "published": true,
       "featured": true,
-      "link": "projects/future-campaign.html"
+      "link": "projects/future-campaign.html",
+      "layout": "standard",
+      "headline": "Direction\n& System",
+      "scope": "Concept / Key Visual / System",
+      "challenge": "",
+      "approach": "",
+      "result": ""
     }
   ]
 }
