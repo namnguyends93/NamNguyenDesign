@@ -71,7 +71,56 @@
       "eyebrow": "Profile.26",
       "title": "About",
       "description": "Nam Nguyen Design is an independent visual design practice focused on brand identity, campaign systems and art direction. Every project is shaped around a clear idea, a strong visual point of view and execution that feels precise, contemporary and memorable.",
-      "image": ""
+      "image": "",
+      "skills": {
+        "visible": true,
+        "eyebrow": "Skillset.26",
+        "label": "Disciplines / Tools",
+        "disciplinesTitle": "What I do",
+        "toolsTitle": "Tools",
+        "disciplines": [
+          "Brand Identity",
+          "Campaign Design",
+          "Art Direction",
+          "Key Visual",
+          "Packaging",
+          "Social Content",
+          "Motion Graphics",
+          "Web UI"
+        ],
+        "tools": [
+          {
+            "name": "Photoshop",
+            "value": 95,
+            "icon": "ps"
+          },
+          {
+            "name": "Illustrator",
+            "value": 90,
+            "icon": "ai"
+          },
+          {
+            "name": "Figma",
+            "value": 85,
+            "icon": "figma"
+          },
+          {
+            "name": "After Effects",
+            "value": 75,
+            "icon": "ae"
+          },
+          {
+            "name": "Blender",
+            "value": 65,
+            "icon": "blender"
+          },
+          {
+            "name": "Cinema 4D",
+            "value": 60,
+            "icon": "c4d"
+          }
+        ]
+      }
     },
     "clients": {
       "visible": true,
