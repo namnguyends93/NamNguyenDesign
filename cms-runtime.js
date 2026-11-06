@@ -10,6 +10,8 @@ window.__CMS_DONE__=(async function(){
     const c=fix(raw);
     // Home-section images must not overwrite images on project detail pages
     const isHome=!/\/projects\/[^/]+\.html$/i.test(location.pathname);
+    // On sub-pages, section links like "#about" must point back to the home page
+    const link=h=>(!isHome&&/^#/.test(h||''))?BASE+'index.html'+h:h;
     const q=(s,r=document)=>r.querySelector(s), qa=(s,r=document)=>[...r.querySelectorAll(s)];
     const txtNodes=()=>{const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);const a=[];let n;while(n=w.nextNode())a.push(n);return a};
     const replaceExact=(from,to,all=false)=>{if(to===undefined||to===null||!from)return;let done=false;for(const n of txtNodes()){if((n.nodeValue||'').trim()===String(from).trim()){n.nodeValue=String(to);done=true;if(!all)break}}return done};
@@ -22,7 +24,7 @@ window.__CMS_DONE__=(async function(){
     // NAV
     replaceExact('Nam Nguyen Design',c.navigation?.brand||c.site?.name,true);
     const navLinks=qa('nav a, header a');
-    (c.navigation?.items||[]).filter(x=>x.visible!==false).forEach((it,i)=>{if(navLinks[i]){navLinks[i].textContent=it.label;navLinks[i].href=it.href}});
+    (c.navigation?.items||[]).filter(x=>x.visible!==false).forEach((it,i)=>{if(navLinks[i]){navLinks[i].textContent=it.label;navLinks[i].href=link(it.href)}});
     if(c.navigation?.visible===false){const nav=q('nav')||q('header');if(nav)nav.style.display='none'}
 
     // HERO
@@ -100,7 +102,7 @@ window.__CMS_DONE__=(async function(){
     replaceExact('© 2026 Nam Nguyen Design',c.footer?.copyright);
     replaceExact('Nam Nguyen Design',c.footer?.brand,true);
     const footer=q('footer');if(footer){
-      const links=qa('a',footer);(c.footer?.links||[]).forEach((it,i)=>{if(links[i]){links[i].textContent=it.label;links[i].href=it.href}});
+      const links=qa('a',footer);(c.footer?.links||[]).forEach((it,i)=>{if(links[i]){links[i].textContent=it.label;links[i].href=link(it.href)}});
       if(c.footer?.visible===false)footer.style.display='none';
     }
 
