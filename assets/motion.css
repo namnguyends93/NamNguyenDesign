@@ -1,0 +1,43 @@
+/* Nam Nguyen Design — interaction layer (motion.js adds .motion to <html>) */
+
+/* split-character headline reveal */
+.split .w{display:inline-block;white-space:nowrap}
+.split .c{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em;margin-bottom:-.08em}
+.split .c>i{display:inline-block;font-style:normal;transform:translateY(105%);transition:transform .9s cubic-bezier(.2,.75,.2,1) var(--cd,0ms)}
+.split.on .c>i{transform:none}
+
+/* scroll-linked layers */
+.motion .hero-bg img{transform:scale(calc(1.04 + var(--hp,0) * .14));transform-origin:50% 40%;will-change:transform}
+.motion .hero-copy.reveal.in{transform:translateY(calc(var(--hp,0) * -90px));opacity:calc(1 - var(--hp,0) * 1.4)}
+.motion [data-par] img{transform:translateY(calc(var(--py,0) * 1px)) scale(1.16);will-change:transform}
+.motion .article img{transition:transform .5s cubic-bezier(.2,.75,.2,1)}
+.motion .article:hover img{transform:translateY(calc(var(--py,0) * 1px)) scale(1.24)}
+
+/* velocity marquee band */
+.big-marquee{background:#000;padding:8px;overflow:hidden}
+.big-marquee .bm-inner{border-radius:var(--radius-lg,72px);background:var(--accent,#4c6fff);color:#fff;padding:clamp(22px,3vw,40px) 0;overflow:hidden}
+.bm-track{display:flex;width:max-content;will-change:transform}
+.bm-track span{font-family:"Space Grotesk",Inter,sans-serif;text-transform:uppercase;font-weight:600;letter-spacing:-.06em;line-height:.9;font-size:clamp(64px,11vw,190px);white-space:nowrap;padding-right:.35em}
+.bm-track span b{font-weight:600;color:transparent;-webkit-text-stroke:2px #fff}
+
+/* scramble targets keep their width while shuffling */
+[data-scramble]{font-variant-numeric:tabular-nums}
+
+/* cursor label */
+.cursor-tag{position:fixed;left:0;top:0;z-index:150;pointer-events:none;width:96px;height:96px;margin:-48px 0 0 -48px;border-radius:50%;background:#fff;color:#000;display:grid;place-items:center;font:500 12px/1 "Kode Mono",monospace;text-transform:uppercase;letter-spacing:-.02em;transform:translate3d(var(--x,-200px),var(--y,-200px),0) scale(0);transition:transform .35s cubic-bezier(.2,.75,.2,1);mix-blend-mode:normal}
+.cursor-tag.on{transform:translate3d(var(--x),var(--y),0) scale(1)}
+.motion .project-stage,.motion .article{cursor:none}
+.motion .project-stage a,.motion .project-stage button{cursor:pointer}
+
+/* magnetic buttons */
+.magnetic{transition:transform .35s cubic-bezier(.2,.75,.2,1)}
+
+@media (hover:none),(pointer:coarse){
+  .cursor-tag{display:none}
+  .motion .project-stage,.motion .article{cursor:auto}
+}
+@media (prefers-reduced-motion:reduce){
+  .split .c>i{transform:none;transition:none}
+  .motion .hero-bg img,.motion .hero-copy.reveal.in,.motion [data-par] img{transform:none!important;opacity:1!important}
+  .cursor-tag{display:none}
+}
