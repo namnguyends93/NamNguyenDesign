@@ -14,6 +14,15 @@ Write replies to the owner in Vietnamese.
 - `content.json` → `site.siteUrl` is the absolute site address used for share previews (og:image), canonical and sitemap.xml. Change it when the domain changes.
 - Deploys run on GitHub Pages via Actions: push to `main`, then build and deploy `dist`. The live site is https://namnguyends93.github.io/NamNguyenDesign/.
 
+- Interaction layer (inspired by gojett.framer.website, keeping the owner's own design):
+  - Lives in `assets/motion.js` and `assets/motion.css`. It runs after `window.__CMS_DONE__` and adds `.motion` to `<html>`.
+  - Effects: split-character headline reveal, hero zoom and fade on scroll, image parallax (`--py`), a velocity marquee (`.big-marquee`, placed before `#journal`), hover text scramble, a "View ↗"/"Read ↗" cursor and magnetic buttons.
+  - The cursor and magnetic buttons run only with a mouse. Reduced motion turns all of it off.
+  - The marquee text is hardcoded in `index.html` and is not in the admin yet.
+  - Not built yet: a Journal list with an image on hover, and a background colour change on scroll.
+- Check animations in Chrome, because the built-in browser pane is hidden and does not run IntersectionObserver or requestAnimationFrame.
+- Deploy everything: `git push origin main` updates GitHub Pages, then `npm run deploy` updates Cloudflare.
+
 ## Rules from the owner
 - Optimize and build locally first. **Push to GitHub only when the owner says so.**
 - Use relative paths everywhere, because the site must work both under `/NamNguyenDesign/` and at a domain root.
