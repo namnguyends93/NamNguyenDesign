@@ -63,8 +63,7 @@ window.__CMS_DONE__=(async function(){
       return '<div class="skills-head"><span class="mono">'+escH(s.eyebrow)+'</span><span class="mono">'+escH(s.label)+'</span></div>'
       +'<div class="skill-rows">'
       +(chips.length?'<div><span class="skills-sub">'+escH(s.disciplinesTitle)+'</span><ul class="chip-list">'+chips.map(x=>'<li class="chip">'+escH(x)+'</li>').join('')+'</ul></div>':'')
-      +(tools.length?'<div><span class="skills-sub">'+escH(s.toolsTitle)+'</span><ul class="tool-list">'+tools.map((t,i)=>{const v=Math.max(0,Math.min(100,Number(t.value)||0));
-        return '<li class="tool">'+appIcon(t.icon,t.name)+'<span class="tool-name">'+escH(t.name)+'</span><span class="bar" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+v+'" aria-label="'+escH(t.name)+'"><i style="width:'+v+'%;--d:'+(i*80)+'ms"></i></span><span class="val">'+v+'</span></li>'}).join('')+'</ul></div>':'')
+      +(tools.length?'<div><span class="skills-sub">'+escH(s.toolsTitle)+'</span><ul class="tool-list">'+tools.map((t,i)=>'<li class="tool" style="--d:'+(i*70)+'ms">'+appIcon(t.icon,t.name)+'<span class="tool-name">'+escH(t.name)+'</span></li>').join('')+'</ul></div>':'')
       +'</div>'};
     const sk=c.home?.about?.skills,skHost=q('#about .skills');
     if(isHome&&sk&&skHost){if(sk.visible===false)skHost.remove();else skHost.innerHTML=renderSkills(sk)}

@@ -92,32 +92,26 @@
         "tools": [
           {
             "name": "Photoshop",
-            "value": 95,
             "icon": "ps"
           },
           {
             "name": "Illustrator",
-            "value": 90,
             "icon": "ai"
           },
           {
             "name": "Figma",
-            "value": 85,
             "icon": "figma"
           },
           {
             "name": "After Effects",
-            "value": 75,
             "icon": "ae"
           },
           {
             "name": "Blender",
-            "value": 65,
             "icon": "blender"
           },
           {
             "name": "Cinema 4D",
-            "value": 60,
             "icon": "c4d"
           }
         ]
