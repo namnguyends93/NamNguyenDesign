@@ -27,8 +27,12 @@ Write replies to the owner in Vietnamese.
   - To deploy from this machine, run `npm run deploy`, which builds and then runs `wrangler deploy`. Wrangler is logged in through OAuth.
   - Cloudflare serves `/x.html` as a 307 redirect to `/x`. That is normal.
   - GitHub Pages is still on as well.
-  - R2 is not enabled yet. Turning it on needs the owner to click "Add R2 subscription" and add a payment method. The plan is free under 10 GB, but Cloudflare requires a card on file. Claude must not enter card details.
-  - Once R2 is enabled, run `npx wrangler r2 bucket create nnd-media`, then make admin uploads go to R2.
+  - R2 is on.
+    - Bucket `nnd-media`, public at https://pub-5947827bb4ba488e9292f97b6e5a045a.r2.dev.
+    - `media.config.json` turns it on. Images uploaded in the admin go to R2 through Wrangler (no keys are stored) and are listed in `media-r2.json`, which is committed.
+    - Old images in `uploads/` stay where they are.
+    - `build.js` downloads R2 images and turns them into WebP in `dist/`, just like other remote images.
+  - On a new machine, run `npm install` and then `npx wrangler login` once, otherwise uploads fail with an error asking you to log in.
 - **Older notes on the GitHub-app route (abandoned in favour of Wrangler):**
   - The owner has a Cloudflare account (Free plan), signed in with namnguyen.thietketkm@gmail.com.
   - The "Cloudflare Workers and Pages" GitHub app install was started for the **NamNguyenDesign repo only**. It stopped at GitHub's "Confirm access" password prompt. First check whether it got installed (GitHub → Settings → Applications); if not, redo it from Cloudflare → Workers & Pages → Create → Pages → Import an existing Git repository → Connect GitHub.
