@@ -1,0 +1,10 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "namnguyendesign",
+  "compatibility_date": "2026-11-04",
+  // Only the built site is published; run `npm run build` first (npm run deploy does both)
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page"
+  }
+}

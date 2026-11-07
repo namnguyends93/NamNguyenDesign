@@ -5,11 +5,13 @@
     "dev": "node server.js",
     "build": "node build.js",
     "preview": "node tools/preview-dist.js",
-    "demo": "node tools/demo-layouts.js"
+    "demo": "node tools/demo-layouts.js",
+    "deploy": "npm run build && wrangler deploy"
   },
   "devDependencies": {
     "html-minifier-terser": "^7.2.0",
     "jsdom": "^25.0.1",
-    "sharp": "^0.33.5"
+    "sharp": "^0.33.5",
+    "wrangler": "^4.158.0"
   }
 }

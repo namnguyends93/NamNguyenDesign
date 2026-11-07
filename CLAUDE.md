@@ -22,7 +22,14 @@ Write replies to the owner in Vietnamese.
 - Custom domain `namnguyendesign.com`. The owner has not set DNS yet, and the registrar is unknown.
   - Option A, GitHub Pages: A records 185.199.108-111.153, CNAME `www` → namnguyends93.github.io, then add a `CNAME` file and turn on Enforce HTTPS.
   - Option B, chosen: move hosting to Cloudflare Pages and move the domain's DNS to Cloudflare.
-- **Cloudflare connection, in progress (stopped 2026-11-07):**
+- **Cloudflare status (2026-11-07):**
+  - The site is live on Cloudflare at https://namnguyendesign.namnguyen-thietketkm.workers.dev, as a Worker with static assets (`wrangler.jsonc`, assets = `./dist` only).
+  - To deploy from this machine, run `npm run deploy`, which builds and then runs `wrangler deploy`. Wrangler is logged in through OAuth.
+  - Cloudflare serves `/x.html` as a 307 redirect to `/x`. That is normal.
+  - GitHub Pages is still on as well.
+  - R2 is not enabled yet. Turning it on needs the owner to click "Add R2 subscription" and add a payment method. The plan is free under 10 GB, but Cloudflare requires a card on file. Claude must not enter card details.
+  - Once R2 is enabled, run `npx wrangler r2 bucket create nnd-media`, then make admin uploads go to R2.
+- **Older notes on the GitHub-app route (abandoned in favour of Wrangler):**
   - The owner has a Cloudflare account (Free plan), signed in with namnguyen.thietketkm@gmail.com.
   - The "Cloudflare Workers and Pages" GitHub app install was started for the **NamNguyenDesign repo only**. It stopped at GitHub's "Confirm access" password prompt. First check whether it got installed (GitHub → Settings → Applications); if not, redo it from Cloudflare → Workers & Pages → Create → Pages → Import an existing Git repository → Connect GitHub.
   - Next steps:
