@@ -17,6 +17,8 @@ window.__CMS_DONE__=(async function(){
     const replaceExact=(from,to,all=false)=>{if(to===undefined||to===null||!from)return;let done=false;for(const n of txtNodes()){if((n.nodeValue||'').trim()===String(from).trim()){n.nodeValue=String(to);done=true;if(!all)break}}return done};
     const hideByIdOrText=(id,text,visible)=>{if(visible!==false)return;const el=q('#'+id)||qa('section,header,footer,div').find(x=>(x.textContent||'').includes(text));if(el)el.style.display='none'};
 
+    // Vietnamese dictionary for assets/i18n.js
+    {const vi=raw.i18n?.vi;let el=q('#i18n-vi');if(vi&&Object.keys(vi).length){if(!el){el=document.createElement('script');el.type='application/json';el.id='i18n-vi';document.head.appendChild(el)}el.textContent=JSON.stringify(vi).replace(/</g,'\\u003c')}else if(el)el.remove()}
     document.title=c.site?.seoTitle||document.title;
     let meta=q('meta[name="description"]');if(meta&&c.site?.seoDescription)meta.content=c.site.seoDescription;
     if(c.site?.accent)document.documentElement.style.setProperty('--accent',c.site.accent);
@@ -97,10 +99,21 @@ window.__CMS_DONE__=(async function(){
     replaceExact('Journal',c.home?.journal?.title);
     replaceExact('Notes on visual culture, process and creative direction.',c.home?.journal?.description);
     const journals=(c.home?.journal?.items||[]).filter(x=>x.published!==false);
-    const journalHost=q('#journal')||q('[class*="journal"]');
-    if(journalHost&&journals.length){
-      const cards=qa('article,a,[class*="card"]',journalHost).filter(x=>(x.textContent||'').trim().length>0);
-      journals.forEach((j,i)=>{const card=cards[i];if(!card)return;const title=q('h2,h3,h4,[class*="title"]',card);if(title)title.textContent=j.title;const img=q('img',card);if(img&&j.thumbnail)img.src=j.thumbnail;const a=card.tagName==='A'?card:q('a',card);if(a&&j.href)a.href=j.href;const meta=qa('span,small,p',card);const d=meta.find(x=>/20\d{2}/.test(x.textContent||''));if(d&&j.date)d.textContent=j.date});
+    // Cards come from home.journal.items. Up to 3 = the normal grid; 4 or more = a carousel with ← → buttons.
+    const jGrid=q('#journal .journal-grid');
+    if(jGrid&&journals.length){
+      const esc=v=>String(v??'').replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+      jGrid.innerHTML=journals.map(j=>{
+        const live=j.href&&j.href!=='#';
+        const hit=live?'<a class="article-hit" href="'+esc(link(j.href))+'"'+(/^https?:/.test(j.href)?' target="_blank" rel="noopener"':'')+' aria-label="'+esc(j.title)+'"></a>':'';
+        return '<article class="article reveal">'+(j.thumbnail?'<img src="'+esc(j.thumbnail)+'" alt="'+esc(j.title)+'">':'')+'<div class="article-copy"><h3>'+esc(j.title)+'</h3><small>'+esc(j.category)+'</small></div>'+hit+'</article>';
+      }).join('');
+      const carousel=journals.length>3;
+      jGrid.classList.toggle('is-carousel',carousel);
+      let nav=q('#journal .journal-nav');
+      if(carousel&&!nav){nav=document.createElement('div');nav.className='journal-nav';nav.innerHTML='<button class="jr-prev" type="button" aria-label="Previous articles" disabled>←</button><button class="jr-next" type="button" aria-label="Next articles">→</button>';jGrid.after(nav)}
+      if(!carousel&&nav)nav.remove();
+      qa('.reveal',jGrid).forEach(el=>{try{io.observe(el)}catch(e){}});
     }
     hideByIdOrText('journal','Journal.26',c.home?.journal?.visible);
 
@@ -110,6 +123,14 @@ window.__CMS_DONE__=(async function(){
     replaceExact('If you are building a brand, campaign or visual system and need a clear creative direction, send over the brief. I am open to selected freelance and collaborative projects.',c.home?.contact?.description);
     if(isHome&&c.home?.contact?.image){const imgs=qa('img');const target=imgs.find(x=>/WDp2|contact/i.test(x.src||''))||imgs.at(-1);if(target)target.src=c.home.contact.image}
     if(c.home?.contact?.email)replaceExact('hello@namnguyen.design',c.home.contact.email,true);
+    // Zalo QR frame: image, caption and phone come from home.contact
+    const qrBox=q('#contact .contact-qr');
+    if(qrBox){
+      const ct=c.home?.contact||{}, qi=q('.qr-img',qrBox), qe=q('.qr-empty',qrBox), qc=q('.qr-caption',qrBox), qp=q('.qr-phone',qrBox);
+      if(ct.qrImage){qi.src=ct.qrImage;qi.hidden=false;qe.hidden=true}
+      if(ct.qrCaption)qc.textContent=ct.qrCaption;
+      if(ct.phone){qp.textContent=ct.phone;qp.href='tel:'+String(ct.phone).replace(/[^+\d]/g,'');qp.hidden=false}
+    }
     hideByIdOrText('contact','Start a Project.26',c.home?.contact?.visible);
 
     // FOOTER

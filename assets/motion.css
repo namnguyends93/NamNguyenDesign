@@ -2,7 +2,7 @@
 
 /* split-character headline reveal */
 .split .w{display:inline-block;white-space:nowrap}
-.split .c{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em;margin-bottom:-.08em}
+.split .c{display:inline-block;overflow:hidden;vertical-align:top;padding:.24em 0 .08em;margin:-.24em 0 -.08em}
 .split .c>i{display:inline-block;font-style:normal;transform:translateY(105%);transition:transform .9s cubic-bezier(.2,.75,.2,1) var(--cd,0ms)}
 .split.on .c>i{transform:none}
 
@@ -23,18 +23,19 @@
 /* scramble targets keep their width while shuffling */
 [data-scramble]{font-variant-numeric:tabular-nums}
 
-/* cursor label */
-.cursor-tag{position:fixed;left:0;top:0;z-index:150;pointer-events:none;width:96px;height:96px;margin:-48px 0 0 -48px;border-radius:50%;background:#fff;color:#000;display:grid;place-items:center;font:500 12px/1 "Kode Mono",monospace;text-transform:uppercase;letter-spacing:-.02em;transform:translate3d(var(--x,-200px),var(--y,-200px),0) scale(0);transition:transform .35s cubic-bezier(.2,.75,.2,1);mix-blend-mode:normal}
-.cursor-tag.on{transform:translate3d(var(--x),var(--y),0) scale(1)}
-.motion .project-stage,.motion .article{cursor:none}
-.motion .project-stage a,.motion .project-stage button{cursor:pointer}
+/* cursor ring: the box follows the mouse, the ring scales in/out */
+.cursor-tag{position:fixed;left:0;top:0;z-index:150;pointer-events:none;width:96px;height:96px;margin:-48px 0 0 -48px;color:#fff;mix-blend-mode:difference;transform:translate3d(var(--x,-200px),var(--y,-200px),0)}
+.cursor-tag svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;transform:scale(0);transition:transform .45s cubic-bezier(.2,.75,.2,1)}
+.cursor-tag.on svg{transform:scale(1)}
+.cursor-tag text{fill:currentColor;font:500 11.5px "Geist Mono",monospace;text-transform:uppercase}
+.cursor-tag .ct-ring{transform-origin:60px 60px;animation:ct-spin 9s linear infinite}
+@keyframes ct-spin{to{transform:rotate(360deg)}}
 
 /* magnetic buttons */
 .magnetic{transition:transform .35s cubic-bezier(.2,.75,.2,1)}
 
 @media (hover:none),(pointer:coarse){
   .cursor-tag{display:none}
-  .motion .project-stage,.motion .article{cursor:auto}
 }
 @media (prefers-reduced-motion:reduce){
   .split .c>i{transform:none;transition:none}

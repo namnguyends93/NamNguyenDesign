@@ -17,6 +17,12 @@ const img = (s, alt, base) => `<img src="${esc(src(s, base))}" alt="${esc(alt)}"
 const list = v => Array.isArray(v) ? v.filter(Boolean) : paras(v);
 
 // ---------- module definitions (admin builds its forms from this) ----------
+// Vietnamese dictionary for assets/i18n.js (content.json → i18n.vi)
+function i18nData(content) {
+  const vi = content && content.i18n && content.i18n.vi;
+  if (!vi || !Object.keys(vi).length) return '';
+  return '<script type="application/json" id="i18n-vi">' + JSON.stringify(vi).replace(/</g, '\\u003c') + '</script>';
+}
 const GALLERY_STYLES = [['mix', '2 ảnh + 1 ảnh lớn (mặc định)'], ['grid2', 'Lưới 2 cột'], ['grid3', 'Lưới 3 cột (gọn)'], ['grand', 'Lớn: 1 · 2 · 1 · 3 (trưng bày)']];
 const BLOCKS = {
   overview:  { label: 'Overview', hint: 'Headline + Description + thông tin Client / Role / Scope / Year (lấy từ phần trên).', fields: [] },
@@ -216,9 +222,10 @@ function renderProjectPage(content, slug) {
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>${esc(title)} — ${esc(brand)}</title>
 <meta name="description" content="${esc(metaDesc)}">
+<script>(function(){try{var q=new URLSearchParams(location.search).get('lang');if((q||localStorage.getItem('nnd-lang'))==='vi'){var d=document.documentElement;d.classList.add('i18n-wait');setTimeout(function(){d.classList.remove('i18n-wait')},2500)}}catch(e){}})()</script><style>.i18n-wait body{opacity:0}</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Kode+Mono:wght@500&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Geist+Mono:wght@500&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
 <style>${CSS}${accent}</style>
 </head>
 <body>
@@ -233,7 +240,9 @@ function renderProjectPage(content, slug) {
   <span>INDEPENDENT · ${esc(location).toUpperCase()}</span>
 </footer>
 <script>${TRANSITION_JS}</script>
+${i18nData(content)}
 <script src="../assets/to-top.js" defer></script>
+<script src="../assets/i18n.js" defer></script>
 </body>
 </html>
 `;
@@ -248,10 +257,10 @@ a{color:inherit;text-decoration:none}
 img{display:block;width:100%;height:100%;object-fit:cover}
 figure{margin:0}
 .display{font-family:"Space Grotesk",Inter,sans-serif;text-transform:uppercase;letter-spacing:-.065em;line-height:.92;font-weight:600}
-.mono{font-family:"Kode Mono",monospace;text-transform:uppercase;letter-spacing:-.04em}
+.mono{font-family:"Geist Mono",monospace;text-transform:uppercase;letter-spacing:-.04em}
 .project-page{padding:8px;display:flex;flex-direction:column;gap:8px}
 .project-nav{position:fixed;z-index:50;top:22px;left:22px;right:22px;display:flex;justify-content:space-between;align-items:center;pointer-events:none}
-.project-nav a{pointer-events:auto;display:inline-flex;align-items:center;gap:10px;padding:13px 16px;border-radius:999px;background:rgba(8,8,8,.35);backdrop-filter:blur(26px);-webkit-backdrop-filter:blur(26px);border:1px solid rgba(255,255,255,.16);font-family:"Kode Mono",monospace;font-size:11px;transition:background .25s,color .25s}
+.project-nav a{pointer-events:auto;display:inline-flex;align-items:center;gap:10px;padding:13px 16px;border-radius:999px;background:rgba(8,8,8,.35);backdrop-filter:blur(26px);-webkit-backdrop-filter:blur(26px);border:1px solid rgba(255,255,255,.16);font-family:"Geist Mono",monospace;font-size:11px;transition:background .25s,color .25s}
 .project-nav a:hover{background:var(--white);color:var(--black)}
 
 /* hero */
@@ -265,11 +274,11 @@ figure{margin:0}
 .hero-side{display:flex;flex-direction:column;gap:18px;justify-self:end;max-width:420px}
 .hero-side p{margin:0;color:#e8e8e8;font-size:16px;line-height:1.5}
 .meta{display:flex;flex-wrap:wrap;gap:8px}
-.meta span{border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:8px 11px;font:10px "Kode Mono",monospace;text-transform:uppercase}
+.meta span{border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:8px 11px;font:10px "Geist Mono",monospace;text-transform:uppercase}
 
 /* shared section */
 .section{border-radius:100px;overflow:hidden;background:var(--dark)}
-.eyebrow{color:var(--accent-soft);font:12px "Kode Mono",monospace;text-transform:uppercase}
+.eyebrow{color:var(--accent-soft);font:12px "Geist Mono",monospace;text-transform:uppercase}
 
 /* overview */
 .overview{min-height:680px;padding:100px 7vw;display:grid;grid-template-columns:.8fr 1.2fr;gap:80px;align-items:start}
@@ -278,7 +287,7 @@ figure{margin:0}
 .overview-copy p{margin:0 0 34px}
 .details{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:18px;margin-top:60px}
 .detail{padding-top:16px;border-top:1px solid rgba(255,255,255,.16)}
-.detail b{display:block;margin-bottom:8px;font:10px "Kode Mono",monospace;color:var(--muted);text-transform:uppercase}
+.detail b{display:block;margin-bottom:8px;font:10px "Geist Mono",monospace;color:var(--muted);text-transform:uppercase}
 .detail span{font-size:15px}
 
 /* minimal intro */
@@ -324,13 +333,13 @@ figure{margin:0}
 .process-grid{display:grid;gap:8px}
 .process-grid.cols-1{grid-template-columns:1fr}.process-grid.cols-2{grid-template-columns:1fr 1fr}.process-grid.cols-3{grid-template-columns:repeat(3,1fr)}
 .step{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:48px;padding:36px 32px;display:flex;flex-direction:column;gap:14px}
-.step-num{font:12px "Kode Mono",monospace;color:var(--accent-soft)}
+.step-num{font:12px "Geist Mono",monospace;color:var(--accent-soft)}
 .step h3{margin:0;font-size:clamp(34px,3.4vw,52px)}
 .step p{margin:0;color:#cfcfcb;font-size:16px;line-height:1.5}
 
 /* credits */
 .credits{padding:60px 7vw;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:24px}
-.credits b{display:block;margin-bottom:10px;font:10px "Kode Mono",monospace;color:var(--muted);text-transform:uppercase}
+.credits b{display:block;margin-bottom:10px;font:10px "Geist Mono",monospace;color:var(--muted);text-transform:uppercase}
 .credits span{font-family:"Space Grotesk",sans-serif;font-size:clamp(18px,1.6vw,24px);text-transform:uppercase;letter-spacing:-.03em}
 
 /* next */
@@ -339,9 +348,9 @@ figure{margin:0}
 .next:hover img{transform:scale(1.03)}
 .next:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.75))}
 .next-copy{position:relative;z-index:2;padding:60px}
-.next-copy small{font:11px "Kode Mono",monospace;color:#ddd}
+.next-copy small{font:11px "Geist Mono",monospace;color:#ddd}
 .next-copy h3{margin:10px 0 0;font-size:clamp(58px,8vw,120px)}
-.footer{padding:80px 32px 40px;display:flex;justify-content:space-between;gap:30px;color:#777;font:11px "Kode Mono",monospace}
+.footer{padding:80px 32px 40px;display:flex;justify-content:space-between;gap:30px;color:#777;font:11px "Geist Mono",monospace}
 
 @media(max-width:850px){
   .hero{border-radius:72px}.hero.short{min-height:70vh}

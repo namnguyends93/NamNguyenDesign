@@ -76,7 +76,7 @@
     }
 
     /* scramble on hover */
-    var scr = document.querySelectorAll('.nav-links a, .nav-contact, .project-link, .footer-links a span:first-child, .article h3, .project-meta span');
+    var scr = document.querySelectorAll('.nav-links a, .nav-contact, .project-link, .footer-links a span:first-child, .project-meta span');
     Array.prototype.forEach.call(scr, function (el) {
       if (el.children.length) { // only scramble the leading text node, keep icons
         var t = el.firstChild; if (!t || t.nodeType !== 3 || !t.textContent.trim()) return;
@@ -133,21 +133,24 @@
 
     /* cursor label + magnetic buttons (mouse only) */
     if (finePointer && !reduce) {
+      // Rotating "NAM NGUYEN" text ring that follows the mouse everywhere on the page
       var tag = document.createElement('div');
-      tag.className = 'cursor-tag'; tag.setAttribute('aria-hidden', 'true'); tag.textContent = 'View ↗';
+      tag.className = 'cursor-tag'; tag.setAttribute('aria-hidden', 'true');
+      tag.innerHTML = '<svg viewBox="0 0 120 120"><defs><path id="ct-path" d="M60,60 m-47,0 a47,47 0 1,1 94,0 a47,47 0 1,1 -94,0"/></defs>' +
+        '<g class="ct-ring"><text><textPath href="#ct-path" textLength="293" lengthAdjust="spacing">NAM NGUYEN • NAM NGUYEN • </textPath></text></g></svg>';
       document.body.appendChild(tag);
-      var cx = -200, cy = -200, tx = -200, ty = -200;
-      window.addEventListener('mousemove', function (e) { tx = e.clientX; ty = e.clientY; }, { passive: true });
+      var cx = -200, cy = -200, tx = -200, ty = -200, seen = false;
+      window.addEventListener('mousemove', function (e) {
+        tx = e.clientX; ty = e.clientY;
+        if (!seen) { seen = true; cx = tx; cy = ty; }   // first move: appear right at the pointer
+        tag.classList.add('on');
+      }, { passive: true });
+      document.documentElement.addEventListener('mouseleave', function () { tag.classList.remove('on'); });
       (function follow() {
         cx += (tx - cx) * 0.18; cy += (ty - cy) * 0.18;
         tag.style.setProperty('--x', cx.toFixed(1) + 'px'); tag.style.setProperty('--y', cy.toFixed(1) + 'px');
         requestAnimationFrame(follow);
       })();
-      Array.prototype.forEach.call(document.querySelectorAll('.project-stage, .article'), function (z) {
-        z.addEventListener('mouseenter', function () { tag.textContent = z.classList.contains('article') ? 'Read ↗' : 'View ↗'; tag.classList.add('on'); });
-        z.addEventListener('mouseleave', function () { tag.classList.remove('on'); });
-        z.addEventListener('mouseover', function (e) { tag.classList.toggle('on', !e.target.closest('button, .project-link, .project-controls')); });
-      });
       Array.prototype.forEach.call(document.querySelectorAll('.nav-contact, .btn, .project-prev, .project-next, .brand-badge'), function (m) {
         m.classList.add('magnetic');
         m.addEventListener('mousemove', function (e) {

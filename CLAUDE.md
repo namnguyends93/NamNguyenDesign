@@ -16,10 +16,17 @@ Write replies to the owner in Vietnamese.
 
 - Interaction layer (inspired by gojett.framer.website, keeping the owner's own design):
   - Lives in `assets/motion.js` and `assets/motion.css`. It runs after `window.__CMS_DONE__` and adds `.motion` to `<html>`.
-  - Effects: split-character headline reveal, hero zoom and fade on scroll, image parallax (`--py`), a velocity marquee (`.big-marquee`, placed before `#journal`), hover text scramble, a "View ↗"/"Read ↗" cursor and magnetic buttons.
-  - The cursor and magnetic buttons run only with a mouse. Reduced motion turns all of it off.
+  - Effects: split-character headline reveal, hero zoom and fade on scroll, image parallax (`--py`), a velocity marquee (`.big-marquee`, placed before `#journal`), hover text scramble, a rotating "NAM NGUYEN •" text ring (96px) that follows the mouse everywhere, and magnetic buttons.
+  - The cursor ring and magnetic buttons run only with a mouse. Reduced motion turns all of it off.
   - The marquee text is hardcoded in `index.html` and is not in the admin yet.
-  - Not built yet: a Journal list with an image on hover, and a background colour change on scroll.
+  - Journal: 3 posts = grid of cards; 4 or more = a carousel with ← → buttons (cards come from the admin). The owner rejected a hover-image list.
+  - Not built yet: a background colour change on scroll.
+- VI / EN switch (`assets/i18n.js`, on every page):
+  - Pages are written in English. Vietnamese is a dictionary `content.json` → `i18n.vi` = { "English text": "Vietnamese text" }, edited in Admin → Tiếng Việt (that tab scans pages with `?i18nscan=1` to list every text).
+  - The dictionary is embedded as `<script type="application/json" id="i18n-vi">`: by `cms-runtime.js` on the home page, by `project-template.js` on project pages.
+  - The choice is kept in localStorage `nnd-lang` (also `?lang=vi|en`). Switching reloads the page, so `i18n.js` must run before `motion.js` splits headlines.
+  - An empty entry means keep English. If English text changes, its old translation no longer matches: rescan in the admin.
+  - `html[lang=vi]` gets a little more line height on big capitals for the accents.
 - Check animations in Chrome, because the built-in browser pane is hidden and does not run IntersectionObserver or requestAnimationFrame.
 - Deploy everything: `git push origin main` updates GitHub Pages, then `npm run deploy` updates Cloudflare.
 
@@ -41,7 +48,7 @@ Write replies to the owner in Vietnamese.
     - `media.config.json` turns it on. Images uploaded in the admin go to R2 through Wrangler (no keys are stored) and are listed in `media-r2.json`, which is committed.
     - Old images in `uploads/` stay where they are.
     - `build.js` downloads R2 images and turns them into WebP in `dist/`, just like other remote images.
-  - On a new machine, run `npm install` and then `npx wrangler login` once, otherwise uploads fail with an error asking you to log in.
+  - On a new machine, run `npm install` and then `npx wrangler login` once (in PowerShell use `npx.cmd`, because script execution is disabled), otherwise uploads fail with an error asking you to log in.
 - **Older notes on the GitHub-app route (abandoned in favour of Wrangler):**
   - The owner has a Cloudflare account (Free plan), signed in with namnguyen.thietketkm@gmail.com.
   - The "Cloudflare Workers and Pages" GitHub app install was started for the **NamNguyenDesign repo only**. It stopped at GitHub's "Confirm access" password prompt. First check whether it got installed (GitHub → Settings → Applications); if not, redo it from Cloudflare → Workers & Pages → Create → Pages → Import an existing Git repository → Connect GitHub.

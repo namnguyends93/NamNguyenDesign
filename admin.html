@@ -22,6 +22,12 @@ input,textarea,select{width:100%;background:var(--panel2);color:#fff;border:1px 
 .preview{height:78vh;width:100%;border:1px solid var(--line);border-radius:18px;background:#fff}.backup-row{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:11px 0;border-top:1px solid var(--line)}.backup-row:first-child{border-top:0}
 @media(max-width:900px){.shell{grid-template-columns:1fr}aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}.nav{grid-template-columns:repeat(4,1fr)}main{padding:16px}.grid2,.image-field{grid-template-columns:1fr}.image-preview{width:100%;height:180px}}
 .modules{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}.blocks{display:grid;gap:8px;margin-bottom:10px}.block{background:#0b0b0b;border:1px solid var(--line);border-radius:14px;padding:12px}.block-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:10px}.block-head small{display:block;color:#777;font-size:11px;margin-top:3px;font-weight:400}.block-head button{padding:6px 11px}button:disabled{opacity:.3;cursor:default}.add-block,.preset-bar{display:flex;gap:8px;align-items:center}.add-block select,.preset-bar select{width:auto;flex:1}.thumbs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}.thumbs img{width:60px;height:60px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}.block-img{display:grid;grid-template-columns:90px 1fr;gap:10px}.block-img img{width:90px;height:64px;object-fit:cover;border-radius:10px;border:1px solid var(--line);background:#111}a.ghost{display:inline-flex;align-items:center;border-radius:999px;padding:10px 14px;background:#242424;color:#fff;font-weight:700;text-decoration:none;font-size:13px}
+.i18n-group{margin:18px 0 8px;font-size:12px;color:#9eabff;text-transform:uppercase;letter-spacing:.04em}
+.i18n-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start;padding:8px 0;border-top:1px solid var(--line)}
+.i18n-row .en{font-size:13px;color:#cfcfcf;padding:10px 0;white-space:pre-wrap;word-break:break-word}
+.i18n-row textarea{min-height:42px;height:auto;resize:vertical}
+.i18n-row.todo textarea{border-color:#5a4a1e}
+@media(max-width:900px){.i18n-row{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -36,6 +42,7 @@ input,textarea,select{width:100%;background:var(--panel2);color:#fff;border:1px 
 <button data-tab="journal">Journal</button>
 <button data-tab="contact">Contact</button>
 <button data-tab="footer">Footer</button>
+<button data-tab="i18n">Tiếng Việt</button>
 <button data-tab="media">Media</button>
 <button data-tab="preview">Live Preview</button>
 <button data-tab="backup">Backup</button>
@@ -99,6 +106,8 @@ input,textarea,select{width:100%;background:var(--panel2);color:#fff;border:1px 
 <div class="card"><div class="section-head"><strong>Get in touch</strong><label class="switch"><input type="checkbox" id="contactVisible"> Visible</label></div>
 <div class="grid2"><div class="field"><label>Eyebrow</label><input id="contactEyebrow"></div><div class="field"><label>Title</label><input id="contactTitle"></div><div class="field"><label>Email</label><input id="contactEmail"></div><div class="field"><label>Phone</label><input id="contactPhone"></div><div class="field"><label>CTA label</label><input id="contactCTA"></div><div class="field"><label>CTA href</label><input id="contactCTAHref"></div></div>
 <div class="field"><label>Description</label><textarea id="contactDesc"></textarea></div>
+<div class="field"><label>QR Zalo</label><div class="image-field"><img id="contactQrPreview" class="image-preview"><div><input id="contactQrImage"><div class="image-actions"><button class="ghost pick" data-target="contactQrImage">Choose from Media</button><button class="ghost upload" data-target="contactQrImage">Upload QR</button><button class="danger clear" data-target="contactQrImage">Remove</button></div></div></div></div>
+<div class="field"><label>QR caption</label><input id="contactQrCaption" placeholder="Scan to message me on Zalo"></div>
 <div class="field"><label>Image</label><div class="image-field"><img id="contactPreview" class="image-preview"><div><input id="contactImage"><div class="image-actions"><button class="ghost pick" data-target="contactImage">Choose from Media</button><button class="ghost upload" data-target="contactImage">Upload image</button><button class="danger clear" data-target="contactImage">Remove</button></div></div></div></div>
 </div></section>
 
@@ -109,6 +118,15 @@ input,textarea,select{width:100%;background:var(--panel2);color:#fff;border:1px 
 <div id="footerLinks" class="list"></div><button id="addFooterLinkBtn">+ Add Footer Link</button></div>
 </section>
 
+<section class="tab" id="tab-i18n">
+<div class="card">
+<div class="section-head"><strong>Bản tiếng Việt (nút VI / EN)</strong><button class="ghost" id="i18nScan" type="button">Quét lại chữ trên trang</button></div>
+<p style="color:var(--muted);font-size:13px;margin:0 0 12px">Cột trái là chữ tiếng Anh đang có trên trang, cột phải là bản tiếng Việt. Ô nào để trống thì bản VI giữ nguyên tiếng Anh (hợp cho tên riêng, tên client). Sửa nội dung tiếng Anh ở các tab khác xong thì Save rồi bấm <b>Quét lại</b> để dịch câu mới.</p>
+<div class="grid2"><div class="field"><input id="i18nFilter" placeholder="Tìm chữ…"></div><label class="switch"><input type="checkbox" id="i18nTodo"> Chỉ hiện câu chưa dịch</label></div>
+<div id="i18nStats" class="status"></div>
+<div id="i18nRows"></div>
+</div>
+</section>
 <section class="tab" id="tab-media">
 <div class="card"><strong>Media Library</strong><div style="color:#777;font-size:12px;margin:5px 0 12px">Upload ảnh một lần, sau đó chọn trực tiếp từ mọi image field.</div><input id="mediaUpload" type="file" accept="image/*" multiple><button class="primary" id="uploadMediaBtn" style="margin-top:10px">Upload Selected</button></div>
 <div id="mediaGrid" class="media-grid"></div>
@@ -143,10 +161,10 @@ function fill(){
   $("#navVisible").checked=nav.visible!==false;$("#navBrand").value=nav.brand||"";$("#navCTA").value=nav.ctaLabel||"";$("#navCTAHref").value=nav.ctaHref||"";renderNav();
   $("#clientsVisible").checked=cl.visible!==false;$("#clientsEyebrow").value=cl.eyebrow||"";$("#clientsTitle").value=cl.title||"";renderClients();
   $("#journalVisible").checked=j.visible!==false;$("#journalEyebrow").value=j.eyebrow||"";$("#journalTitle").value=j.title||"";$("#journalDesc").value=j.description||"";renderJournal();
-  $("#contactVisible").checked=ct.visible!==false;$("#contactEyebrow").value=ct.eyebrow||"";$("#contactTitle").value=ct.title||"";$("#contactDesc").value=ct.description||"";$("#contactImage").value=ct.image||"";$("#contactEmail").value=ct.email||"";$("#contactPhone").value=ct.phone||"";$("#contactCTA").value=ct.ctaLabel||"";$("#contactCTAHref").value=ct.ctaHref||"";
+  $("#contactVisible").checked=ct.visible!==false;$("#contactEyebrow").value=ct.eyebrow||"";$("#contactTitle").value=ct.title||"";$("#contactDesc").value=ct.description||"";$("#contactImage").value=ct.image||"";$("#contactEmail").value=ct.email||"";$("#contactPhone").value=ct.phone||"";$("#contactQrImage").value=ct.qrImage||"";$("#contactQrCaption").value=ct.qrCaption||"";$("#contactCTA").value=ct.ctaLabel||"";$("#contactCTAHref").value=ct.ctaHref||"";
   $("#footerVisible").checked=ft.visible!==false;$("#footerBrand").value=ft.brand||"";$("#footerDesc").value=ft.description||"";$("#footerCopyright").value=ft.copyright||"";renderFooter();
   renderProjects();
-  ["hero","intro","about","contact"].forEach(x=>setImg(x+"Image",x+"Preview"));
+  ["hero","intro","about","contact","contactQr"].forEach(x=>setImg(x+"Image",x+"Preview"));
 }
 function collect(){
   const h=state.home||(state.home={});
@@ -155,10 +173,11 @@ function collect(){
   h.about={...(h.about||{}),visible:$("#aboutVisible").checked,eyebrow:$("#aboutEyebrow").value,title:$("#aboutTitle").value,description:$("#aboutDesc").value,image:$("#aboutImage").value,skills:{...(h.about?.skills||{}),visible:$("#skillsVisible").checked,eyebrow:$("#skillsEyebrow").value,label:$("#skillsLabel").value,disciplinesTitle:$("#skillsDiscTitle").value,toolsTitle:$("#skillsToolsTitle").value,disciplines:$("#skillsDisciplines").value.split("\n").map(x=>x.trim()).filter(Boolean),tools:collectGeneric("#toolItems",["name","icon"],["visible"])}};
   h.clients={...(h.clients||{}),visible:$("#clientsVisible").checked,eyebrow:$("#clientsEyebrow").value,title:$("#clientsTitle").value,items:collectGeneric("#clientItems",["name","logo","href"],["visible"])};
   h.journal={...(h.journal||{}),visible:$("#journalVisible").checked,eyebrow:$("#journalEyebrow").value,title:$("#journalTitle").value,description:$("#journalDesc").value,items:collectGeneric("#journalItems",["title","date","category","thumbnail","href"],["published"])};
-  h.contact={...(h.contact||{}),visible:$("#contactVisible").checked,eyebrow:$("#contactEyebrow").value,title:$("#contactTitle").value,description:$("#contactDesc").value,image:$("#contactImage").value,email:$("#contactEmail").value,phone:$("#contactPhone").value,ctaLabel:$("#contactCTA").value,ctaHref:$("#contactCTAHref").value};
+  h.contact={...(h.contact||{}),visible:$("#contactVisible").checked,eyebrow:$("#contactEyebrow").value,title:$("#contactTitle").value,description:$("#contactDesc").value,image:$("#contactImage").value,email:$("#contactEmail").value,phone:$("#contactPhone").value,qrImage:$("#contactQrImage").value,qrCaption:$("#contactQrCaption").value,ctaLabel:$("#contactCTA").value,ctaHref:$("#contactCTAHref").value};
   state.navigation={...(state.navigation||{}),visible:$("#navVisible").checked,brand:$("#navBrand").value,ctaLabel:$("#navCTA").value,ctaHref:$("#navCTAHref").value,items:collectGeneric("#navItems",["label","href"],["visible"])};
   state.footer={...(state.footer||{}),visible:$("#footerVisible").checked,brand:$("#footerBrand").value,description:$("#footerDesc").value,copyright:$("#footerCopyright").value,links:collectGeneric("#footerLinks",["label","href"],[])};
   collectProjects();
+  collectI18n();
 }
 function collectGeneric(host,fields,checks){return $$(host+" .item").map(el=>{const o={};fields.forEach(k=>o[k]=el.querySelector(`[data-k="${k}"]`)?.value||"");checks.forEach(k=>o[k]=!!el.querySelector(`[data-k="${k}"]`)?.checked);return o})}
 function renderNav(){const a=state.navigation?.items||[];$("#navItems").innerHTML=a.map((x,i)=>`<div class="item"><div class="grid2"><div class="field"><label>Label</label><input data-k="label" value="${esc(x.label)}"></div><div class="field"><label>Href</label><input data-k="href" value="${esc(x.href)}"></div></div><div class="item-head"><label class="switch"><input type="checkbox" data-k="visible" ${x.visible!==false?"checked":""}> Visible</label><button class="danger remove-generic" data-type="nav" data-i="${i}">Delete</button></div></div>`).join("")}
@@ -202,7 +221,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("button");if(!t)r
 async function save(){collect();const d=await api("/api/content",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(state)});state=d.content;status("Saved. Backup created.");refreshPreview()}
 $("#saveBtn").onclick=()=>save().catch(e=>status("Error: "+e.message));$("#reloadBtn").onclick=()=>load().catch(e=>status("Error: "+e.message));
 
-$$(".nav button").forEach(b=>b.onclick=async()=>{$$(".nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");$$(".tab").forEach(x=>x.classList.remove("active"));$("#tab-"+b.dataset.tab).classList.add("active");$("#title").textContent=b.textContent;if(b.dataset.tab==="media")await loadMedia();if(b.dataset.tab==="backup")await loadBackups();if(b.dataset.tab==="preview")refreshPreview()});
+$$(".nav button").forEach(b=>b.onclick=async()=>{$$(".nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");$$(".tab").forEach(x=>x.classList.remove("active"));$("#tab-"+b.dataset.tab).classList.add("active");$("#title").textContent=b.textContent;if(b.dataset.tab==="media")await loadMedia();if(b.dataset.tab==="i18n"&&!i18nScanned)await scanI18n();if(b.dataset.tab==="backup")await loadBackups();if(b.dataset.tab==="preview")refreshPreview()});
 
 $("#addNavBtn").onclick=()=>{collect();state.navigation.items.push({label:"New Item",href:"#",visible:true});renderNav()}
 $("#addToolBtn").onclick=()=>{collect();(state.home.about.skills.tools||(state.home.about.skills.tools=[])).push({name:"New App",icon:"other",visible:true});renderTools()}
@@ -245,8 +264,39 @@ document.addEventListener("click",e=>{
   if(t.classList.contains("gallery-upload")){$("#hiddenUpload").onchange=async()=>{const f=$("#hiddenUpload").files[0];if(!f)return;const d=await uploadFile(f);const ta=$$("#projectItems .project")[Number(t.dataset.i)].querySelector('[data-k="gallery"]');ta.value+=(ta.value.trim()?"\n":"")+d.url;$("#hiddenUpload").value=""};$("#hiddenUpload").click()}
 });
 
-["heroImage","introImage","aboutImage","contactImage"].forEach(id=>$("#"+id).addEventListener("input",()=>{const pv=id.replace("Image","Preview");setImg(id,pv)}));
+["heroImage","introImage","aboutImage","contactImage","contactQrImage"].forEach(id=>$("#"+id).addEventListener("input",()=>{const pv=id.replace("Image","Preview");setImg(id,pv)}));
 
+/* ---------- Tiếng Việt ---------- */
+let i18nScanned=false;
+function scanPage(url){return new Promise(res=>{const f=document.createElement("iframe");f.style.cssText="position:fixed;left:-3000px;top:0;width:1280px;height:800px;opacity:0;pointer-events:none";f.src=url+(url.includes("?")?"&":"?")+"i18nscan=1&t="+Date.now();let done=false;const finish=v=>{if(done)return;done=true;f.remove();res(v||[])};f.onload=async()=>{try{const w=f.contentWindow;if(w.__CMS_DONE__)await w.__CMS_DONE__;for(let i=0;i<40&&!w.__I18N_STRINGS__;i++)await new Promise(r=>setTimeout(r,100));finish(w.__I18N_STRINGS__)}catch(e){finish([])}};setTimeout(()=>finish([]),15000);document.body.appendChild(f)})}
+async function scanI18n(){
+  collectI18n();
+  status("Đang quét chữ trên trang…");
+  const groups=[["Trang chủ",await scanPage("/")]];
+  for(const p of (state.projects||[]).filter(x=>x.published!==false)){const slug=p.slug||p.id;if(!/^[\w-]+$/.test(slug||""))continue;groups.push(["Project: "+(p.title||slug),await scanPage("/projects/"+slug+".html")])}
+  const vi=(state.i18n&&state.i18n.vi)||{};const seen=new Set();
+  const clean=gs=>gs.map(([n,list])=>[n,list.filter(s=>{if(seen.has(s))return false;seen.add(s);return true})]).filter(([,l])=>l.length);
+  const out=clean(groups);
+  const orphans=Object.keys(vi).filter(k=>!seen.has(k));
+  if(orphans.length)out.push(["Không còn thấy trên trang (giữ lại phòng khi dùng)",orphans]);
+  $("#i18nRows").innerHTML=out.map(([n,list])=>'<div class="i18n-group">'+esc(n)+'</div>'+list.map(s=>{const v=vi[s]||"";return '<div class="i18n-row'+(v?"":" todo")+'" data-en="'+esc(s)+'"><div class="en">'+esc(s)+'</div><textarea rows="'+Math.max(1,Math.ceil(Math.max(s.length,v.length)/48))+'" placeholder="(giữ tiếng Anh)">'+esc(v)+'</textarea></div>'}).join("")).join("");
+  i18nScanned=true;filterI18n();status("Đã quét xong. Sửa bản dịch rồi bấm Save.");
+}
+function collectI18n(){
+  const rows=$$("#i18nRows .i18n-row");if(!rows.length)return;
+  const vi={...((state.i18n&&state.i18n.vi)||{})};
+  rows.forEach(r=>{const en=r.dataset.en,v=r.querySelector("textarea").value.trim();if(v)vi[en]=v;else delete vi[en]});
+  state.i18n={...(state.i18n||{}),vi};
+}
+function filterI18n(){
+  const q=$("#i18nFilter").value.trim().toLowerCase(),todo=$("#i18nTodo").checked;let shown=0,total=0,done=0;
+  $$("#i18nRows .i18n-row").forEach(r=>{const v=r.querySelector("textarea").value.trim();r.classList.toggle("todo",!v);total++;if(v)done++;const hit=(!q||r.dataset.en.toLowerCase().includes(q)||v.toLowerCase().includes(q))&&(!todo||!v);r.style.display=hit?"":"none";if(hit)shown++});
+  $$("#i18nRows .i18n-group").forEach(g=>{let n=g.nextElementSibling,any=false;while(n&&n.classList.contains("i18n-row")){if(n.style.display!=="none")any=true;n=n.nextElementSibling}g.style.display=any?"":"none"});
+  $("#i18nStats").textContent="Đã dịch "+done+"/"+total+" câu"+(q||todo?" · đang hiện "+shown:"");
+}
+$("#i18nFilter").addEventListener("input",filterI18n);$("#i18nTodo").addEventListener("change",filterI18n);
+$("#i18nRows").addEventListener("input",e=>{if(e.target.tagName==="TEXTAREA")filterI18n()});
+$("#i18nScan").onclick=async()=>{await scanI18n()};
 function refreshPreview(){$("#previewFrame").src="/?cms="+Date.now()}
 async function loadBackups(){const d=await api("/api/backups");$("#backupList").innerHTML=(d.backups||[]).map(b=>`<div class="backup-row"><div><strong>${esc(b.name)}</strong><div style="color:#777;font-size:12px">${Math.round(b.size/1024)} KB · ${new Date(b.modified).toLocaleString()}</div></div><button class="ghost restore" data-name="${esc(b.name)}">Restore</button></div>`).join("")||'<div style="color:#777">No backups yet.</div>'}
 $("#backupNowBtn").onclick=async()=>{await api("/api/backups/create",{method:"POST"});await loadBackups();status("Backup created.")}
