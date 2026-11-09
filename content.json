@@ -1,14 +1,16 @@
 {
   "site": {
     "name": "Nam Nguyen Design",
-    "role": "Independent Visual Designer",
+    "role": "Design Leader",
     "location": "Ho Chi Minh City, Vietnam",
-    "email": "hello@namnguyen.design",
+    "email": "namnguyen.thietketkm@gmail.com",
     "siteUrl": "https://namnguyends93.github.io/NamNguyenDesign/",
     "accent": "#4c6fff",
-    "seoTitle": "Nam Nguyen Design — Visual Designer",
-    "seoDescription": "Independent visual design practice focused on brand identity, campaign systems and art direction.",
-    "favicon": ""
+    "seoTitle": "Nam Nguyen Design — Design Leader",
+    "seoDescription": "Nam Nguyen — Design Leader at Ngoc Dung Beauty Center, leading campaign key visuals, art direction and brand content in Ho Chi Minh City.",
+    "favicon": "",
+    "cursorText": "NAM NGUYEN",
+    "cursorRing": true
   },
   "navigation": {
     "visible": true,
@@ -46,23 +48,23 @@
   "home": {
     "hero": {
       "visible": true,
-      "eyebrow": "Visual Designer",
+      "eyebrow": "Design Leader",
       "indexLabel": "2026",
       "title": "Nam Nguyen Design",
-      "description": "Brand identities, campaign visuals and digital experiences built with clarity, edge and intent.",
+      "description": "Design Leader at Ngoc Dung Beauty Center. 20 campaigns led in 2026, from the first key visual to every touchpoint.",
       "image": "/uploads/ava-1787077972159-488571.jpg",
       "ctaLabel": "Tìm hiểu thêm",
       "ctaHref": "#projects"
     },
     "intro": {
       "visible": true,
-      "eyebrow": "Visual Designer / Art Direction",
+      "eyebrow": "Design Leader / Art Direction",
       "title": "Clear ideas. Bold visual direction.",
       "description": "",
       "services": [
-        "Brand Identity",
-        "Campaign Design",
-        "Art Direction"
+        "Campaign Key Visual",
+        "Art Direction",
+        "Beauty Branding"
       ],
       "location": "Ho Chi Minh City, Vietnam",
       "image": "/uploads/554572611_1893148574968600_5562284692063288802_n-1787077987020-e5bd75.jpg"
@@ -71,7 +73,7 @@
       "visible": true,
       "eyebrow": "Profile.26",
       "title": "About",
-      "description": "Nam Nguyen Design is an independent visual design practice focused on brand identity, campaign systems and art direction. Every project is shaped around a clear idea, a strong visual point of view and execution that feels precise, contemporary and memorable.",
+      "description": "I'm Nam Nguyen, a designer since 2019 and now Design Leader at Ngoc Dung Beauty Center, where I have led 20 campaigns this year, from concept and key visual to social, print and in-store rollout. Before that I designed for Seedcom (Juno, Hnoss), the real-estate brands LinkHouse and Maple Land, and the beauty brands Tu Trinh Spa and Zema. Every project starts from a clear idea and ends in work that feels precise and memorable.",
       "image": "",
       "skills": {
         "visible": true,
@@ -80,14 +82,20 @@
         "disciplinesTitle": "What I do",
         "toolsTitle": "Tools",
         "disciplines": [
-          "Brand Identity",
-          "Campaign Design",
+          "Campaign Key Visual",
           "Art Direction",
-          "Key Visual",
-          "Packaging",
+          "Design Team Leadership",
+          "Branding",
           "Social Content",
-          "Motion Graphics",
-          "Web UI"
+          "Packaging",
+          "Web & UI Design",
+          "Beauty Retouch",
+          "Photography",
+          "Video Editing",
+          "AI Image Generation",
+          "AI Upscale & Retouch",
+          "AI Motion & Video",
+          "Prompt Direction"
         ],
         "tools": [
           {
@@ -107,12 +115,27 @@
             "icon": "ae"
           },
           {
-            "name": "Blender",
-            "icon": "blender"
+            "name": "Premiere Pro",
+            "icon": "pr"
           },
           {
-            "name": "Cinema 4D",
-            "icon": "c4d"
+            "name": "CapCut",
+            "icon": ""
+          }
+        ],
+        "aiTitle": "AI Tools",
+        "aiTools": [
+          {
+            "name": "Higgsfield",
+            "icon": "",
+            "image": "",
+            "visible": true
+          },
+          {
+            "name": "Magnific",
+            "icon": "",
+            "image": "",
+            "visible": true
           }
         ]
       }
@@ -124,6 +147,30 @@
       "items": [
         {
           "name": "NGOC DUNG",
+          "logo": "",
+          "href": "",
+          "visible": true
+        },
+        {
+          "name": "ZEMA",
+          "logo": "",
+          "href": "",
+          "visible": true
+        },
+        {
+          "name": "SEEDCOM",
+          "logo": "",
+          "href": "",
+          "visible": true
+        },
+        {
+          "name": "MAPLE LAND",
+          "logo": "",
+          "href": "",
+          "visible": true
+        },
+        {
+          "name": "LEAD ENGLISH",
           "logo": "",
           "href": "",
           "visible": true
@@ -146,13 +193,23 @@
       "visible": true,
       "eyebrow": "Selected Work.26",
       "title": "Projects",
-      "description": "Selected identity, campaign and digital projects shaped through concept, art direction and disciplined visual systems."
+      "description": "Campaigns and visual systems from my work as Design Leader at Ngoc Dung Beauty Center, alongside earlier brand projects.",
+      "stats": [
+        {
+          "value": "20",
+          "label": "Campaigns led in 2026"
+        },
+        {
+          "value": "7+",
+          "label": "Years in design"
+        }
+      ]
     },
     "journal": {
       "visible": true,
       "eyebrow": "Journal.26",
       "title": "Journal",
-      "description": "Notes on visual culture, process and creative direction.",
+      "description": "Notes on AI workflows, key visuals and leading campaigns, from my work as a Design Leader.",
       "items": [
         {
           "title": "Building clearer campaign systems",
@@ -184,20 +241,29 @@
       "visible": true,
       "eyebrow": "Start a Project.26",
       "title": "Get in touch",
-      "description": "If you are building a brand, campaign or visual system and need a clear creative direction, send over the brief. I am open to selected freelance and collaborative projects.",
+      "description": "Building a campaign, a brand or a visual system and need a clear creative direction? Send me the brief. Alongside my role at Ngoc Dung, I take on selected freelance and collaboration projects.",
       "image": "",
-      "email": "hello@namnguyen.design",
+      "email": "namnguyen.thietketkm@gmail.com",
       "phone": "",
       "ctaLabel": "Start a Project +",
-      "ctaHref": "mailto:hello@namnguyen.design",
-      "qrImage": "",
+      "ctaHref": "mailto:namnguyen.thietketkm@gmail.com",
+      "qrImage": "/uploads/qr-zalo-demo.png",
       "qrCaption": "Scan to message me on Zalo"
+    },
+    "marquee": {
+      "visible": true,
+      "words": [
+        "Key Visual",
+        "Campaign",
+        "AI Visual",
+        "Art Direction"
+      ]
     }
   },
   "footer": {
     "visible": true,
     "brand": "Nam Nguyen Design",
-    "description": "Independent visual design practice.",
+    "description": "Design Leader at Ngoc Dung Beauty Center.",
     "copyright": "© 2026 Nam Nguyen Design",
     "links": [
       {
@@ -206,7 +272,7 @@
       },
       {
         "label": "Behance",
-        "href": "#"
+        "href": "https://www.behance.net/gallery/199409315/Portfolio-2024"
       },
       {
         "label": "LinkedIn",
@@ -214,7 +280,7 @@
       },
       {
         "label": "Email",
-        "href": "mailto:hello@namnguyen.design"
+        "href": "mailto:namnguyen.thietketkm@gmail.com"
       }
     ]
   },
@@ -223,17 +289,17 @@
       "id": "ngoc-dung-campaign",
       "slug": "ngoc-dung-campaign",
       "title": "NGOC DUNG CAMPAIGN",
-      "category": "BRAND IDENTITY",
+      "category": "CAMPAIGN DESIGN",
       "year": "2026",
-      "client": "Ngoc Dung",
-      "role": "Visual Design / Art Direction",
+      "client": "Ngoc Dung Beauty Center",
+      "role": "Design Leader / Art Direction",
       "cover": "https://framerusercontent.com/images/H3KNH97QuI3MqCMMrAfkRwWSDAc.jpg?width=1600",
-      "description": "A campaign system built to feel premium, contemporary and unmistakably beauty-led — balancing elegance with a sharper, more editorial attitude.",
+      "description": "One of the 20 campaigns I led at Ngoc Dung Beauty Center in 2026: a premium, beauty-led system rolled out from key visual to social, print and in-store.",
       "published": true,
       "featured": true,
       "link": "projects/ngoc-dung-campaign.html",
       "headline": "Direction\n& System",
-      "scope": "Concept / Key Visual / System",
+      "scope": "Campaign Concept / Key Visual / Rollout",
       "heroSize": "full",
       "blocks": [
         {
@@ -260,8 +326,8 @@
       "title": "BEAUTY VISUAL SYSTEM",
       "category": "ART DIRECTION",
       "year": "2026",
-      "client": "",
-      "role": "Art Direction / Visual System",
+      "client": "Ngoc Dung & Zema Beauty More",
+      "role": "Design Leader / Visual System",
       "cover": "https://framerusercontent.com/images/BYTBcqFikmPNhvjQYU7pi3ciyI.jpg?width=1600",
       "description": "A flexible visual language for beauty content across campaign, social and digital formats, designed around consistency without losing expression.",
       "published": true,
@@ -323,6 +389,244 @@
           "text": "Future-facing design works best when the concept stays simple and the execution stays precise."
         }
       ]
+    },
+    {
+      "id": "article-ai-brief-to-key-visual",
+      "kind": "journal",
+      "slug": "ai-brief-to-key-visual",
+      "title": "FROM BRIEF TO KEY VISUAL IN ONE DAY",
+      "category": "AI WORKFLOW",
+      "year": "2026",
+      "client": "",
+      "role": "",
+      "scope": "",
+      "cover": "https://framerusercontent.com/images/r1Q4APz4TNMV5x9oKRYscAL06c.jpg?width=1200",
+      "description": "How I combine AI image tools with classic retouching to move from a campaign brief to an approved key visual in a single working day.",
+      "published": true,
+      "featured": false,
+      "link": "",
+      "headline": "",
+      "heroSize": "short",
+      "blocks": [
+        {
+          "type": "text",
+          "label": "01 / The brief",
+          "text": "Every key visual starts with one sentence: what should the customer feel in the first second? I write it down before opening any tool, because AI is fast but it cannot decide the idea for you."
+        },
+        {
+          "type": "process",
+          "t1": "Moodboard & direction",
+          "x1": "Collect references, lock the palette, the light and the pose.",
+          "t2": "Generate & select",
+          "x2": "Generate scenes and props with AI, then keep only the frames that serve the idea.",
+          "t3": "Upscale, retouch, layout",
+          "x3": "Magnific for detail, Photoshop for skin and product, then the final layout and copy."
+        },
+        {
+          "type": "gallery",
+          "style": "grid2",
+          "images": [
+            "https://framerusercontent.com/images/r1Q4APz4TNMV5x9oKRYscAL06c.jpg?width=1200",
+            "https://framerusercontent.com/images/BYTBcqFikmPNhvjQYU7pi3ciyI.jpg?width=1200"
+          ]
+        },
+        {
+          "type": "statement",
+          "text": "AI speeds up the making. The idea still has to come first."
+        }
+      ]
+    },
+    {
+      "id": "article-magnific-for-beauty",
+      "kind": "journal",
+      "slug": "magnific-for-beauty",
+      "title": "MAGNIFIC FOR BEAUTY VISUALS",
+      "category": "AI UPSCALE",
+      "year": "2026",
+      "client": "",
+      "role": "",
+      "scope": "",
+      "cover": "https://framerusercontent.com/images/BYTBcqFikmPNhvjQYU7pi3ciyI.jpg?width=1200",
+      "description": "Before and after: how I use Magnific to bring back skin, hair and product detail without losing the natural look a beauty brand needs.",
+      "published": true,
+      "featured": false,
+      "link": "",
+      "headline": "",
+      "heroSize": "short",
+      "blocks": [
+        {
+          "type": "chapter",
+          "label": "Before / After",
+          "text": "Low-resolution or generated images often look soft. Magnific rebuilds texture, but too much creativity changes the face. I keep it low on people and push it higher on products and backgrounds.",
+          "image": "https://framerusercontent.com/images/BYTBcqFikmPNhvjQYU7pi3ciyI.jpg?width=1200",
+          "side": "right"
+        },
+        {
+          "type": "gallery",
+          "style": "grid2",
+          "images": [
+            "https://framerusercontent.com/images/BYTBcqFikmPNhvjQYU7pi3ciyI.jpg?width=1200",
+            "https://framerusercontent.com/images/ZNnj2toPGisdyf6eClzPnuV72fM.jpg?width=1200"
+          ]
+        },
+        {
+          "type": "statement",
+          "text": "Sharper is not the goal. Believable is."
+        }
+      ]
+    },
+    {
+      "id": "article-higgsfield-still-to-motion",
+      "kind": "journal",
+      "slug": "higgsfield-still-to-motion",
+      "title": "HIGGSFIELD: FROM STILL TO MOTION",
+      "category": "AI MOTION",
+      "year": "2026",
+      "client": "",
+      "role": "",
+      "scope": "",
+      "cover": "https://framerusercontent.com/images/ZNnj2toPGisdyf6eClzPnuV72fM.jpg?width=1200",
+      "description": "Turning one approved key visual into short motion pieces for Reels and TikTok, without a new shoot.",
+      "published": true,
+      "featured": false,
+      "link": "",
+      "headline": "",
+      "heroSize": "short",
+      "blocks": [
+        {
+          "type": "chapter",
+          "label": "One visual, many formats",
+          "text": "A campaign needs the same idea on every screen. With Higgsfield I add camera moves and small motion to the key visual, then cut 5 to 10 second clips for social.",
+          "image": "https://framerusercontent.com/images/ZNnj2toPGisdyf6eClzPnuV72fM.jpg?width=1200",
+          "side": "left"
+        },
+        {
+          "type": "gallery",
+          "style": "grid3",
+          "images": [
+            "https://framerusercontent.com/images/ZNnj2toPGisdyf6eClzPnuV72fM.jpg?width=1200",
+            "https://framerusercontent.com/images/r1Q4APz4TNMV5x9oKRYscAL06c.jpg?width=1200",
+            "https://framerusercontent.com/images/BYTBcqFikmPNhvjQYU7pi3ciyI.jpg?width=1200"
+          ]
+        },
+        {
+          "type": "statement",
+          "text": "Motion makes people stop. The key visual makes them remember."
+        }
+      ]
+    },
+    {
+      "id": "article-ai-rules-beauty-brand",
+      "kind": "journal",
+      "slug": "ai-rules-beauty-brand",
+      "title": "AI RULES FOR A BEAUTY BRAND",
+      "category": "PROCESS",
+      "year": "2026",
+      "client": "",
+      "role": "",
+      "scope": "",
+      "cover": "https://framerusercontent.com/images/H3KNH97QuI3MqCMMrAfkRwWSDAc.jpg?width=1600",
+      "description": "The rules my team follows so AI helps the brand instead of putting its trust at risk.",
+      "published": true,
+      "featured": false,
+      "link": "",
+      "headline": "",
+      "heroSize": "short",
+      "blocks": [
+        {
+          "type": "process",
+          "t1": "Keep faces real",
+          "x1": "Models and customers keep their own faces. AI never changes who someone is.",
+          "t2": "No fake results",
+          "x2": "Before and after images of treatments are always real photos, never generated.",
+          "t3": "Brand first",
+          "x3": "Colours, logo and tone follow the brand guide, and every visual is reviewed before it goes live."
+        },
+        {
+          "type": "statement",
+          "text": "Use AI for the scene, never for the promise."
+        }
+      ]
+    },
+    {
+      "id": "article-behind-a-summer-key-visual",
+      "kind": "journal",
+      "slug": "behind-a-summer-key-visual",
+      "title": "BEHIND A SUMMER KEY VISUAL",
+      "category": "CASE STUDY",
+      "year": "2026",
+      "client": "",
+      "role": "",
+      "scope": "",
+      "cover": "https://framerusercontent.com/images/BYTBcqFikmPNhvjQYU7pi3ciyI.jpg?width=1600",
+      "description": "From the first sketch to the final rollout of the \"Thay sắc đón hè\" campaign for Ngoc Dung Beauty Center.",
+      "published": true,
+      "featured": false,
+      "link": "",
+      "headline": "",
+      "heroSize": "short",
+      "blocks": [
+        {
+          "type": "chapter",
+          "label": "01 / The idea",
+          "text": "Summer, travel and a fresh new look: the brief asked for energy without losing the premium feel of the brand.",
+          "image": "https://framerusercontent.com/images/BYTBcqFikmPNhvjQYU7pi3ciyI.jpg?width=1600",
+          "side": "right"
+        },
+        {
+          "type": "chapter",
+          "label": "02 / Exploring with AI",
+          "text": "AI helped me test several backgrounds and light setups in an hour, so the team could choose a direction before any production started.",
+          "image": "https://framerusercontent.com/images/r1Q4APz4TNMV5x9oKRYscAL06c.jpg?width=1200",
+          "side": "left"
+        },
+        {
+          "type": "gallery",
+          "style": "mix",
+          "images": [
+            "https://framerusercontent.com/images/BYTBcqFikmPNhvjQYU7pi3ciyI.jpg?width=1200",
+            "https://framerusercontent.com/images/ZNnj2toPGisdyf6eClzPnuV72fM.jpg?width=1200",
+            "https://framerusercontent.com/images/BYTBcqFikmPNhvjQYU7pi3ciyI.jpg?width=1600"
+          ]
+        },
+        {
+          "type": "statement",
+          "text": "One idea, carried from the first sketch to every branch."
+        }
+      ]
+    },
+    {
+      "id": "article-leading-20-campaigns",
+      "kind": "journal",
+      "slug": "leading-20-campaigns",
+      "title": "LEADING 20 CAMPAIGNS IN A YEAR",
+      "category": "LEADERSHIP",
+      "year": "2026",
+      "client": "",
+      "role": "",
+      "scope": "",
+      "cover": "https://framerusercontent.com/images/r1Q4APz4TNMV5x9oKRYscAL06c.jpg?width=1600",
+      "description": "What I learned leading the design team at Ngoc Dung Beauty Center through 20 campaigns in 2026.",
+      "published": true,
+      "featured": false,
+      "link": "",
+      "headline": "",
+      "heroSize": "short",
+      "blocks": [
+        {
+          "type": "process",
+          "t1": "Shared templates",
+          "x1": "One master file per campaign, so every format starts from the same system.",
+          "t2": "Clear reviews",
+          "x2": "Fixed review steps keep feedback short and the deadline safe.",
+          "t3": "Room to grow",
+          "x3": "Each designer owns part of a campaign and learns the AI workflow on real work."
+        },
+        {
+          "type": "statement",
+          "text": "A good system lets a team move fast without losing the brand."
+        }
+      ]
     }
   ],
   "i18n": {
@@ -347,7 +651,7 @@
       "Skillset.26": "Kỹ năng.26",
       "Disciplines / Tools": "Chuyên môn / Công cụ",
       "What I do": "Tôi làm gì",
-      "Key Visual": "Hình ảnh chủ đạo",
+      "Key Visual": "Key visual",
       "Packaging": "Bao bì",
       "Social Content": "Nội dung mạng xã hội",
       "Motion Graphics": "Đồ hoạ chuyển động",
@@ -411,7 +715,98 @@
       "INDEPENDENT · HO CHI MINH CITY, VIETNAM": "ĐỘC LẬP · TP. HỒ CHÍ MINH, VIỆT NAM",
       "BRAND CONNECT": "KẾT NỐI THƯƠNG HIỆU",
       "Back to top": "Lên đầu trang",
-      "Brand Identity, Campaign Design, Art Direction, Key Visual": "Nhận diện thương hiệu, Thiết kế chiến dịch, Định hướng nghệ thuật, Hình ảnh chủ đạo"
+      "Brand Identity, Campaign Design, Art Direction, Key Visual": "Nhận diện thương hiệu, Thiết kế chiến dịch, Định hướng nghệ thuật, Hình ảnh chủ đạo",
+      "PROJECT": "DỰ ÁN",
+      "Design Leader": "Trưởng nhóm thiết kế",
+      "Nam Nguyen — Design Leader at Ngoc Dung Beauty Center, leading campaign key visuals, art direction and brand content in Ho Chi Minh City.": "Nam Nguyễn — Trưởng nhóm thiết kế tại Thẩm mỹ viện Ngọc Dung, dẫn dắt key visual chiến dịch, định hướng nghệ thuật và nội dung thương hiệu tại TP. Hồ Chí Minh.",
+      "Design Leader at Ngoc Dung Beauty Center. 20 campaigns led in 2026, from the first key visual to every touchpoint.": "Trưởng nhóm thiết kế tại Thẩm mỹ viện Ngọc Dung. 20 chiến dịch đã dẫn dắt trong năm 2026, từ key visual đầu tiên đến mọi điểm chạm.",
+      "Design Leader / Art Direction": "Trưởng nhóm thiết kế / Định hướng nghệ thuật",
+      "Campaign Key Visual": "Key visual chiến dịch",
+      "Beauty Branding": "Thương hiệu làm đẹp",
+      "I'm Nam Nguyen, a designer since 2019 and now Design Leader at Ngoc Dung Beauty Center, where I have led 20 campaigns this year, from concept and key visual to social, print and in-store rollout. Before that I designed for Seedcom (Juno, Hnoss), the real-estate brands LinkHouse and Maple Land, and the beauty brands Tu Trinh Spa and Zema. Every project starts from a clear idea and ends in work that feels precise and memorable.": "Mình là Nam Nguyễn, làm thiết kế từ năm 2019 và hiện là Trưởng nhóm thiết kế tại Thẩm mỹ viện Ngọc Dung, nơi mình đã dẫn dắt 20 chiến dịch trong năm nay, từ ý tưởng, key visual đến mạng xã hội, ấn phẩm in và triển khai tại chi nhánh. Trước đó mình thiết kế cho Seedcom (Juno, Hnoss), các thương hiệu bất động sản LinkHouse, Maple Land và các thương hiệu làm đẹp Tú Trinh Spa, Zema. Mỗi dự án đều bắt đầu từ một ý tưởng rõ ràng và kết thúc bằng sản phẩm chỉn chu, dễ nhớ.",
+      "Design Team Leadership": "Dẫn dắt đội thiết kế",
+      "Branding": "Xây dựng thương hiệu",
+      "Web & UI Design": "Thiết kế web & UI",
+      "Beauty Retouch": "Retouch ảnh làm đẹp",
+      "Photography": "Nhiếp ảnh",
+      "Video Editing": "Dựng video",
+      "Campaigns and visual systems from my work as Design Leader at Ngoc Dung Beauty Center, alongside earlier brand projects.": "Các chiến dịch và hệ thống hình ảnh từ vai trò Trưởng nhóm thiết kế tại Thẩm mỹ viện Ngọc Dung, cùng các dự án thương hiệu trước đó.",
+      "Building a campaign, a brand or a visual system and need a clear creative direction? Send me the brief. Alongside my role at Ngoc Dung, I take on selected freelance and collaboration projects.": "Bạn đang làm chiến dịch, thương hiệu hay hệ thống hình ảnh và cần một định hướng sáng tạo rõ ràng? Hãy gửi brief cho mình. Song song công việc tại Ngọc Dung, mình nhận một số dự án freelance và hợp tác chọn lọc.",
+      "Design Leader at Ngoc Dung Beauty Center.": "Trưởng nhóm thiết kế tại Thẩm mỹ viện Ngọc Dung.",
+      "Ngoc Dung Beauty Center": "Thẩm mỹ viện Ngọc Dung",
+      "Campaign Concept / Key Visual / Rollout": "Ý tưởng chiến dịch / Key visual / Triển khai",
+      "One of the 20 campaigns I led at Ngoc Dung Beauty Center in 2026: a premium, beauty-led system rolled out from key visual to social, print and in-store.": "Một trong 20 chiến dịch mình dẫn dắt tại Thẩm mỹ viện Ngọc Dung năm 2026: hệ thống hình ảnh cao cấp, đậm chất làm đẹp, triển khai từ key visual đến mạng xã hội, ấn phẩm in và tại chi nhánh.",
+      "Ngoc Dung & Zema Beauty More": "Ngọc Dung & Zema Beauty More",
+      "Design Leader / Visual System": "Trưởng nhóm thiết kế / Hệ thống hình ảnh",
+      "Campaigns led in 2026": "Chiến dịch đã dẫn dắt năm 2026",
+      "Years in design": "Năm làm thiết kế",
+      "AI WORKFLOW": "QUY TRÌNH AI",
+      "AI UPSCALE": "AI NÂNG CHI TIẾT",
+      "AI MOTION": "AI CHUYỂN ĐỘNG",
+      "CASE STUDY": "PHÂN TÍCH DỰ ÁN",
+      "LEADERSHIP": "DẪN DẮT",
+      "NEXT ARTICLE →": "BÀI TIẾP THEO →",
+      "← BACK TO JOURNAL": "← VỀ NHẬT KÝ",
+      "FROM BRIEF TO KEY VISUAL IN ONE DAY": "TỪ BRIEF ĐẾN KEY VISUAL TRONG MỘT NGÀY",
+      "How I combine AI image tools with classic retouching to move from a campaign brief to an approved key visual in a single working day.": "Cách mình kết hợp công cụ AI với retouch truyền thống để đi từ brief chiến dịch đến key visual được duyệt chỉ trong một ngày làm việc.",
+      "01 / The brief": "01 / Brief",
+      "Every key visual starts with one sentence: what should the customer feel in the first second? I write it down before opening any tool, because AI is fast but it cannot decide the idea for you.": "Mỗi key visual bắt đầu từ một câu: khách hàng cần cảm thấy gì trong giây đầu tiên? Mình viết câu đó ra trước khi mở bất kỳ công cụ nào, vì AI làm rất nhanh nhưng không thể quyết định ý tưởng thay mình.",
+      "Moodboard & direction": "Moodboard & định hướng",
+      "Collect references, lock the palette, the light and the pose.": "Gom tham khảo, chốt bảng màu, ánh sáng và tư thế.",
+      "Generate & select": "Tạo & chọn lọc",
+      "Generate scenes and props with AI, then keep only the frames that serve the idea.": "Tạo bối cảnh và đạo cụ bằng AI, chỉ giữ những khung hình phục vụ ý tưởng.",
+      "Upscale, retouch, layout": "Nâng chi tiết, retouch, dàn trang",
+      "Magnific for detail, Photoshop for skin and product, then the final layout and copy.": "Magnific để nâng chi tiết, Photoshop cho da và sản phẩm, rồi dàn trang và chữ.",
+      "AI speeds up the making. The idea still has to come first.": "AI giúp làm nhanh hơn. Nhưng ý tưởng vẫn phải đi trước.",
+      "MAGNIFIC FOR BEAUTY VISUALS": "MAGNIFIC CHO HÌNH ẢNH LÀM ĐẸP",
+      "Before and after: how I use Magnific to bring back skin, hair and product detail without losing the natural look a beauty brand needs.": "Trước và sau: cách mình dùng Magnific để lấy lại chi tiết da, tóc và sản phẩm mà vẫn giữ vẻ tự nhiên mà thương hiệu làm đẹp cần.",
+      "Before / After": "Trước / Sau",
+      "Low-resolution or generated images often look soft. Magnific rebuilds texture, but too much creativity changes the face. I keep it low on people and push it higher on products and backgrounds.": "Ảnh độ phân giải thấp hoặc ảnh tạo bằng AI thường bị mềm. Magnific dựng lại chi tiết, nhưng để độ sáng tạo cao sẽ làm đổi gương mặt. Mình để thấp với người mẫu và tăng cao hơn với sản phẩm, hậu cảnh.",
+      "Sharper is not the goal. Believable is.": "Mục tiêu không phải là nét hơn, mà là đáng tin hơn.",
+      "HIGGSFIELD: FROM STILL TO MOTION": "HIGGSFIELD: TỪ ẢNH TĨNH ĐẾN CHUYỂN ĐỘNG",
+      "Turning one approved key visual into short motion pieces for Reels and TikTok, without a new shoot.": "Biến một key visual đã duyệt thành các đoạn video ngắn cho Reels và TikTok mà không cần chụp lại.",
+      "One visual, many formats": "Một hình, nhiều định dạng",
+      "A campaign needs the same idea on every screen. With Higgsfield I add camera moves and small motion to the key visual, then cut 5 to 10 second clips for social.": "Một chiến dịch cần cùng một ý tưởng trên mọi màn hình. Với Higgsfield, mình thêm chuyển động máy quay và chuyển động nhỏ vào key visual, rồi cắt thành các đoạn 5 đến 10 giây cho mạng xã hội.",
+      "Motion makes people stop. The key visual makes them remember.": "Chuyển động khiến người xem dừng lại. Key visual khiến họ nhớ.",
+      "AI RULES FOR A BEAUTY BRAND": "NGUYÊN TẮC DÙNG AI CHO THƯƠNG HIỆU LÀM ĐẸP",
+      "The rules my team follows so AI helps the brand instead of putting its trust at risk.": "Những nguyên tắc team mình tuân theo để AI giúp thương hiệu, thay vì làm mất niềm tin của khách hàng.",
+      "Keep faces real": "Giữ gương mặt thật",
+      "Models and customers keep their own faces. AI never changes who someone is.": "Người mẫu và khách hàng giữ đúng gương mặt của họ. AI không bao giờ thay đổi một người là ai.",
+      "No fake results": "Không tạo kết quả giả",
+      "Before and after images of treatments are always real photos, never generated.": "Ảnh trước và sau dịch vụ luôn là ảnh thật, không bao giờ tạo bằng AI.",
+      "Brand first": "Thương hiệu là trên hết",
+      "Colours, logo and tone follow the brand guide, and every visual is reviewed before it goes live.": "Màu sắc, logo và giọng điệu theo đúng bộ nhận diện, mọi hình ảnh đều được duyệt trước khi đăng.",
+      "Use AI for the scene, never for the promise.": "Dùng AI cho bối cảnh, không bao giờ cho lời hứa.",
+      "BEHIND A SUMMER KEY VISUAL": "PHÍA SAU MỘT KEY VISUAL MÙA HÈ",
+      "From the first sketch to the final rollout of the \"Thay sắc đón hè\" campaign for Ngoc Dung Beauty Center.": "Từ bản phác đầu tiên đến khi triển khai chiến dịch \"Thay sắc đón hè\" cho Thẩm mỹ viện Ngọc Dung.",
+      "01 / The idea": "01 / Ý tưởng",
+      "Summer, travel and a fresh new look: the brief asked for energy without losing the premium feel of the brand.": "Mùa hè, du lịch và một diện mạo mới: brief cần sự tươi mới nhưng vẫn giữ cảm giác cao cấp của thương hiệu.",
+      "02 / Exploring with AI": "02 / Thử nghiệm với AI",
+      "AI helped me test several backgrounds and light setups in an hour, so the team could choose a direction before any production started.": "AI giúp mình thử nhiều bối cảnh và kiểu ánh sáng trong một giờ, để cả team chọn hướng trước khi bắt đầu sản xuất.",
+      "One idea, carried from the first sketch to every branch.": "Một ý tưởng, đi từ bản phác đầu tiên đến từng chi nhánh.",
+      "LEADING 20 CAMPAIGNS IN A YEAR": "DẪN DẮT 20 CHIẾN DỊCH TRONG MỘT NĂM",
+      "What I learned leading the design team at Ngoc Dung Beauty Center through 20 campaigns in 2026.": "Những điều mình học được khi dẫn dắt đội thiết kế tại Thẩm mỹ viện Ngọc Dung qua 20 chiến dịch năm 2026.",
+      "Shared templates": "Mẫu dùng chung",
+      "One master file per campaign, so every format starts from the same system.": "Mỗi chiến dịch có một file gốc, để mọi định dạng đều bắt đầu từ cùng một hệ thống.",
+      "Clear reviews": "Duyệt rõ ràng",
+      "Fixed review steps keep feedback short and the deadline safe.": "Các bước duyệt cố định giúp góp ý ngắn gọn và giữ đúng hạn.",
+      "Room to grow": "Không gian để phát triển",
+      "Each designer owns part of a campaign and learns the AI workflow on real work.": "Mỗi designer phụ trách một phần chiến dịch và học quy trình AI trên việc thật.",
+      "A good system lets a team move fast without losing the brand.": "Một hệ thống tốt giúp team làm nhanh mà không đánh mất thương hiệu.",
+      "Notes on AI workflows, key visuals and leading campaigns, from my work as a Design Leader.": "Ghi chép về quy trình AI, key visual và dẫn dắt chiến dịch, từ công việc của một Trưởng nhóm thiết kế.",
+      "AI Tools": "Công cụ AI",
+      "AI Image Generation": "Tạo hình ảnh bằng AI",
+      "AI Upscale & Retouch": "Nâng chi tiết & retouch bằng AI",
+      "AI Motion & Video": "Chuyển động & video bằng AI",
+      "Prompt Direction": "Chỉ đạo prompt",
+      "Key Visual ·": "Key visual ·",
+      "· AI Visual ·": "· Hình ảnh AI ·",
+      "Key Visual, Campaign, AI Visual, Art Direction": "Key visual, Chiến dịch, Hình ảnh AI, Định hướng nghệ thuật",
+      "MORE PROJECTS": "DỰ ÁN KHÁC",
+      "MORE ARTICLES": "BÀI VIẾT KHÁC",
+      "VIEW ALL →": "XEM TẤT CẢ →",
+      "Process": "Quy trình",
+      "AI Visual": "Hình ảnh AI"
     }
   }
 }

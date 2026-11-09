@@ -68,13 +68,45 @@ async function serveStatic(res,pathname){
   const ext=path.extname(file).toLowerCase();
   if(ext==='.html'){
     let html=await fsp.readFile(file,'utf8');
-    if(!html.includes('/cms-runtime.js'))html=html.replace(/<\/body>/i,'<script src="/cms-runtime.js"></script></body>');
+    // the site pages get the CMS; the admin page itself must not be rewritten by it
+    if(!['admin.html','editor.html'].includes(path.basename(file))&&!html.includes('/cms-runtime.js'))html=html.replace(/<\/body>/i,'<script src="/cms-runtime.js"></script></body>');
     return send(res,200,html,MIME['.html']);
   }
   return send(res,200,await fsp.readFile(file),MIME[ext]||'application/octet-stream');
 }
 
+// ---- Publish jobs (Admin → Xuất bản): build + Cloudflare, or commit + push to GitHub ----
+const {spawn}=require('child_process');
+let job=null;   // one job at a time: {id,kind,done,ok,log}
+function runStep(cmd,args,log){return new Promise(resolve=>{log.push('$ '+[cmd==process.execPath?'node':cmd,...args].join(' '));const p=spawn(cmd,args,{cwd:ROOT,windowsHide:true,env:{...process.env,FORCE_COLOR:'0',GIT_TERMINAL_PROMPT:'0'}});const add=d=>{for(const l of d.toString().replace(/\x1b\[[0-9;]*m/g,'').split(/\r?\n/))if(l.trim())log.push(l)};p.stdout.on('data',add);p.stderr.on('data',add);p.on('error',e=>{log.push('Lỗi: '+e.message);resolve(1)});p.on('close',code=>resolve(code))})}
+async function startJob(kind,message){
+  const log=[];job={id:Date.now().toString(36),kind,done:false,ok:false,log};
+  try{
+    if(kind==='build'){
+      if(await runStep(process.execPath,['build.js'],log))throw new Error('Build lỗi, xem log phía trên.');
+    }else if(kind==='cloudflare'){
+      const bin=wranglerBin();if(!bin)throw new Error('Chưa cài wrangler: chạy npm install');
+      if(await runStep(process.execPath,['build.js'],log))throw new Error('Build lỗi, xem log phía trên.');
+      if(await runStep(process.execPath,[bin,'deploy'],log))throw new Error('Đưa lên Cloudflare lỗi. Nếu log báo chưa đăng nhập: mở cửa sổ lệnh trong thư mục dự án, chạy  npx.cmd wrangler login  rồi thử lại.');
+    }else if(kind==='github'){
+      await runStep('git',['add','-A'],log);
+      const msg=String(message||'').trim()||('Update portfolio '+new Date().toISOString().slice(0,16).replace('T',' '));
+      const c=await runStep('git',['commit','-m',msg],log);
+      if(c&&!log.some(l=>/nothing to commit|nothing added/i.test(l)))throw new Error('Commit lỗi, xem log phía trên.');
+      if(await runStep('git',['push','origin','HEAD'],log))throw new Error('Push lỗi. Nếu log báo cần đăng nhập GitHub: chạy  git push  một lần trong cửa sổ lệnh để đăng nhập, rồi thử lại.');
+    }
+    job.ok=true;log.push('✓ Xong.');
+  }catch(e){log.push('✗ '+e.message)}
+  job.done=true;
+}
+function gitInfo(){return new Promise(resolve=>{execFile('git',['status','--porcelain'],{cwd:ROOT,windowsHide:true},(e,out)=>{const changed=e?null:out.split(/\r?\n/).filter(Boolean).length;execFile('git',['log','-1','--format=%s|%cr'],{cwd:ROOT,windowsHide:true},(e2,o2)=>{const [last,when]=(e2?'':o2.trim()).split('|');resolve({changed,last:last||'',when:when||''})})})})}
+
 async function handleAPI(req,res,u){
+  // Only this admin page may change things: block requests sent from other websites
+  if(req.method!=='GET'){const o=req.headers.origin;if(o&&!/^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(o))return sendJSON(res,403,{ok:false,error:'Forbidden origin'})}
+  if(u.pathname==='/api/publish/status'&&req.method==='GET')return sendJSON(res,200,{ok:true,git:await gitInfo(),job:job&&{id:job.id,kind:job.kind,done:job.done,ok:job.ok,log:job.log}});
+  const pj=u.pathname.match(/^\/api\/publish\/(build|cloudflare|github)$/);
+  if(pj&&req.method==='POST'){if(job&&!job.done)return sendJSON(res,409,{ok:false,error:'Đang có một lần xuất bản chạy, đợi xong đã.'});const body=await readJSONBody(req).catch(()=>({}));startJob(pj[1],body.message);return sendJSON(res,202,{ok:true,id:job.id})}
   if(u.pathname==='/api/content'&&req.method==='GET')return sendJSON(res,200,await readContent());
   if(u.pathname==='/api/content'&&req.method==='PUT'){const body=await readJSONBody(req);await saveContent(body);return sendJSON(res,200,{ok:true,content:body})}
   if(u.pathname==='/api/media'&&req.method==='GET')return sendJSON(res,200,{ok:true,media:await listMedia()});
@@ -99,4 +131,4 @@ async function handleAPI(req,res,u){
   return sendJSON(res,404,{ok:false,error:'API route not found'});
 }
 
-(async()=>{await ensureDirs();http.createServer(async(req,res)=>{try{const u=new URL(req.url,'http://127.0.0.1');if(u.pathname.startsWith('/api/'))return await handleAPI(req,res,u);if(u.pathname==='/cms-runtime.js')return send(res,200,await fsp.readFile(CMS_RUNTIME_FILE),'application/javascript; charset=utf-8');{const pm=u.pathname.match(/^\/projects\/([^/]+)\.html$/i);if(pm)return await serveProject(res,decodeURIComponent(pm[1]))}if(u.pathname==='/admin')return await serveStatic(res,'/admin.html');return await serveStatic(res,u.pathname)}catch(e){console.error(e);return sendJSON(res,500,{ok:false,error:e.message||'Server error'})}}).listen(PORT,HOST,()=>{console.log('');console.log('NAM NGUYEN DESIGN CMS FULL');console.log('Website : http://127.0.0.1:'+PORT+'/');console.log('CMS     : http://127.0.0.1:'+PORT+'/admin');console.log('')})})();
+(async()=>{await ensureDirs();http.createServer(async(req,res)=>{try{const u=new URL(req.url,'http://127.0.0.1');if(u.pathname.startsWith('/api/'))return await handleAPI(req,res,u);if(u.pathname==='/cms-runtime.js')return send(res,200,await fsp.readFile(CMS_RUNTIME_FILE),'application/javascript; charset=utf-8');{const pm=u.pathname.match(/^\/projects\/([^/]+)\.html$/i);if(pm)return await serveProject(res,decodeURIComponent(pm[1]))}if(u.pathname==='/admin')return await serveStatic(res,'/admin.html');if(u.pathname==='/edit')return await serveStatic(res,'/editor.html');return await serveStatic(res,u.pathname)}catch(e){console.error(e);return sendJSON(res,500,{ok:false,error:e.message||'Server error'})}}).listen(PORT,HOST,()=>{console.log('');console.log('NAM NGUYEN DESIGN CMS FULL');console.log('Website : http://127.0.0.1:'+PORT+'/');console.log('CMS     : http://127.0.0.1:'+PORT+'/admin');console.log('')})})();

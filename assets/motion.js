@@ -5,6 +5,7 @@
  */
 (function () {
   'use strict';
+  if (/[?&]edit=1/.test(location.search)) return;   // visual editor: keep text plain and still
   var doc = document.documentElement;
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
@@ -15,6 +16,11 @@
   }
 
   /* ---------- split text into characters ---------- */
+  var segmenter = window.Intl && Intl.Segmenter ? new Intl.Segmenter(undefined, { granularity: 'grapheme' }) : null;
+  function graphemes(s) {
+    if (segmenter) return Array.from(segmenter.segment(s), function (g) { return g.segment; });
+    return s.match(/[\s\S][̀-ͯ᷀-᷿⃐-⃿︠-︯]*/g) || [];
+  }
   function split(el) {
     if (el.dataset.split) return;
     el.dataset.split = '1';
@@ -28,7 +34,8 @@
             if (!part) return;
             if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(' ')); return; }
             var w = document.createElement('span'); w.className = 'w';
-            Array.from(part).forEach(function (c) {
+            // one span per visible letter: a letter typed with separate accent marks stays together
+            graphemes(part.normalize ? part.normalize('NFC') : part).forEach(function (c) {
               var s = document.createElement('span'); s.className = 'c';
               var i = document.createElement('i'); i.textContent = c; i.style.setProperty('--cd', (n++ * 28) + 'ms');
               s.appendChild(i); w.appendChild(s);
@@ -132,12 +139,15 @@
     requestAnimationFrame(frame);
 
     /* cursor label + magnetic buttons (mouse only) */
-    if (finePointer && !reduce) {
-      // Rotating "NAM NGUYEN" text ring that follows the mouse everywhere on the page
+    var ringOn = doc.dataset.cursorRing !== 'off';
+    var ringText = (doc.dataset.cursorText || 'NAM NGUYEN').toUpperCase();
+    if (finePointer && !reduce && ringOn) {
+      // Rotating text ring that follows the mouse everywhere on the page
       var tag = document.createElement('div');
       tag.className = 'cursor-tag'; tag.setAttribute('aria-hidden', 'true');
       tag.innerHTML = '<svg viewBox="0 0 120 120"><defs><path id="ct-path" d="M60,60 m-47,0 a47,47 0 1,1 94,0 a47,47 0 1,1 -94,0"/></defs>' +
-        '<g class="ct-ring"><text><textPath href="#ct-path" textLength="293" lengthAdjust="spacing">NAM NGUYEN • NAM NGUYEN • </textPath></text></g></svg>';
+        '<g class="ct-ring"><text><textPath href="#ct-path" textLength="293" lengthAdjust="spacing"></textPath></text></g></svg>';
+      tag.querySelector('textPath').textContent = ringText + ' • ' + ringText + ' • ';
       document.body.appendChild(tag);
       var cx = -200, cy = -200, tx = -200, ty = -200, seen = false;
       window.addEventListener('mousemove', function (e) {

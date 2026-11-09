@@ -2,7 +2,8 @@
 
 /* split-character headline reveal */
 .split .w{display:inline-block;white-space:nowrap}
-.split .c{display:inline-block;overflow:hidden;vertical-align:top;padding:.24em 0 .08em;margin:-.24em 0 -.08em}
+/* room above and below each letter so Vietnamese marks (Ấ, Ở above; Ệ, Ạ, Ụ dot below) are never cut */
+.split .c{display:inline-block;overflow:hidden;vertical-align:top;padding:.26em 0 .24em;margin:-.26em 0 -.24em}
 .split .c>i{display:inline-block;font-style:normal;transform:translateY(105%);transition:transform .9s cubic-bezier(.2,.75,.2,1) var(--cd,0ms)}
 .split.on .c>i{transform:none}
 

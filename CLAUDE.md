@@ -9,8 +9,19 @@ Write replies to the owner in Vietnamese.
 - `project-template.js` is shared by Node and the browser and renders `projects/<slug>.html` from each project's `blocks`.
   - Block types: overview, intro, gallery, image, chapter, text, process, statement, credits.
   - Presets: minimal, compact, standard (the default), story, showcase.
+- The owner edits everything without AI: double-click `Mo Admin Portfolio.bat` (starts server.js and opens the admin).
+  - Visual editor at /edit (`editor.html`, also "✎ Chỉnh sửa trực tiếp" in the admin): the home page in an iframe (`/?edit=1`); click a text to type, "🖼 Đổi ảnh" badges change images (upload or Media, with size notes), right panel toggles sections, accent colour, marquee words, intro services; Lưu / Hoàn tác / Máy tính–Điện thoại. Text and image targets are listed in `bindings()` in editor.html: add a line there when the home page gets a new field. With `?edit=1`, motion.js and i18n.js do nothing, so the page stays plain English.
+  - Project and article pages are edited in the same editor (page picker in the toolbar, or `/edit?page=<slug>`). The editor renders them in the browser with `ProjectTemplate.renderProjectPage(state, slug, { edit: true })` into an iframe srcdoc (`<base href="/projects/">`, `window.__VE_EDIT__`). Edit mode adds data-ve / data-ve-img / data-ve-block marks and placeholders for empty fields; normal rendering is byte-identical. The right panel lists modules: add, ↑ ↓, delete, gallery style, add photos, chapter side, hero height, published, article card image.
+  - Image fields in the admin show recommended sizes (`.hint`); article projects have their own portrait card image (`thumbnail`).
+  - Admin → Cài đặt chung: brand, contact email (applied to every mailto), SEO title/description, site URL, accent colour, marquee words (`home.marquee`), the two numbers beside the slider (`home.projectsSection.stats`), cursor ring on/off and text (`site.cursorRing`, `site.cursorText`).
+  - Admin → Xuất bản: "Build thử", "Đưa lên Cloudflare" (build + wrangler deploy) and "Lưu lên GitHub" (git add/commit/push). server.js runs one job at a time and the page polls `/api/publish/status` for the log.
+  - Non-GET API calls from another origin get 403, so other websites cannot drive the local admin.
+  - server.js injects cms-runtime.js into site pages only, never into admin.html.
 - `npm run build` writes `dist/`. It prerenders with jsdom, converts images to WebP with sharp, and minifies the HTML.
 - `npm run demo` writes demo pages of the 5 presets into `dist/`.
+- Owner (2026): Nam Nguyen, Design Leader at Ngoc Dung Beauty Center (Thẩm mỹ viện Ngọc Dung), led 20 campaigns in 2026; designer since 2019 (FPT Arena). Earlier: Sinbad, Tu Trinh Spa, LinkHouse, Seedcom (Juno, Hnoss), Maple Land, Ngoc Dung & Zema. Old portfolio: https://www.behance.net/gallery/199409315/Portfolio-2024
+- Home project slider: one slide per published project, in admin order. `home.projectsSection.homeLimit` (Admin → Projects) caps how many; empty = all.
+- Contact: a white QR on a transparent PNG sits on the glass with no card (`home.contact.qrImage`). `uploads/qr-zalo-demo.png` is a placeholder that points to a fake number: replace it before going live.
 - `content.json` → `site.siteUrl` is the absolute site address used for share previews (og:image), canonical and sitemap.xml. Change it when the domain changes.
 - Deploys run on GitHub Pages via Actions: push to `main`, then build and deploy `dist`. The live site is https://namnguyends93.github.io/NamNguyenDesign/.
 
@@ -19,7 +30,11 @@ Write replies to the owner in Vietnamese.
   - Effects: split-character headline reveal, hero zoom and fade on scroll, image parallax (`--py`), a velocity marquee (`.big-marquee`, placed before `#journal`), hover text scramble, a rotating "NAM NGUYEN •" text ring (96px) that follows the mouse everywhere, and magnetic buttons.
   - The cursor ring and magnetic buttons run only with a mouse. Reduced motion turns all of it off.
   - The marquee text is hardcoded in `index.html` and is not in the admin yet.
-  - Journal: 3 posts = grid of cards; 4 or more = a carousel with ← → buttons (cards come from the admin). The owner rejected a hover-image list.
+  - Journal: 3 posts = grid of cards; 4 or more = a carousel with ← → buttons. The owner rejected a hover-image list.
+  - Journal articles are projects with `kind: "journal"` (Admin → Projects → Loại, or Journal tab → "+ Thêm bài Nhật ký"). They get pages at `projects/<slug>.html`, are left out of the home slider, and fill the Journal cards. `home.journal.items` is only a fallback when no article exists.
+  - The 6 articles about AI (Higgsfield, Magnific) and leadership are sample copy with placeholder images: the owner will rewrite them.
+  - Every project/article page ends with "More projects / More articles": the other pages of the same kind, next one first, up to 6.
+  - Skillset has an "AI Tools" group (`about.skills.aiTools`, `aiTitle`). Any tool can have its own icon image (`image`), which wins over the preset icon.
   - Not built yet: a background colour change on scroll.
 - VI / EN switch (`assets/i18n.js`, on every page):
   - Pages are written in English. Vietnamese is a dictionary `content.json` → `i18n.vi` = { "English text": "Vietnamese text" }, edited in Admin → Tiếng Việt (that tab scans pages with `?i18nscan=1` to list every text).

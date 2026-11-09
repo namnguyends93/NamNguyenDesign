@@ -27,13 +27,19 @@
     var exact = {}, lower = {};
     Object.keys(dict).forEach(function (k) {
       var v = dict[k]; if (!v || !String(v).trim()) return;
+      v = String(v); if (v.normalize) v = v.normalize('NFC');   // accents typed as separate marks → one letter
       exact[norm(k)] = v; lower[norm(k).toLowerCase()] = v;
     });
     return function (text) {
       var t = norm(text); if (!t) return null;
       if (exact[t]) return exact[t];
       var v = lower[t.toLowerCase()];
-      if (!v) return null;
+      if (!v) {
+        var m = t.match(/^(.*\S)(\s*\/\s*\d+)$/);   // e.g. "PROJECT / 04"
+        var base = m && (exact[m[1]] || lower[m[1].toLowerCase()]);
+        if (!base) return null;
+        v = base + m[2];
+      }
       // page shows the text in capitals (e.g. "PROJECT / 01") → keep it in capitals
       return (t === t.toUpperCase() && /[A-Z]/.test(t)) ? v.toUpperCase() : v;
     };
@@ -72,7 +78,9 @@
       '.project-nav .nav-end{pointer-events:auto}' +
       '.project-nav .lang-switch{background:rgba(8,8,8,.35);backdrop-filter:blur(26px);-webkit-backdrop-filter:blur(26px)}' +
       /* Vietnamese capitals carry accents above and below: give big type a little more line height */
-      'html[lang="vi"] .display{line-height:1.04}' +
+      'html[lang="vi"] .display{line-height:1.16}' +
+      'html[lang="vi"] .project-info-showcase h2{line-height:1.1}' +
+      'html[lang="vi"] .intro-panel.text h2,html[lang="vi"] .contact-copy h2,html[lang="vi"] .section-head .big-title{margin-top:.22em}' +
       'html[lang="vi"] .bm-track span{line-height:1.1}';
     document.head.appendChild(css);
 
@@ -117,6 +125,7 @@
   }
 
   function run() {
+    if (/[?&]edit=1/.test(location.search) || window.__VE_EDIT__) { root.classList.remove('i18n-wait'); return; }   // visual editor edits the English page
     if (/[?&]i18nscan=1/.test(location.search)) { scan(); root.classList.remove('i18n-wait'); return; }
     var dict = readDict();
     var lang = dict ? getLang() : 'en';

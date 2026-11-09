@@ -28,6 +28,8 @@ input,textarea,select{width:100%;background:var(--panel2);color:#fff;border:1px 
 .i18n-row textarea{min-height:42px;height:auto;resize:vertical}
 .i18n-row.todo textarea{border-color:#5a4a1e}
 @media(max-width:900px){.i18n-row{grid-template-columns:1fr}}
+.hint{display:block;font-size:11.5px;line-height:1.45;color:#9eabff;margin:-2px 0 8px}
+.hint b{color:#cfd6ff}
 </style>
 </head>
 <body>
@@ -35,6 +37,7 @@ input,textarea,select{width:100%;background:var(--panel2);color:#fff;border:1px 
 <aside>
 <div class="brand">Nam Nguyen Design<small>CMS Full</small></div>
 <div class="nav">
+<button data-tab="site">Cài đặt chung</button>
 <button class="active" data-tab="home">Home</button>
 <button data-tab="navigation">Navigation</button>
 <button data-tab="clients">Clients</button>
@@ -46,12 +49,29 @@ input,textarea,select{width:100%;background:var(--panel2);color:#fff;border:1px 
 <button data-tab="media">Media</button>
 <button data-tab="preview">Live Preview</button>
 <button data-tab="backup">Backup</button>
+<button data-tab="publish">Xuất bản ↑</button>
 </div>
 </aside>
 <main>
-<div class="top"><h1 id="title">Home</h1><div class="actions"><button class="ghost" id="reloadBtn">Reload</button><button class="primary" id="saveBtn">Save</button></div></div>
+<div class="top"><h1 id="title">Home</h1><div class="actions"><a class="ghost" href="/edit" target="_blank" style="border-radius:999px;padding:10px 14px;text-decoration:none;font-weight:700;background:#242424;color:#fff">✎ Chỉnh sửa trực tiếp</a><button class="ghost" id="reloadBtn">Reload</button><button class="primary" id="saveBtn">Save</button></div></div>
 <div class="status" id="status">Loading...</div>
 
+<section class="tab" id="tab-site">
+<div class="card"><div class="section-head"><strong>Thông tin website</strong></div>
+<div class="grid2"><div class="field"><label>Tên thương hiệu</label><input id="siteName"></div><div class="field"><label>Email liên hệ (dùng cho mọi nút Email)</label><input id="siteEmail" type="email"></div>
+<div class="field"><label>Tiêu đề tab trình duyệt / Google (SEO title)</label><input id="siteSeoTitle"></div><div class="field"><label>Địa chỉ website (dùng cho ảnh khi chia sẻ link)</label><input id="siteUrl" placeholder="https://..."></div></div>
+<div class="field"><label>Mô tả khi tìm thấy trên Google / chia sẻ link (SEO description)</label><textarea id="siteSeoDesc" style="min-height:70px"></textarea></div>
+<div class="field"><label>Màu chủ đạo (nút, điểm nhấn, dải chữ chạy)</label><div style="display:flex;gap:10px;align-items:center"><input id="siteAccentPick" type="color" style="width:56px;height:42px;padding:4px"><input id="siteAccent" placeholder="#4c6fff" style="max-width:160px"></div></div>
+</div>
+<div class="card"><div class="section-head"><strong>Dải chữ chạy lớn</strong><label class="switch"><input type="checkbox" id="marqueeVisible"> Visible</label></div>
+<div class="field"><label>Các cụm chữ — mỗi dòng 1 cụm (cụm thứ 2, 4… hiện kiểu chữ viền)</label><textarea id="marqueeWords" style="min-height:90px"></textarea></div></div>
+<div class="card"><div class="section-head"><strong>Hai con số cạnh slider Dự án</strong></div>
+<div class="grid2"><div class="field"><label>Số 1</label><input id="stat1Value" placeholder="20"></div><div class="field"><label>Chữ dưới số 1</label><input id="stat1Label"></div>
+<div class="field"><label>Số 2</label><input id="stat2Value" placeholder="7+"></div><div class="field"><label>Chữ dưới số 2</label><input id="stat2Label"></div></div>
+<p style="color:var(--muted);font-size:12px;margin:0">Để trống cả số và chữ thì ô đó ẩn. Nhớ dịch chữ mới ở tab Tiếng Việt.</p></div>
+<div class="card"><div class="section-head"><strong>Vòng chữ xoay theo chuột</strong><label class="switch"><input type="checkbox" id="cursorRing"> Bật</label></div>
+<div class="field"><label>Chữ trên vòng (ngắn, khoảng 8–14 ký tự)</label><input id="cursorText" maxlength="24" placeholder="NAM NGUYEN"></div></div>
+</section>
 <section class="tab active" id="tab-home">
   <div class="card"><div class="section-head"><strong>Hero</strong><label class="switch"><input type="checkbox" id="heroVisible"> Visible</label></div>
     <div class="grid2">
@@ -78,6 +98,9 @@ input,textarea,select{width:100%;background:var(--panel2);color:#fff;border:1px 
     <div class="field"><label>Kỹ năng (chip) — mỗi dòng 1 kỹ năng</label><textarea id="skillsDisciplines"></textarea></div>
     <label>Công cụ / App</label>
     <div id="toolItems" class="list"></div><button id="addToolBtn">+ Add tool</button>
+    <div class="field" style="margin-top:16px"><label>Tiêu đề nhóm AI</label><input id="skillsAiTitle" placeholder="AI Tools"></div>
+    <label>Công cụ AI</label>
+    <div id="aiToolItems" class="list"></div><button id="addAiToolBtn">+ Add AI tool</button>
   </div>
 </section>
 
@@ -93,13 +116,15 @@ input,textarea,select{width:100%;background:var(--panel2);color:#fff;border:1px 
 <div id="clientItems" class="list"></div><button id="addClientBtn">+ Add Client</button></div>
 </section>
 
-<section class="tab" id="tab-projects"><div class="card"><div class="section-head"><div><strong>Projects</strong><div style="color:#777;font-size:12px;margin-top:4px">Add, duplicate, delete, reorder, images and gallery.</div></div><button id="addProjectBtn">+ Add Project</button></div></div><div id="projectItems" class="list projects"></div></section>
+<section class="tab" id="tab-projects"><div class="card"><div class="section-head"><div><strong>Projects</strong><div style="color:#777;font-size:12px;margin-top:4px">Add, duplicate, delete, reorder, images and gallery.</div></div><button id="addProjectBtn">+ Add Project</button></div>
+<div class="grid2"><div class="field"><label>Số project hiện ở slider trang chủ (để trống = tất cả project đang Published)</label><input id="projectsHomeLimit" type="number" min="1" step="1" placeholder="Tất cả"></div><div class="field" style="color:#777;font-size:12px;align-self:end;padding-bottom:12px">Thứ tự slide = thứ tự trong danh sách bên dưới (kéo ↑ ↓ để đổi). Project tắt Published sẽ không hiện.</div></div></div><div id="projectItems" class="list projects"></div></section>
 
 <section class="tab" id="tab-journal">
 <div class="card"><div class="section-head"><strong>Journal</strong><label class="switch"><input type="checkbox" id="journalVisible"> Visible</label></div>
 <div class="grid2"><div class="field"><label>Eyebrow</label><input id="journalEyebrow"></div><div class="field"><label>Title</label><input id="journalTitle"></div></div>
 <div class="field"><label>Description</label><textarea id="journalDesc"></textarea></div>
-<div id="journalItems" class="list"></div><button id="addJournalBtn">+ Add Journal Item</button></div>
+<div class="item" style="margin:6px 0 14px"><strong>Bài viết Nhật ký</strong><p style="color:var(--muted);font-size:13px;margin:6px 0 10px">Mỗi bài là một trang riêng, soạn trong tab <b>Projects</b> với Loại = <b>Bài Nhật ký</b> (đủ module: chữ, ảnh, gallery…). 3 bài thì giữ lưới thẻ, từ 4 bài trở lên tự thành carousel.</p><button id="addArticleBtn" type="button">+ Thêm bài Nhật ký</button></div>
+<details style="margin-top:6px"><summary style="cursor:pointer;color:var(--muted);font-size:13px">Danh sách thẻ cũ (chỉ dùng khi chưa có bài Nhật ký nào)</summary><div id="journalItems" class="list" style="margin-top:10px"></div><button id="addJournalBtn">+ Add Journal Item</button></details></div>
 </section>
 
 <section class="tab" id="tab-contact">
@@ -125,6 +150,17 @@ input,textarea,select{width:100%;background:var(--panel2);color:#fff;border:1px 
 <div class="grid2"><div class="field"><input id="i18nFilter" placeholder="Tìm chữ…"></div><label class="switch"><input type="checkbox" id="i18nTodo"> Chỉ hiện câu chưa dịch</label></div>
 <div id="i18nStats" class="status"></div>
 <div id="i18nRows"></div>
+</div>
+</section>
+<section class="tab" id="tab-publish">
+<div class="card"><div class="section-head"><strong>Đưa portfolio lên mạng</strong><div class="actions"><button class="ghost" id="pubBuild" type="button">Build thử (chỉ trên máy)</button><button class="ghost" id="pubRefresh" type="button">Làm mới</button></div></div>
+<p style="color:var(--muted);font-size:13px;margin:0 0 6px">Bấm <b>Save</b> trước. Các nút dưới tự build bản tối ưu rồi đưa lên — không cần gõ lệnh.</p>
+<div id="pubGit" class="status" style="margin:10px 0"></div>
+<div class="grid2">
+<div class="item"><strong>1 · Cloudflare</strong><p style="color:var(--muted);font-size:12px;margin:6px 0 10px">Cập nhật trang chính: namnguyendesign…workers.dev (khoảng 30 giây).</p><button class="primary" id="pubCloudflare" type="button">Đưa lên Cloudflare</button></div>
+<div class="item"><strong>2 · GitHub</strong><p style="color:var(--muted);font-size:12px;margin:6px 0 10px">Lưu toàn bộ thay đổi lên GitHub (dùng khi đổi máy) và cập nhật bản GitHub Pages.</p><input id="pubMessage" placeholder="Ghi chú thay đổi (không bắt buộc)" style="margin-bottom:8px"><button id="pubGithub" type="button">Lưu lên GitHub</button></div>
+</div>
+<pre id="pubLog" style="margin-top:14px;background:#0b0b0b;border:1px solid var(--line);border-radius:14px;padding:12px;max-height:340px;overflow:auto;font-size:12px;white-space:pre-wrap;display:none"></pre>
 </div>
 </section>
 <section class="tab" id="tab-media">
@@ -157,12 +193,16 @@ function fill(){
   $("#heroVisible").checked=hero.visible!==false;$("#heroEyebrow").value=hero.eyebrow||"";$("#heroIndex").value=hero.indexLabel||"";$("#heroTitle").value=hero.title||"";$("#heroDesc").value=hero.description||"";$("#heroImage").value=hero.image||"";$("#heroCTA").value=hero.ctaLabel||"";
   $("#introVisible").checked=intro.visible!==false;$("#introEyebrow").value=intro.eyebrow||"";$("#introTitle").value=intro.title||"";$("#introDesc").value=intro.description||"";$("#introServices").value=(intro.services||[]).join("\n");$("#introLocation").value=intro.location||"";$("#introImage").value=intro.image||"";
   $("#aboutVisible").checked=about.visible!==false;$("#aboutEyebrow").value=about.eyebrow||"";$("#aboutTitle").value=about.title||"";$("#aboutDesc").value=about.description||"";$("#aboutImage").value=about.image||"";
-  const sk=about.skills||{};$("#skillsVisible").checked=sk.visible!==false;$("#skillsEyebrow").value=sk.eyebrow||"";$("#skillsLabel").value=sk.label||"";$("#skillsDiscTitle").value=sk.disciplinesTitle||"";$("#skillsToolsTitle").value=sk.toolsTitle||"";$("#skillsDisciplines").value=(sk.disciplines||[]).join("\n");renderTools();
+  const sk=about.skills||{};$("#skillsVisible").checked=sk.visible!==false;$("#skillsEyebrow").value=sk.eyebrow||"";$("#skillsLabel").value=sk.label||"";$("#skillsDiscTitle").value=sk.disciplinesTitle||"";$("#skillsToolsTitle").value=sk.toolsTitle||"";$("#skillsDisciplines").value=(sk.disciplines||[]).join("\n");$("#skillsAiTitle").value=sk.aiTitle||"";renderTools();renderAiTools();
   $("#navVisible").checked=nav.visible!==false;$("#navBrand").value=nav.brand||"";$("#navCTA").value=nav.ctaLabel||"";$("#navCTAHref").value=nav.ctaHref||"";renderNav();
   $("#clientsVisible").checked=cl.visible!==false;$("#clientsEyebrow").value=cl.eyebrow||"";$("#clientsTitle").value=cl.title||"";renderClients();
   $("#journalVisible").checked=j.visible!==false;$("#journalEyebrow").value=j.eyebrow||"";$("#journalTitle").value=j.title||"";$("#journalDesc").value=j.description||"";renderJournal();
   $("#contactVisible").checked=ct.visible!==false;$("#contactEyebrow").value=ct.eyebrow||"";$("#contactTitle").value=ct.title||"";$("#contactDesc").value=ct.description||"";$("#contactImage").value=ct.image||"";$("#contactEmail").value=ct.email||"";$("#contactPhone").value=ct.phone||"";$("#contactQrImage").value=ct.qrImage||"";$("#contactQrCaption").value=ct.qrCaption||"";$("#contactCTA").value=ct.ctaLabel||"";$("#contactCTAHref").value=ct.ctaHref||"";
   $("#footerVisible").checked=ft.visible!==false;$("#footerBrand").value=ft.brand||"";$("#footerDesc").value=ft.description||"";$("#footerCopyright").value=ft.copyright||"";renderFooter();
+  $("#projectsHomeLimit").value=(h.projectsSection&&h.projectsSection.homeLimit)||"";
+  {const s=state.site||{};$("#siteName").value=s.name||"";$("#siteEmail").value=s.email||"";$("#siteSeoTitle").value=s.seoTitle||"";$("#siteUrl").value=s.siteUrl||"";$("#siteSeoDesc").value=s.seoDescription||"";$("#siteAccent").value=s.accent||"";$("#siteAccentPick").value=/^#[0-9a-f]{6}$/i.test(s.accent||"")?s.accent:"#4c6fff";$("#cursorRing").checked=s.cursorRing!==false;$("#cursorText").value=s.cursorText||"";
+   const mq=h.marquee||{};$("#marqueeVisible").checked=mq.visible!==false;$("#marqueeWords").value=(mq.words||[]).join("\n");
+   const st=(h.projectsSection&&h.projectsSection.stats)||[];[1,2].forEach(n=>{const x=st[n-1]||{};$("#stat"+n+"Value").value=x.value||"";$("#stat"+n+"Label").value=x.label||""})}
   renderProjects();
   ["hero","intro","about","contact","contactQr"].forEach(x=>setImg(x+"Image",x+"Preview"));
 }
@@ -170,34 +210,42 @@ function collect(){
   const h=state.home||(state.home={});
   h.hero={...(h.hero||{}),visible:$("#heroVisible").checked,eyebrow:$("#heroEyebrow").value,indexLabel:$("#heroIndex").value,title:$("#heroTitle").value,description:$("#heroDesc").value,image:$("#heroImage").value,ctaLabel:$("#heroCTA").value};
   h.intro={...(h.intro||{}),visible:$("#introVisible").checked,eyebrow:$("#introEyebrow").value,title:$("#introTitle").value,description:$("#introDesc").value,services:$("#introServices").value.split("\n").map(x=>x.trim()).filter(Boolean),location:$("#introLocation").value,image:$("#introImage").value};
-  h.about={...(h.about||{}),visible:$("#aboutVisible").checked,eyebrow:$("#aboutEyebrow").value,title:$("#aboutTitle").value,description:$("#aboutDesc").value,image:$("#aboutImage").value,skills:{...(h.about?.skills||{}),visible:$("#skillsVisible").checked,eyebrow:$("#skillsEyebrow").value,label:$("#skillsLabel").value,disciplinesTitle:$("#skillsDiscTitle").value,toolsTitle:$("#skillsToolsTitle").value,disciplines:$("#skillsDisciplines").value.split("\n").map(x=>x.trim()).filter(Boolean),tools:collectGeneric("#toolItems",["name","icon"],["visible"])}};
+  h.about={...(h.about||{}),visible:$("#aboutVisible").checked,eyebrow:$("#aboutEyebrow").value,title:$("#aboutTitle").value,description:$("#aboutDesc").value,image:$("#aboutImage").value,skills:{...(h.about?.skills||{}),visible:$("#skillsVisible").checked,eyebrow:$("#skillsEyebrow").value,label:$("#skillsLabel").value,disciplinesTitle:$("#skillsDiscTitle").value,toolsTitle:$("#skillsToolsTitle").value,disciplines:$("#skillsDisciplines").value.split("\n").map(x=>x.trim()).filter(Boolean),tools:collectGeneric("#toolItems",["name","icon","image"],["visible"]),aiTitle:$("#skillsAiTitle").value,aiTools:collectGeneric("#aiToolItems",["name","icon","image"],["visible"])}};
   h.clients={...(h.clients||{}),visible:$("#clientsVisible").checked,eyebrow:$("#clientsEyebrow").value,title:$("#clientsTitle").value,items:collectGeneric("#clientItems",["name","logo","href"],["visible"])};
   h.journal={...(h.journal||{}),visible:$("#journalVisible").checked,eyebrow:$("#journalEyebrow").value,title:$("#journalTitle").value,description:$("#journalDesc").value,items:collectGeneric("#journalItems",["title","date","category","thumbnail","href"],["published"])};
   h.contact={...(h.contact||{}),visible:$("#contactVisible").checked,eyebrow:$("#contactEyebrow").value,title:$("#contactTitle").value,description:$("#contactDesc").value,image:$("#contactImage").value,email:$("#contactEmail").value,phone:$("#contactPhone").value,qrImage:$("#contactQrImage").value,qrCaption:$("#contactQrCaption").value,ctaLabel:$("#contactCTA").value,ctaHref:$("#contactCTAHref").value};
   state.navigation={...(state.navigation||{}),visible:$("#navVisible").checked,brand:$("#navBrand").value,ctaLabel:$("#navCTA").value,ctaHref:$("#navCTAHref").value,items:collectGeneric("#navItems",["label","href"],["visible"])};
   state.footer={...(state.footer||{}),visible:$("#footerVisible").checked,brand:$("#footerBrand").value,description:$("#footerDesc").value,copyright:$("#footerCopyright").value,links:collectGeneric("#footerLinks",["label","href"],[])};
+  {const n=parseInt($("#projectsHomeLimit").value,10);h.projectsSection={...(h.projectsSection||{})};if(n>0)h.projectsSection.homeLimit=n;else delete h.projectsSection.homeLimit}
+  {const email=$("#siteEmail").value.trim();state.site={...(state.site||{}),name:$("#siteName").value,email,seoTitle:$("#siteSeoTitle").value,siteUrl:$("#siteUrl").value.trim(),seoDescription:$("#siteSeoDesc").value,accent:$("#siteAccent").value.trim(),cursorRing:$("#cursorRing").checked,cursorText:$("#cursorText").value.trim()};
+   // one email everywhere: contact, footer link
+   if(email){h.contact.email=email;h.contact.ctaHref="mailto:"+email;(state.footer.links||[]).forEach(l=>{if(/^mailto:/i.test(l.href||""))l.href="mailto:"+email})}
+   h.marquee={visible:$("#marqueeVisible").checked,words:$("#marqueeWords").value.split("\n").map(x=>x.trim()).filter(Boolean)};
+   h.projectsSection={...(h.projectsSection||{}),stats:[1,2].map(n=>({value:$("#stat"+n+"Value").value.trim(),label:$("#stat"+n+"Label").value.trim()}))}}
   collectProjects();
   collectI18n();
 }
 function collectGeneric(host,fields,checks){return $$(host+" .item").map(el=>{const o={};fields.forEach(k=>o[k]=el.querySelector(`[data-k="${k}"]`)?.value||"");checks.forEach(k=>o[k]=!!el.querySelector(`[data-k="${k}"]`)?.checked);return o})}
 function renderNav(){const a=state.navigation?.items||[];$("#navItems").innerHTML=a.map((x,i)=>`<div class="item"><div class="grid2"><div class="field"><label>Label</label><input data-k="label" value="${esc(x.label)}"></div><div class="field"><label>Href</label><input data-k="href" value="${esc(x.href)}"></div></div><div class="item-head"><label class="switch"><input type="checkbox" data-k="visible" ${x.visible!==false?"checked":""}> Visible</label><button class="danger remove-generic" data-type="nav" data-i="${i}">Delete</button></div></div>`).join("")}
 function renderClients(){const a=state.home?.clients?.items||[];$("#clientItems").innerHTML=a.map((x,i)=>`<div class="item"><div class="grid2"><div class="field"><label>Name</label><input data-k="name" value="${esc(x.name)}"></div><div class="field"><label>Link</label><input data-k="href" value="${esc(x.href)}"></div></div><div class="field"><label>Logo / image</label><input data-k="logo" value="${esc(x.logo)}"><div class="image-actions"><button class="ghost pick-generic" data-host="clientItems" data-i="${i}" data-k="logo">Choose from Media</button><button class="ghost upload-generic" data-host="clientItems" data-i="${i}" data-k="logo">Upload</button></div></div><div class="item-head"><label class="switch"><input type="checkbox" data-k="visible" ${x.visible!==false?"checked":""}> Visible</label><button class="danger remove-generic" data-type="client" data-i="${i}">Delete</button></div></div>`).join("")}
-function renderJournal(){const a=state.home?.journal?.items||[];$("#journalItems").innerHTML=a.map((x,i)=>`<div class="item"><div class="grid2"><div class="field"><label>Title</label><input data-k="title" value="${esc(x.title)}"></div><div class="field"><label>Date</label><input data-k="date" value="${esc(x.date)}"></div><div class="field"><label>Category</label><input data-k="category" value="${esc(x.category)}"></div><div class="field"><label>Link</label><input data-k="href" value="${esc(x.href)}"></div></div><div class="field"><label>Thumbnail</label><input data-k="thumbnail" value="${esc(x.thumbnail)}"><div class="image-actions"><button class="ghost pick-generic" data-host="journalItems" data-i="${i}" data-k="thumbnail">Choose from Media</button><button class="ghost upload-generic" data-host="journalItems" data-i="${i}" data-k="thumbnail">Upload</button></div></div><div class="item-head"><label class="switch"><input type="checkbox" data-k="published" ${x.published!==false?"checked":""}> Published</label><button class="danger remove-generic" data-type="journal" data-i="${i}">Delete</button></div></div>`).join("")}
+function renderJournal(){const a=state.home?.journal?.items||[];$("#journalItems").innerHTML=a.map((x,i)=>`<div class="item"><div class="grid2"><div class="field"><label>Title</label><input data-k="title" value="${esc(x.title)}"></div><div class="field"><label>Date</label><input data-k="date" value="${esc(x.date)}"></div><div class="field"><label>Category</label><input data-k="category" value="${esc(x.category)}"></div><div class="field"><label>Link</label><input data-k="href" value="${esc(x.href)}"></div></div><div class="field"><label>Thumbnail</label><small class="hint"><b>Dọc 1200×1600 (3:4).</b> Chữ tiêu đề nằm ở phần dưới ảnh.</small><input data-k="thumbnail" value="${esc(x.thumbnail)}"><div class="image-actions"><button class="ghost pick-generic" data-host="journalItems" data-i="${i}" data-k="thumbnail">Choose from Media</button><button class="ghost upload-generic" data-host="journalItems" data-i="${i}" data-k="thumbnail">Upload</button></div></div><div class="item-head"><label class="switch"><input type="checkbox" data-k="published" ${x.published!==false?"checked":""}> Published</label><button class="danger remove-generic" data-type="journal" data-i="${i}">Delete</button></div></div>`).join("")}
 const APP_OPTIONS=[["ps","Photoshop"],["ai","Illustrator"],["id","InDesign"],["ae","After Effects"],["pr","Premiere Pro"],["lr","Lightroom"],["xd","Adobe XD"],["figma","Figma"],["blender","Blender"],["c4d","Cinema 4D"],["canva","Canva"],["davinci","DaVinci Resolve"],["procreate","Procreate"],["other","Khác (2 chữ cái đầu)"]];
-function renderTools(){const a=state.home?.about?.skills?.tools||[];$("#toolItems").innerHTML=a.map((x,i)=>`<div class="item"><div class="grid2"><div class="field"><label>Tên app</label><input data-k="name" value="${esc(x.name)}"></div><div class="field"><label>Icon</label><select data-k="icon">${APP_OPTIONS.map(([k,n])=>`<option value="${k}" ${x.icon===k?"selected":""}>${esc(n)}</option>`).join("")}</select></div></div><div class="item-head"><label class="switch"><input type="checkbox" data-k="visible" ${x.visible!==false?"checked":""}> Visible</label><button class="danger remove-generic" data-type="tool" data-i="${i}">Delete</button></div></div>`).join("")}
+function renderTools(){const a=state.home?.about?.skills?.tools||[];$("#toolItems").innerHTML=a.map((x,i)=>`<div class="item"><div class="grid2"><div class="field"><label>Tên app</label><input data-k="name" value="${esc(x.name)}"></div><div class="field"><label>Icon</label><select data-k="icon">${APP_OPTIONS.map(([k,n])=>`<option value="${k}" ${x.icon===k?"selected":""}>${esc(n)}</option>`).join("")}</select></div></div><div class="field"><label>Icon riêng (ưu tiên hơn icon có sẵn)</label><small class="hint"><b>Vuông 256×256, PNG.</b> Logo căn giữa, bo góc sẵn hoặc nền trong suốt.</small><input data-k="image" value="${esc(x.image)}"><div class="image-actions"><button class="ghost pick-generic" data-host="toolItems" data-i="${i}" data-k="image">Choose from Media</button><button class="ghost upload-generic" data-host="toolItems" data-i="${i}" data-k="image">Upload</button></div></div><div class="item-head"><label class="switch"><input type="checkbox" data-k="visible" ${x.visible!==false?"checked":""}> Visible</label><button class="danger remove-generic" data-type="tool" data-i="${i}">Delete</button></div></div>`).join("")}
+function renderAiTools(){const a=state.home?.about?.skills?.aiTools||[];$("#aiToolItems").innerHTML=a.map((x,i)=>`<div class="item"><div class="grid2"><div class="field"><label>Tên AI</label><input data-k="name" value="${esc(x.name)}"></div><div class="field"><label>Icon</label><select data-k="icon">${APP_OPTIONS.map(([k,n])=>`<option value="${k}" ${x.icon===k?"selected":""}>${esc(n)}</option>`).join("")}</select></div></div><div class="field"><label>Icon riêng (ưu tiên hơn icon có sẵn)</label><small class="hint"><b>Vuông 256×256, PNG.</b> Logo căn giữa, bo góc sẵn hoặc nền trong suốt.</small><input data-k="image" value="${esc(x.image)}"><div class="image-actions"><button class="ghost pick-generic" data-host="aiToolItems" data-i="${i}" data-k="image">Choose from Media</button><button class="ghost upload-generic" data-host="aiToolItems" data-i="${i}" data-k="image">Upload</button></div></div><div class="item-head"><label class="switch"><input type="checkbox" data-k="visible" ${x.visible!==false?"checked":""}> Visible</label><button class="danger remove-generic" data-type="aitool" data-i="${i}">Delete</button></div></div>`).join("")}
 function renderFooter(){const a=state.footer?.links||[];$("#footerLinks").innerHTML=a.map((x,i)=>`<div class="item"><div class="grid2"><div class="field"><label>Label</label><input data-k="label" value="${esc(x.label)}"></div><div class="field"><label>Href</label><input data-k="href" value="${esc(x.href)}"></div></div><button class="danger remove-generic" data-type="footer" data-i="${i}">Delete</button></div>`).join("")}
 const PT=window.ProjectTemplate;
 const fieldHTML=(fd,v)=>{
   if(fd.kind==="select")return `<div class="field"><label>${esc(fd.label)}</label><select data-bk="${fd.k}">${fd.options.map(([k,n])=>`<option value="${k}" ${(v||fd.options[0][0])===k?"selected":""}>${esc(n)}</option>`).join("")}</select></div>`;
   if(fd.kind==="textarea")return `<div class="field"><label>${esc(fd.label)}</label><textarea data-bk="${fd.k}" style="min-height:70px">${esc(v)}</textarea></div>`;
-  if(fd.kind==="image")return `<div class="field"><label>${esc(fd.label)}</label><div class="block-img"><img src="${esc(v||"")}" style="visibility:${v?"visible":"hidden"}"><div><input data-bk="${fd.k}" value="${esc(v)}"><div class="image-actions"><button class="ghost block-pick" data-mode="one">Chọn từ Media</button><button class="ghost block-upload" data-mode="one">Upload</button></div></div></div></div>`;
-  if(fd.kind==="images"){const arr=Array.isArray(v)?v:[];return `<div class="field"><label>${esc(fd.label)} — ${arr.length} ảnh</label>${arr.length?`<div class="thumbs">${arr.map(s=>`<img src="${esc(s)}">`).join("")}</div>`:""}<textarea data-bk="${fd.k}" data-list="1" style="min-height:70px">${esc(arr.join("\n"))}</textarea><div class="image-actions"><button class="ghost block-pick" data-mode="many">Thêm từ Media</button><button class="ghost block-upload" data-mode="many">Upload nhiều ảnh</button></div></div>`}
+  if(fd.kind==="image")return `<div class="field"><label>${esc(fd.label)}</label>${fd.note?`<small class="hint">${esc(fd.note)}</small>`:""}<div class="block-img"><img src="${esc(v||"")}" style="visibility:${v?"visible":"hidden"}"><div><input data-bk="${fd.k}" value="${esc(v)}"><div class="image-actions"><button class="ghost block-pick" data-mode="one">Chọn từ Media</button><button class="ghost block-upload" data-mode="one">Upload</button></div></div></div></div>`;
+  if(fd.kind==="images"){const arr=Array.isArray(v)?v:[];return `<div class="field"><label>${esc(fd.label)} — ${arr.length} ảnh</label>${fd.note?`<small class="hint">${esc(fd.note)}</small>`:""}${arr.length?`<div class="thumbs">${arr.map(s=>`<img src="${esc(s)}">`).join("")}</div>`:""}<textarea data-bk="${fd.k}" data-list="1" style="min-height:70px">${esc(arr.join("\n"))}</textarea><div class="image-actions"><button class="ghost block-pick" data-mode="many">Thêm từ Media</button><button class="ghost block-upload" data-mode="many">Upload nhiều ảnh</button></div></div>`}
   return `<div class="field"><label>${esc(fd.label)}</label><input data-bk="${fd.k}" value="${esc(v)}"></div>`};
 function blockHTML(b,bi,n){const def=PT.BLOCKS[b.type]||{label:b.type,hint:"",fields:[]};
   return `<div class="block" data-type="${esc(b.type)}"><div class="block-head"><div><b>${bi+1}. ${esc(def.label)}</b><small>${esc(def.hint)}</small></div><div class="row-actions"><button class="ghost block-up" title="Lên" ${bi===0?"disabled":""}>↑</button><button class="ghost block-down" title="Xuống" ${bi===n-1?"disabled":""}>↓</button><button class="danger block-del" title="Xoá module">✕</button></div></div>${def.fields.length?`<div class="grid2">${def.fields.map(fd=>fieldHTML(fd,b[fd.k])).join("")}</div>`:""}</div>`}
-function renderProjects(){const open=new Set($$("#projectItems .project.open").map(e=>e.dataset.i));const a=state.projects||[];$("#projectItems").innerHTML=a.map((p,i)=>{const {heroSize,blocks}=PT.blocksOf(p);const hs=p.heroSize||heroSize;return `<div class="item project${open.has(String(i))?" open":""}" draggable="true" data-i="${i}"><div class="item-head"><div><span class="drag">☰</span> <strong>${esc(p.title||"Untitled")}</strong><div style="color:#777;font-size:12px">${esc(p.category||"")} · ${esc(p.year||"")} · ${blocks.length} module</div></div><div class="row-actions"><a class="ghost open-page" href="/projects/${encodeURIComponent(p.slug||p.id||"")}.html" target="_blank" title="Bấm Save trước để thấy thay đổi">Xem trang ↗</a><button class="ghost toggle-project">Edit</button><button class="ghost duplicate-project">Duplicate</button><button class="danger delete-project">Delete</button></div></div><div class="project-body">
-<div class="grid2"><div class="field"><label>Title</label><input data-k="title" value="${esc(p.title)}"></div><div class="field"><label>Slug (tên file trang)</label><input data-k="slug" value="${esc(p.slug)}"></div><div class="field"><label>Category</label><input data-k="category" value="${esc(p.category)}"></div><div class="field"><label>Year</label><input data-k="year" value="${esc(p.year)}"></div><div class="field"><label>Client</label><input data-k="client" value="${esc(p.client)}"></div><div class="field"><label>Role</label><input data-k="role" value="${esc(p.role)}"></div><div class="field"><label>Scope</label><input data-k="scope" value="${esc(p.scope)}"></div><div class="field"><label>Link ngoài (để trống = trang project)</label><input data-k="link" value="${esc(/^\/?projects\//.test(p.link||"")?"":p.link)}"></div></div>
-<div class="field"><label>Cover — ảnh bìa trang chủ + hero</label><input data-k="cover" value="${esc(p.cover)}"><div class="image-actions"><button class="ghost project-pick" data-i="${i}" data-k="cover">Choose from Media</button><button class="ghost project-upload" data-i="${i}" data-k="cover">Upload</button></div></div>
+function renderProjects(){const open=new Set($$("#projectItems .project.open").map(e=>e.dataset.i));const a=state.projects||[];$("#projectItems").innerHTML=a.map((p,i)=>{const {heroSize,blocks}=PT.blocksOf(p);const hs=p.heroSize||heroSize;return `<div class="item project${open.has(String(i))?" open":""}" draggable="true" data-i="${i}"><div class="item-head"><div><span class="drag">☰</span> <strong>${esc(p.title||"Untitled")}</strong>${p.kind==="journal"?' <span style="font-size:11px;color:#9eabff;border:1px solid #3a4580;border-radius:999px;padding:2px 8px;margin-left:6px">Nhật ký</span>':''}<div style="color:#777;font-size:12px">${esc(p.category||"")} · ${esc(p.year||"")} · ${blocks.length} module</div></div><div class="row-actions"><a class="ghost open-page" href="/projects/${encodeURIComponent(p.slug||p.id||"")}.html" target="_blank" title="Bấm Save trước để thấy thay đổi">Xem trang ↗</a><button class="ghost toggle-project">Edit</button><button class="ghost duplicate-project">Duplicate</button><button class="danger delete-project">Delete</button></div></div><div class="project-body">
+<div class="grid2"><div class="field"><label>Title</label><input data-k="title" value="${esc(p.title)}"></div><div class="field"><label>Slug (tên file trang)</label><input data-k="slug" value="${esc(p.slug)}"></div><div class="field"><label>Category</label><input data-k="category" value="${esc(p.category)}"></div><div class="field"><label>Year</label><input data-k="year" value="${esc(p.year)}"></div><div class="field"><label>Client</label><input data-k="client" value="${esc(p.client)}"></div><div class="field"><label>Role</label><input data-k="role" value="${esc(p.role)}"></div><div class="field"><label>Scope</label><input data-k="scope" value="${esc(p.scope)}"></div><div class="field"><label>Link ngoài (để trống = trang project)</label><input data-k="link" value="${esc(/^\/?projects\//.test(p.link||"")?"":p.link)}"></div><div class="field"><label>Loại</label><select data-k="kind"><option value="" ${p.kind!=="journal"?"selected":""}>Dự án — hiện ở slider Dự án</option><option value="journal" ${p.kind==="journal"?"selected":""}>Bài Nhật ký — hiện ở mục Journal</option></select></div></div>
+<div class="field"><label>Cover — ảnh bìa trang chủ + hero</label><small class="hint"><b>2400×1800 (4:3).</b> Một ảnh dùng cho: slide trang chủ (gần vuông, trên điện thoại thành dọc), đầu trang project (ngang), thẻ "Dự án khác" và ảnh khi chia sẻ link. Đặt chủ thể trong vùng giữa khoảng 40%.</small><input data-k="cover" value="${esc(p.cover)}"><div class="image-actions"><button class="ghost project-pick" data-i="${i}" data-k="cover">Choose from Media</button><button class="ghost project-upload" data-i="${i}" data-k="cover">Upload</button></div></div>
+${p.kind==="journal"?`<div class="field"><label>Ảnh thẻ Nhật ký (không bắt buộc)</label><small class="hint"><b>Dọc 1200×1600 (3:4).</b> Ảnh trên thẻ ở mục Journal trang chủ; chữ tiêu đề nằm ở phần dưới ảnh. Để trống = dùng ảnh Cover.</small><input data-k="thumbnail" value="${esc(p.thumbnail)}"><div class="image-actions"><button class="ghost project-pick" data-i="${i}" data-k="thumbnail">Choose from Media</button><button class="ghost project-upload" data-i="${i}" data-k="thumbnail">Upload</button></div></div>`:""}
 <div class="grid2"><div class="field"><label>Headline (Overview) — xuống dòng được</label><textarea data-k="headline" style="min-height:70px">${esc(p.headline)}</textarea></div><div class="field"><label>Hero</label><select data-k="heroSize"><option value="full" ${hs!=="short"?"selected":""}>Cao full màn hình</option><option value="short" ${hs==="short"?"selected":""}>Thấp (gọn)</option></select></div></div>
 <div class="field"><label>Description — mỗi dòng 1 đoạn</label><textarea data-k="description">${esc(p.description)}</textarea></div>
 <div class="row-actions"><label class="switch"><input type="checkbox" data-k="published" ${p.published!==false?"checked":""}> Published</label><label class="switch"><input type="checkbox" data-k="featured" ${p.featured?"checked":""}> Featured</label></div>
@@ -221,18 +269,20 @@ document.addEventListener("click",e=>{const t=e.target.closest("button");if(!t)r
 async function save(){collect();const d=await api("/api/content",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(state)});state=d.content;status("Saved. Backup created.");refreshPreview()}
 $("#saveBtn").onclick=()=>save().catch(e=>status("Error: "+e.message));$("#reloadBtn").onclick=()=>load().catch(e=>status("Error: "+e.message));
 
-$$(".nav button").forEach(b=>b.onclick=async()=>{$$(".nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");$$(".tab").forEach(x=>x.classList.remove("active"));$("#tab-"+b.dataset.tab).classList.add("active");$("#title").textContent=b.textContent;if(b.dataset.tab==="media")await loadMedia();if(b.dataset.tab==="i18n"&&!i18nScanned)await scanI18n();if(b.dataset.tab==="backup")await loadBackups();if(b.dataset.tab==="preview")refreshPreview()});
+$$(".nav button").forEach(b=>b.onclick=async()=>{$$(".nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");$$(".tab").forEach(x=>x.classList.remove("active"));$("#tab-"+b.dataset.tab).classList.add("active");$("#title").textContent=b.textContent;if(b.dataset.tab==="media")await loadMedia();if(b.dataset.tab==="publish")await loadPub();if(b.dataset.tab==="i18n"&&!i18nScanned)await scanI18n();if(b.dataset.tab==="backup")await loadBackups();if(b.dataset.tab==="preview")refreshPreview()});
 
 $("#addNavBtn").onclick=()=>{collect();state.navigation.items.push({label:"New Item",href:"#",visible:true});renderNav()}
+$("#addAiToolBtn").onclick=()=>{collect();(state.home.about.skills.aiTools||(state.home.about.skills.aiTools=[])).push({name:"New AI",icon:"other",visible:true});renderAiTools()};
 $("#addToolBtn").onclick=()=>{collect();(state.home.about.skills.tools||(state.home.about.skills.tools=[])).push({name:"New App",icon:"other",visible:true});renderTools()}
 $("#addClientBtn").onclick=()=>{collect();state.home.clients.items.push({name:"NEW CLIENT",logo:"",href:"",visible:true});renderClients()}
 $("#addJournalBtn").onclick=()=>{collect();state.home.journal.items.push({title:"New Journal Item",date:"2026",category:"JOURNAL",thumbnail:"",href:"#",published:true});renderJournal()}
 $("#addFooterLinkBtn").onclick=()=>{collect();state.footer.links.push({label:"New Link",href:"#"});renderFooter()}
+$("#addArticleBtn").onclick=()=>{collect();state.projects.push({id:"article-"+Date.now(),kind:"journal",slug:"new-article-"+Date.now().toString(36),title:"NEW ARTICLE",category:"AI WORKFLOW",year:new Date().getFullYear().toString(),cover:"",description:"",published:true,heroSize:"short",blocks:[{type:"text",label:"",text:""},{type:"gallery",style:"grid2",images:[]}]});renderProjects();$('.nav button[data-tab="projects"]').click();setTimeout(()=>{const last=$$("#projectItems .project").at(-1);if(last){last.classList.add("open");last.scrollIntoView({behavior:"smooth",block:"start"})}},60);status("Đã thêm bài Nhật ký mới ở cuối danh sách Projects. Soạn xong bấm Save.")};
 $("#addProjectBtn").onclick=()=>{collect();state.projects.push({id:"project-"+Date.now(),slug:"new-project",title:"NEW PROJECT",category:"ART DIRECTION",year:new Date().getFullYear().toString(),client:"",role:"",cover:"",description:"",published:true,featured:false,link:"",headline:"",scope:"",...PT.presetBlocks("standard")});renderProjects();$$("#projectItems .project").at(-1)?.classList.add("open")}
 
 document.addEventListener("click",e=>{
   const t=e.target;
-  if(t.classList.contains("remove-generic")){collect();const i=Number(t.dataset.i);if(t.dataset.type==="nav")state.navigation.items.splice(i,1);if(t.dataset.type==="client")state.home.clients.items.splice(i,1);if(t.dataset.type==="journal")state.home.journal.items.splice(i,1);if(t.dataset.type==="footer")state.footer.links.splice(i,1);if(t.dataset.type==="tool")state.home.about.skills.tools.splice(i,1);fill()}
+  if(t.classList.contains("remove-generic")){collect();const i=Number(t.dataset.i);if(t.dataset.type==="nav")state.navigation.items.splice(i,1);if(t.dataset.type==="client")state.home.clients.items.splice(i,1);if(t.dataset.type==="journal")state.home.journal.items.splice(i,1);if(t.dataset.type==="footer")state.footer.links.splice(i,1);if(t.dataset.type==="tool")state.home.about.skills.tools.splice(i,1);if(t.dataset.type==="aitool")state.home.about.skills.aiTools.splice(i,1);fill()}
   if(t.classList.contains("toggle-project"))t.closest(".project").classList.toggle("open");
   if(t.classList.contains("delete-project")){collectProjects();const i=Number(t.closest(".project").dataset.i);if(confirm("Delete project?")){state.projects.splice(i,1);renderProjects()}}
   if(t.classList.contains("duplicate-project")){collectProjects();const i=Number(t.closest(".project").dataset.i);const cp=JSON.parse(JSON.stringify(state.projects[i]));cp.id=(cp.id||"project")+"-"+Date.now();cp.slug=(cp.slug||"project")+"-copy";cp.title=(cp.title||"PROJECT")+" COPY";state.projects.splice(i+1,0,cp);renderProjects()}
@@ -297,6 +347,32 @@ function filterI18n(){
 $("#i18nFilter").addEventListener("input",filterI18n);$("#i18nTodo").addEventListener("change",filterI18n);
 $("#i18nRows").addEventListener("input",e=>{if(e.target.tagName==="TEXTAREA")filterI18n()});
 $("#i18nScan").onclick=async()=>{await scanI18n()};
+$("#siteAccentPick").addEventListener("input",e=>{$("#siteAccent").value=e.target.value});
+$("#siteAccent").addEventListener("input",e=>{if(/^#[0-9a-f]{6}$/i.test(e.target.value))$("#siteAccentPick").value=e.target.value});
+/* ---------- Xuất bản ---------- */
+let pubTimer=null;
+function showPub(d){
+  const g=d.git||{};$("#pubGit").textContent=(g.changed==null?"":(g.changed?g.changed+" file thay đổi chưa lưu lên GitHub":"GitHub đã có bản mới nhất"))+(g.last?" · Lần lưu gần nhất: "+g.last+" ("+g.when+")":"");
+  const j=d.job;const busy=j&&!j.done;["#pubCloudflare","#pubGithub","#pubBuild"].forEach(s=>$(s).disabled=!!busy);
+  if(j){$("#pubLog").style.display="block";$("#pubLog").textContent=(busy?"Đang chạy "+({cloudflare:"Cloudflare",github:"GitHub",build:"build thử"}[j.kind])+"…\n\n":"")+j.log.join("\n");$("#pubLog").scrollTop=1e9;
+    if(j.done)status(j.ok?({cloudflare:"Đã đưa lên Cloudflare.",github:"Đã lưu lên GitHub.",build:"Build thử thành công, không có lỗi."}[j.kind]):"Xuất bản bị lỗi — xem log bên dưới.")}
+  clearTimeout(pubTimer);if(busy)pubTimer=setTimeout(loadPub,1500);
+}
+async function loadPub(){try{showPub(await api("/api/publish/status"))}catch(e){status(e.message)}}
+async function startPub(kind){try{await api("/api/publish/"+kind,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:$("#pubMessage").value})});status("Đang chạy…");loadPub()}catch(e){status(e.message)}}
+$("#pubCloudflare").onclick=()=>startPub("cloudflare");
+$("#pubGithub").onclick=()=>{if(confirm("Lưu toàn bộ thay đổi lên GitHub?"))startPub("github")};
+$("#pubRefresh").onclick=loadPub;
+$("#pubBuild").onclick=()=>startPub("build");
+/* Recommended sizes shown under each image field */
+const IMG_HINTS={
+  heroImage:'<b>Ngang 2400×1600 (3:2).</b> Ảnh nền đầu trang, có zoom nhẹ khi cuộn. Trên điện thoại chỉ thấy khoảng 30% bề ngang ở giữa → đặt chủ thể chính giữa.',
+  introImage:'<b>Vuông 1600×1600.</b> Ảnh cạnh khối "Clear ideas". Ảnh trôi nhẹ khi cuộn → chừa mép khoảng 10%.',
+  aboutImage:'<b>Ngang 2400×1400.</b> Ảnh nền mục Giới thiệu, chữ và khối kỹ năng nằm đè lên → chọn ảnh tối hoặc ít chi tiết. Trên điện thoại khung thành dọc.',
+  contactImage:'<b>Ngang 2400×1300.</b> Ảnh nền mục Liên hệ: chữ bên trái, mã QR bên phải → chọn ảnh tối, ít chi tiết.',
+  contactQrImage:'<b>PNG nền trong suốt, mã QR màu trắng, vuông từ 600×600.</b> Hiện ở khoảng 300×300 trên trang.'
+};
+Object.entries(IMG_HINTS).forEach(([id,html])=>{const f=$("#"+id)?.closest(".field");const lb=f&&f.querySelector("label");if(lb&&!f.querySelector(".hint"))lb.insertAdjacentHTML("afterend",'<small class="hint">'+html+'</small>')});
 function refreshPreview(){$("#previewFrame").src="/?cms="+Date.now()}
 async function loadBackups(){const d=await api("/api/backups");$("#backupList").innerHTML=(d.backups||[]).map(b=>`<div class="backup-row"><div><strong>${esc(b.name)}</strong><div style="color:#777;font-size:12px">${Math.round(b.size/1024)} KB · ${new Date(b.modified).toLocaleString()}</div></div><button class="ghost restore" data-name="${esc(b.name)}">Restore</button></div>`).join("")||'<div style="color:#777">No backups yet.</div>'}
 $("#backupNowBtn").onclick=async()=>{await api("/api/backups/create",{method:"POST"});await loadBackups();status("Backup created.")}

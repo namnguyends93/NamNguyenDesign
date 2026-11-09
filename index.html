@@ -283,6 +283,9 @@ main{width:100%}
 .tool-name{line-height:1.2;min-width:0}
 .app-icon{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14),0 6px 14px rgba(0,0,0,.25)}
 .app-icon svg{width:17px;height:17px}
+.app-icon.has-img{background:#fff}
+.app-icon img{width:100%;height:100%;object-fit:cover}
+.skills-sub-ai{margin-top:26px}
 .app-icon b{width:100%;height:100%;border-radius:9px;display:grid;place-items:center;font:600 14px/1 "Space Grotesk",Inter,sans-serif;letter-spacing:-.02em}
 @media (prefers-reduced-motion:reduce){.tool{transition:none;opacity:1;transform:none}}
 @media (max-width:900px){.skills{margin-top:0}.skill-rows{grid-template-columns:1fr;gap:30px}.chip-list{justify-content:center}.skills-head{justify-content:center;gap:16px}}
@@ -630,12 +633,13 @@ main{width:100%}
   padding:46px;
 }
 .contact-qr{display:grid;grid-template-columns:minmax(180px,300px) 1fr;gap:44px;align-items:center}
-.qr-frame{position:relative;aspect-ratio:1;border-radius:32px;background:#fff;padding:18px;overflow:hidden}
-.qr-img{width:100%;height:100%;object-fit:contain;border-radius:14px}
+/* QR sits straight on the glass: no white card. Upload a white QR on a transparent background (PNG). */
+.qr-frame{position:relative;aspect-ratio:1}
+.qr-img{width:100%;height:100%;object-fit:contain}
 .qr-img[hidden],.qr-phone[hidden],.qr-empty[hidden]{display:none}
-.qr-empty{position:absolute;inset:18px;border:2px dashed #c9c9c9;border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#111;text-align:center;padding:12px}
+.qr-empty{position:absolute;inset:0;border:2px dashed rgba(255,255,255,.4);border-radius:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#fff;text-align:center;padding:12px}
 .qr-empty .mono{font-size:20px}
-.qr-empty small{font-size:12px;color:#777}
+.qr-empty small{font-size:12px;color:rgba(255,255,255,.6)}
 .qr-info{display:flex;flex-direction:column;gap:14px}
 .qr-label{font-size:12px;opacity:.75}
 .qr-caption{margin:0;font-size:18px;line-height:1.35;color:var(--soft)}
@@ -887,8 +891,8 @@ html.page-leaving body{
         <h2 class="display big-title">Projects</h2>
         <p class="copy">Selected identity, campaign and digital projects shaped through concept, art direction and disciplined visual systems.</p>
         <div class="stats">
-          <div class="stat"><strong class="display">20+</strong><span class="muted">Campaign directions</span></div>
-          <div class="stat"><strong class="display">50+</strong><span class="muted">Design outputs</span></div>
+          <div class="stat"><strong class="display">20</strong><span class="muted">Campaigns led in 2026</span></div>
+          <div class="stat"><strong class="display">7+</strong><span class="muted">Years in design</span></div>
         </div>
       </div>
 
@@ -997,8 +1001,8 @@ html.page-leaving body{
     </div>
   </section>
 
-  <section class="big-marquee" aria-label="Brand Identity, Campaign Design, Art Direction, Key Visual">
-    <div class="bm-inner"><div class="bm-track"><span>Brand Identity · <b>Campaign</b> · Art Direction · <b>Key Visual</b> · </span></div></div>
+  <section class="big-marquee" aria-label="Key Visual, Campaign, AI Visual, Art Direction">
+    <div class="bm-inner"><div class="bm-track"><span>Key Visual · <b>Campaign</b> · AI Visual · <b>Art Direction</b> · </span></div></div>
   </section>
 
   <section class="section-shell" id="journal">
@@ -1062,7 +1066,7 @@ html.page-leaving body{
           <a href="#projects"><span>Projects</span><span>03</span></a>
           <a href="#journal"><span>Journal</span><span>04</span></a>
           <a href="#contact"><span>Contact</span><span>05</span></a>
-          <a href="mailto:hello@namnguyen.design"><span>Email</span><span>→</span></a>
+          <a href="mailto:namnguyen.thietketkm@gmail.com"><span>Email</span><span>→</span></a>
         </div>
       </div>
       <div class="footer-word display reveal">Nam Nguyen Design</div>
@@ -1111,7 +1115,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
   });
 });
 
-const projectSlides = document.querySelectorAll(".project-slide");
+const slidesNow = () => document.querySelectorAll(".project-slide");
 const prevProject = document.querySelector(".project-prev");
 const nextProject = document.querySelector(".project-next");
 const currentProject = document.querySelector(".current-project");
@@ -1120,8 +1124,13 @@ const progressActive = document.querySelector(".progress-active");
 let projectIndex = 0;
 
 function showProject(index){
+  const projectSlides = slidesNow();
+  if(!projectSlides.length) return;
+  projectIndex = index;
   projectSlides.forEach(slide => slide.classList.remove("active"));
   projectSlides[index].classList.add("active");
+  const total = document.querySelector(".total-project");
+  if(total) total.textContent = String(projectSlides.length).padStart(2,"0");
 
   if(currentProject){
     currentProject.textContent = String(index + 1).padStart(2,"0");
@@ -1134,19 +1143,19 @@ function showProject(index){
 
 if(nextProject){
   nextProject.addEventListener("click",()=>{
-    projectIndex = (projectIndex + 1) % projectSlides.length;
+    projectIndex = (projectIndex + 1) % slidesNow().length;
     showProject(projectIndex);
   });
 }
 
 if(prevProject){
   prevProject.addEventListener("click",()=>{
-    projectIndex = (projectIndex - 1 + projectSlides.length) % projectSlides.length;
+    projectIndex = (projectIndex - 1 + slidesNow().length) % slidesNow().length;
     showProject(projectIndex);
   });
 }
 
-if(projectSlides.length){
+if(slidesNow().length){
   showProject(0);
 }
 

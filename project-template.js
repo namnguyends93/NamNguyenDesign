@@ -16,6 +16,22 @@ const src = (s, base) => !s ? '' : /^(https?:|data:)/i.test(s) ? s : base + Stri
 const img = (s, alt, base) => `<img src="${esc(src(s, base))}" alt="${esc(alt)}">`;
 const list = v => Array.isArray(v) ? v.filter(Boolean) : paras(v);
 
+// ---------- visual editor (/edit) ----------
+// renderProjectPage(content, slug, { edit: true }) marks every editable spot: data-ve="path" (text),
+// data-ve-img="path" (image), data-ve-block="i" (module). Paths are relative to the project.
+// Empty fields get a grey placeholder so they can still be clicked. Normal pages are unchanged.
+let VE = null;                                   // { i: current block index } while rendering for the editor
+const at = path => VE ? ` data-ve="${esc(path)}"` : '';
+const ati = path => VE ? ` data-ve-img="${esc(path)}"` : '';
+const bk = k => 'blocks.' + (VE ? VE.i : 0) + '.' + k;
+const blank = v => !String(v ?? '').trim();
+// editable text: element tag, classes, path, value, placeholder, multi-paragraph?
+function edT(tag, cls, path, value, ph, multi) {
+  const empty = blank(value);
+  const inner = empty ? (multi ? `<p>${esc(ph)}</p>` : esc(ph)) : (multi ? P(value) : esc(value));
+  return `<${tag}${cls || empty ? ` class="${[cls, empty ? 've-empty' : ''].filter(Boolean).join(' ')}"` : ''}${at(path)}>${inner}</${tag}>`;
+}
+
 // ---------- module definitions (admin builds its forms from this) ----------
 // Vietnamese dictionary for assets/i18n.js (content.json → i18n.vi)
 function i18nData(content) {
@@ -29,12 +45,12 @@ const BLOCKS = {
   intro:     { label: 'Giới thiệu ngắn', hint: 'Description căn giữa + thông tin. Thay cho Overview khi muốn trang gọn.', fields: [] },
   gallery:   { label: 'Gallery ảnh', hint: 'Bao nhiêu ảnh cũng được, tự chia hàng theo kiểu đã chọn.', fields: [
     { k: 'style', label: 'Kiểu lưới', kind: 'select', options: GALLERY_STYLES },
-    { k: 'images', label: 'Ảnh — mỗi dòng 1 ảnh', kind: 'images' }] },
-  image:     { label: 'Ảnh tràn màn hình', hint: '1 ảnh lớn gần full màn hình.', fields: [{ k: 'image', label: 'Ảnh', kind: 'image' }] },
+    { k: 'images', label: 'Ảnh — mỗi dòng 1 ảnh', kind: 'images', note: 'Ảnh 2 cột: dọc 1600×2000 (4:5) · 3 cột: dọc 1200×1600 (3:4) · ảnh nằm 1 mình 1 hàng: ngang 2400 px, cao tuỳ ý. Ảnh cùng hàng nên cùng tỉ lệ.' }] },
+  image:     { label: 'Ảnh tràn màn hình', hint: '1 ảnh lớn gần full màn hình.', fields: [{ k: 'image', label: 'Ảnh', kind: 'image', note: 'Ngang 2400×1500 (16:10), gần tràn màn hình. Trên điện thoại khung thành dọc: giữ chủ thể ở giữa.' }] },
   chapter:   { label: 'Chữ + ảnh (2 cột)', hint: 'Một đoạn kể chuyện kèm ảnh, vd Challenge / Approach.', fields: [
     { k: 'label', label: 'Nhãn (vd 01 / Challenge)', kind: 'text' },
     { k: 'text', label: 'Nội dung', kind: 'textarea' },
-    { k: 'image', label: 'Ảnh', kind: 'image' },
+    { k: 'image', label: 'Ảnh', kind: 'image', note: 'Dọc 1600×2000 (4:5), nằm cạnh đoạn chữ.' },
     { k: 'side', label: 'Ảnh nằm bên', kind: 'select', options: [['right', 'Phải'], ['left', 'Trái']] }] },
   text:      { label: 'Đoạn chữ', hint: 'Một đoạn chữ lớn, không ảnh — vd Result.', fields: [
     { k: 'label', label: 'Nhãn (vd 03 / Result)', kind: 'text' },
@@ -107,7 +123,7 @@ function blocksOf(p) {
 // ---------- rendering ----------
 const GALLERY = { mix: [[2, 1], ''], grid2: [[2], 'medium'], grid3: [[3], 'dense'], grand: [[1, 2, 1, 3], 'grand'] };
 function gallery(images, style, alt, base) {
-  if (!images.length) return '';
+  if (!images.length) return VE ? `<section class="section ve-ph">Gallery trống — thêm ảnh ở bảng bên phải</section>` : '';
   const [pattern, cls] = GALLERY[style] || GALLERY.mix;
   const rows = [];
   let i = 0, r = 0;
@@ -115,7 +131,7 @@ function gallery(images, style, alt, base) {
     const want = pattern[r++ % pattern.length];
     const n = Math.min(want, images.length - i);
     rows.push(`<div class="g-row cols-${n}${want === 1 ? ' tall' : ''}">` +
-      images.slice(i, i + n).map((s, k) => `<figure class="g-item">${img(s, `${alt} — image ${i + k + 1}`, base)}</figure>`).join('') + '</div>');
+      images.slice(i, i + n).map((s, k) => `<figure class="g-item"${ati(bk('images.' + (i + k)))}>${img(s, `${alt} — image ${i + k + 1}`, base)}</figure>`).join('') + '</div>');
     i += n;
   }
   return `<section class="gallery ${cls}">${rows.join('')}</section>`;
@@ -123,9 +139,9 @@ function gallery(images, style, alt, base) {
 
 const DETAIL_FIELDS = [['client', 'Client'], ['role', 'Role'], ['scope', 'Scope'], ['year', 'Year']];
 function details(p) {
-  const items = DETAIL_FIELDS.map(([k, label]) => [label, p[k]]).filter(([, v]) => v && String(v).trim());
+  const items = DETAIL_FIELDS.map(([k, label]) => [label, p[k], k]).filter(([, v]) => VE || (v && String(v).trim()));
   if (!items.length) return '';
-  return `<div class="details">${items.map(([l, v]) => `<div class="detail"><b>${esc(l)}</b><span>${esc(v)}</span></div>`).join('')}</div>`;
+  return `<div class="details">${items.map(([l, v, k]) => `<div class="detail"><b>${esc(l)}</b>${VE ? edT('span', '', k, v, '—') : `<span>${esc(v)}</span>`}</div>`).join('')}</div>`;
 }
 
 function renderBlock(b, p, base) {
@@ -135,17 +151,22 @@ function renderBlock(b, p, base) {
   switch (b.type) {
     case 'overview': return `
   <section class="section overview">
-    <div><div class="eyebrow">Project Overview</div><h2 class="display">${p.headline ? H(p.headline) : 'Direction<br>&amp; System'}</h2></div>
-    <div>${desc ? `<div class="overview-copy">${P(desc)}</div>` : ''}${details(p)}</div>
+    <div><div class="eyebrow">Project Overview</div><h2 class="display"${at('headline')}>${p.headline ? H(p.headline) : 'Direction<br>&amp; System'}</h2></div>
+    <div>${VE ? edT('div', 'overview-copy', 'description', desc, 'Nhập mô tả dự án…', true) : desc ? `<div class="overview-copy">${P(desc)}</div>` : ''}${details(p)}</div>
   </section>`;
-    case 'intro': return (desc || metaTags) ? `
+    case 'intro': return (desc || metaTags || VE) ? `
   <section class="section intro-mini">
-    ${metaTags ? `<div class="meta">${metaTags}</div>` : ''}${desc ? `<div class="intro-text">${P(desc)}</div>` : ''}${details(p)}
+    ${VE ? `<div class="meta">${edT('span', '', 'category', p.category, 'Chuyên mục')}${edT('span', '', 'year', p.year, 'Năm')}</div>` + edT('div', 'intro-text', 'description', desc, 'Nhập mô tả…', true) : `${metaTags ? `<div class="meta">${metaTags}</div>` : ''}${desc ? `<div class="intro-text">${P(desc)}</div>` : ''}`}${details(p)}
   </section>` : '';
     case 'gallery': return gallery(list(b.images), b.style, title, base);
-    case 'image': return b.image ? `
-  <figure class="bleed">${img(b.image, `${title} — key visual`, base)}</figure>` : '';
+    case 'image': return (b.image || VE) ? `
+  <figure class="bleed"${ati(bk('image'))}>${b.image ? img(b.image, `${title} — key visual`, base) : ''}</figure>` : '';
     case 'chapter': {
+      if (VE) return `
+  <section class="chapter-split${b.side === 'left' ? ' reverse' : ''}">
+    <div class="section chapter-copy">${edT('div', 'eyebrow', bk('label'), b.label, 'Nhãn (vd 01 / Challenge)')}${edT('div', 'chapter-text', bk('text'), b.text, 'Nhập nội dung…', true)}</div>
+    <figure class="chapter-media"${ati(bk('image'))}>${b.image ? img(b.image, `${title} — ${b.label || 'detail'}`, base) : ''}</figure>
+  </section>`;
       if (!b.text && !b.image) return '';
       const eyebrow = b.label ? `<div class="eyebrow">${esc(b.label)}</div>` : '';
       if (!b.image) return renderBlock({ type: 'text', label: b.label, text: b.text }, p, base);
@@ -155,9 +176,16 @@ function renderBlock(b, p, base) {
     <figure class="chapter-media">${img(b.image, `${title} — ${b.label || 'detail'}`, base)}</figure>
   </section>`;
     }
-    case 'text': return b.text ? `
+    case 'text': if (VE) return `
+  <section class="section chapter solo"><div class="chapter-copy">${edT('div', 'eyebrow', bk('label'), b.label, 'Nhãn (không bắt buộc)')}${edT('div', 'chapter-text', bk('text'), b.text, 'Nhập nội dung…', true)}</div></section>`;
+      return b.text ? `
   <section class="section chapter solo"><div class="chapter-copy">${b.label ? `<div class="eyebrow">${esc(b.label)}</div>` : ''}<div class="chapter-text">${P(b.text)}</div></div></section>` : '';
     case 'process': {
+      if (VE) return `
+  <section class="section process">
+    <div class="eyebrow">Process</div>
+    <div class="process-grid cols-3">${[1, 2, 3].map(n => `<div class="step"><span class="step-num">0${n}</span>${edT('h3', 'display', bk('t' + n), b['t' + n], 'Tiêu đề bước ' + n)}${edT('div', '', bk('x' + n), b['x' + n], 'Nội dung bước ' + n, true)}</div>`).join('')}</div>
+  </section>`;
       const steps = [1, 2, 3].map(n => [String(n).padStart(2, '0'), b['t' + n], b['x' + n]]).filter(s => s[1] || s[2]);
       return steps.length ? `
   <section class="section process">
@@ -165,22 +193,29 @@ function renderBlock(b, p, base) {
     <div class="process-grid cols-${steps.length}">${steps.map(([n, t, x]) => `<div class="step"><span class="step-num">${n}</span>${t ? `<h3 class="display">${esc(t)}</h3>` : ''}${P(x)}</div>`).join('')}</div>
   </section>` : '';
     }
-    case 'statement': return b.text ? `
-  <section class="section statement"><p>${esc(b.text)}</p></section>` : '';
+    case 'statement': return (b.text || VE) ? `
+  <section class="section statement">${VE ? edT('p', '', bk('text'), b.text, 'Câu statement…') : `<p>${esc(b.text)}</p>`}</section>` : '';
     case 'credits': {
-      const rows = [['Client', p.client], ['Category', p.category], ['Role', p.role], ['Scope', p.scope], ['Year', p.year]].filter(r => r[1]);
+      const rows = [['Client', p.client, 'client'], ['Category', p.category, 'category'], ['Role', p.role, 'role'], ['Scope', p.scope, 'scope'], ['Year', p.year, 'year']].filter(r => VE || r[1]);
       return rows.length ? `
-  <section class="section credits">${rows.map(([l, v]) => `<div><b>${l}</b><span>${esc(v)}</span></div>`).join('')}</section>` : '';
+  <section class="section credits">${rows.map(([l, v, k]) => `<div><b>${l}</b>${VE ? edT('span', '', k, v, '—') : `<span>${esc(v)}</span>`}</div>`).join('')}</section>` : '';
     }
     default: return '';
   }
 }
 
-function renderProjectPage(content, slug) {
-  const all = (content.projects || []).filter(p => p.published !== false);
-  const idx = all.findIndex(p => (p.slug || p.id) === slug);
-  if (idx < 0) return null;
-  const p = all[idx];
+function renderProjectPage(content, slug, opts) {
+  VE = opts && opts.edit ? { i: 0 } : null;
+  try { return renderPage(content, slug); } finally { VE = null; }
+}
+function renderPage(content, slug) {
+  const pub = (content.projects || []).filter(p => p.published !== false);
+  const p = pub.find(x => (x.slug || x.id) === slug);
+  if (!p) return null;
+  // Journal articles (kind "journal") use the same page; "next" stays within the same kind
+  const isArticle = p.kind === 'journal';
+  const all = pub.filter(x => (x.kind === 'journal') === isArticle);
+  const idx = all.indexOf(p);
   const next = all.length > 1 ? all[(idx + 1) % all.length] : null;
   const base = '../';
   const title = String(p.title || '').trim() || 'Untitled project';
@@ -195,23 +230,37 @@ function renderProjectPage(content, slug) {
 
   const hero = `
   <section class="hero${short ? ' short' : ''}">
-    <div class="hero-media">${p.cover ? img(p.cover, title, base) : ''}</div>
+    <div class="hero-media"${ati('cover')}>${p.cover ? img(p.cover, title, base) : ''}</div>
     <div class="hero-copy">
-      <h1 class="display">${esc(title)}</h1>
+      <h1 class="display"${at('title')}>${esc(title)}</h1>
       <div class="hero-side">
-        ${metaTags ? `<div class="meta">${metaTags}</div>` : ''}
-        ${desc ? `<p>${esc(paras(desc)[0])}</p>` : ''}
+        ${VE ? `<div class="meta">${edT('span', '', 'category', p.category, 'Chuyên mục')}${edT('span', '', 'year', p.year, 'Năm')}</div>` : metaTags ? `<div class="meta">${metaTags}</div>` : ''}
+        ${VE && paras(desc).length <= 1 ? edT('p', '', 'description', desc, 'Mô tả ngắn…') : desc ? `<p>${esc(paras(desc)[0])}</p>` : ''}
       </div>
     </div>
   </section>`;
 
-  const nextBlock = next ? `
-  <a class="next" href="${esc((next.slug || next.id) + '.html')}">
-    ${next.cover ? img(next.cover, String(next.title || '').trim(), base) : ''}
-    <div class="next-copy"><small>NEXT PROJECT →</small><h3 class="display">${esc(String(next.title || '').trim())}</h3></div>
-  </a>` : '';
+  // Bottom of the page: every other project (or article), starting with the next one, up to 6
+  const others = all.length > 1 ? [...all.slice(idx + 1), ...all.slice(0, idx)].slice(0, 6) : [];
+  const nextBlock = others.length ? `
+  <section class="more">
+    <div class="more-head">
+      <h2 class="display">${isArticle ? 'MORE ARTICLES' : 'MORE PROJECTS'}</h2>
+      <a href="${isArticle ? '../index.html#journal' : '../index.html#projects'}">VIEW ALL →</a>
+    </div>
+    <div class="more-grid" style="--cols:${Math.min(3, others.length)}">${others.map((o, i) => `
+      <a class="more-card" href="${esc((o.slug || o.id) + '.html')}">
+        ${o.cover ? img(o.cover, String(o.title || '').trim(), base) : ''}
+        <div class="more-copy"><small>${i === 0 ? (isArticle ? 'NEXT ARTICLE →' : 'NEXT PROJECT →') : [o.category, o.year].filter(Boolean).map(x => `<span>${esc(x)}</span>`).join(' · ')}</small><h3 class="display">${esc(String(o.title || '').trim())}</h3></div>
+      </a>`).join('')}
+    </div>
+  </section>` : '';
 
-  const body = hero + blocks.map(b => renderBlock(b, p, base)).join('');
+  const body = hero + blocks.map((b, i) => {
+    if (VE) VE.i = i;
+    const h = renderBlock(b, p, base);
+    return VE && h ? h.replace(/<(section|figure)/, m => `${m} data-ve-block="${i}"`) : h;
+  }).join('');
   const accent = site.accent && /^#[0-9a-f]{3,8}$/i.test(site.accent) ? `:root{--accent:${site.accent}}` : '';
   const metaDesc = paras(desc)[0] || `${title} project by ${brand}.`;
 
@@ -230,7 +279,7 @@ function renderProjectPage(content, slug) {
 </head>
 <body>
 <nav class="project-nav">
-  <a href="../index.html#projects">← BACK TO WORK</a>
+  ${isArticle ? '<a href="../index.html#journal">← BACK TO JOURNAL</a>' : '<a href="../index.html#projects">← BACK TO WORK</a>'}
   <a href="../index.html#contact">START A PROJECT +</a>
 </nav>
 <main class="project-page">${body}${nextBlock}
@@ -345,12 +394,26 @@ figure{margin:0}
 /* next */
 .next{position:relative;min-height:620px;display:flex;align-items:flex-end;border-radius:100px;overflow:hidden;background:#1b1b1b}
 .next img{position:absolute;inset:0;transition:transform .9s cubic-bezier(.22,.75,.24,1)}
+.more{padding-top:90px}
+.more-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;padding:0 24px 28px}
+.more-head h2{margin:0;font-size:clamp(40px,5vw,76px)}
+.more-head a{flex:none;padding:13px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.2);font:11px "Geist Mono",monospace;transition:background .25s,color .25s}
+.more-head a:hover{background:var(--white);color:var(--black)}
+.more-grid{display:grid;grid-template-columns:repeat(var(--cols),minmax(0,1fr));gap:8px}
+.more-card{position:relative;min-height:480px;display:flex;align-items:flex-end;border-radius:72px;overflow:hidden;background:#1b1b1b}
+.more-card img{position:absolute;inset:0;transition:transform .9s cubic-bezier(.22,.75,.24,1)}
+.more-card:hover img{transform:scale(1.04)}
+.more-card:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 35%,rgba(0,0,0,.78))}
+.more-copy{position:relative;z-index:2;padding:40px}
+.more-copy small{font:11px "Geist Mono",monospace;color:#ddd;text-transform:uppercase}
+.more-copy h3{margin:10px 0 0;font-size:clamp(28px,2.8vw,46px)}
+@media (max-width:900px){.more-grid{grid-template-columns:1fr}.more-card{min-height:380px;border-radius:52px}.more-copy{padding:30px 26px}.more{padding-top:60px}}
 .next:hover img{transform:scale(1.03)}
 .next:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.75))}
 .next-copy{position:relative;z-index:2;padding:60px}
 .next-copy small{font:11px "Geist Mono",monospace;color:#ddd}
 .next-copy h3{margin:10px 0 0;font-size:clamp(58px,8vw,120px)}
-.footer{padding:80px 32px 40px;display:flex;justify-content:space-between;gap:30px;color:#777;font:11px "Geist Mono",monospace}
+.footer{padding:80px 104px 40px 32px;display:flex;justify-content:space-between;gap:30px;color:#777;font:11px "Geist Mono",monospace}
 
 @media(max-width:850px){
   .hero{border-radius:72px}.hero.short{min-height:70vh}
