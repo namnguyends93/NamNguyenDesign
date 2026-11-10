@@ -10,7 +10,15 @@
     "seoDescription": "Nam Nguyen — Design Leader at Ngoc Dung Beauty Center, leading campaign key visuals, art direction and brand content in Ho Chi Minh City.",
     "favicon": "",
     "cursorText": "NAM NGUYEN",
-    "cursorRing": true
+    "cursorRing": true,
+    "theme": {
+      "black": "#080808",
+      "dark": "#141414",
+      "white": "#f7f5ef",
+      "accentSoft": "#8ea1ff",
+      "headingFont": "Space Grotesk",
+      "radius": 1
+    }
   },
   "navigation": {
     "visible": true,
@@ -19,7 +27,7 @@
       {
         "label": "Home",
         "href": "#home",
-        "visible": true
+        "visible": false
       },
       {
         "label": "About",
@@ -43,14 +51,15 @@
       }
     ],
     "ctaLabel": "Start a Project +",
-    "ctaHref": "#contact"
+    "ctaHref": "#contact",
+    "badge": "NAM\nNGUYEN"
   },
   "home": {
     "hero": {
       "visible": true,
       "eyebrow": "Design Leader",
       "indexLabel": "2026",
-      "title": "Nam Nguyen Design",
+      "title": "Nam Nguyen\nDesign",
       "description": "Design Leader at Ngoc Dung Beauty Center. 20 campaigns led in 2026, from the first key visual to every touchpoint.",
       "image": "/uploads/ava-1787077972159-488571.jpg",
       "ctaLabel": "Tìm hiểu thêm",
@@ -187,7 +196,8 @@
           "href": "",
           "visible": true
         }
-      ]
+      ],
+      "description": "Working with brands and creative teams that value sharp thinking, strong systems and visuals with a clear point of view."
     },
     "projectsSection": {
       "visible": true,
@@ -282,7 +292,10 @@
         "label": "Email",
         "href": "mailto:namnguyen.thietketkm@gmail.com"
       }
-    ]
+    ],
+    "tagline": "Brand Identity · Campaign Design · Art Direction · Visual Systems",
+    "bigWord": "Nam Nguyen Design",
+    "note": "Independent · Ho Chi Minh City"
   },
   "projects": [
     {

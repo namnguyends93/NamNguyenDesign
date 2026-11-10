@@ -4,7 +4,9 @@ window.__CMS_DONE__=(async function(){
   // build.js sets __CMS_BASE__ / __CMS_CONTENT__ to prerender pages without fetching.
   const BASE=window.__CMS_BASE__!==undefined?window.__CMS_BASE__:(document.currentScript&&document.currentScript.src)?new URL(".",document.currentScript.src).href:location.origin+"/";
   try{
-    const raw=window.__CMS_CONTENT__||await (await fetch(BASE+"content.json",{cache:"no-store"})).json();
+    // Visual editor (/edit): preview the editor's unsaved content instead of the saved file
+    const veState=(/[?&]edit=1/.test(location.search)&&window.parent!==window)?(()=>{try{return window.parent.__VE_STATE__?JSON.parse(JSON.stringify(window.parent.__VE_STATE__)):null}catch(e){return null}})():null;
+    const raw=window.__CMS_CONTENT__||veState||await (await fetch(BASE+"content.json",{cache:"no-store"})).json();
     // Rewrite root-absolute paths like /uploads/x.jpg so they resolve under BASE
     const fix=v=>typeof v==="string"?(/^\/(uploads|projects)\//.test(v)?BASE+v.slice(1):v):Array.isArray(v)?v.map(fix):(v&&typeof v==="object")?Object.fromEntries(Object.entries(v).map(([k,x])=>[k,fix(x)])):v;
     const c=fix(raw);
@@ -30,17 +32,32 @@ window.__CMS_DONE__=(async function(){
     // Two numbers beside the project slider
     {const st=c.home?.projectsSection?.stats,box=q('#projects .stats');if(box&&Array.isArray(st)){const ok=st.filter(s=>s&&(s.value||s.label));const e=v=>String(v??'').replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));box.innerHTML=ok.map(s=>'<div class="stat"><strong class="display">'+e(s.value)+'</strong><span class="muted">'+e(s.label)+'</span></div>').join('');box.style.display=ok.length?'':'none'}}
 
-    // NAV
-    replaceExact('Nam Nguyen Design',c.navigation?.brand||c.site?.name,true);
-    const navLinks=qa('nav a, header a');
-    (c.navigation?.items||[]).filter(x=>x.visible!==false).forEach((it,i)=>{if(navLinks[i]){navLinks[i].textContent=it.label;navLinks[i].href=link(it.href)}});
-    if(c.navigation?.visible===false){const nav=q('nav')||q('header');if(nav)nav.style.display='none'}
+    const E=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    const lines=v=>E(v).replace(/\n/g,'<br>');   // text fields: a new line = <br>
+    const ext=h=>/^https?:/i.test(h||'');
+
+    // THEME: colours, heading font, corner roundness (site.theme)
+    {const t=c.site?.theme||{},r=document.documentElement.style;
+      [['black','--black'],['dark','--dark'],['white','--white'],['accentSoft','--accent-soft']].forEach(([k,v])=>{if(/^#[0-9a-f]{3,8}$/i.test(t[k]||''))r.setProperty(v,t[k])});
+      const FONTS={'Space Grotesk':'','Inter':'','Syne':'Syne:wght@600;700','Archivo':'Archivo:wght@600;800','Unbounded':'Unbounded:wght@500;700','Bricolage Grotesque':'Bricolage+Grotesque:wght@600;700','Playfair Display':'Playfair+Display:wght@600;700','DM Serif Display':'DM+Serif+Display','Anton':'Anton','Be Vietnam Pro':'Be+Vietnam+Pro:wght@600;700'};
+      let css='';const f=t.headingFont;
+      if(f&&f!=='Space Grotesk'&&f in FONTS){if(FONTS[f]&&!q('link[data-cms-font]')){const l=document.createElement('link');l.rel='stylesheet';l.dataset.cmsFont='1';l.href='https://fonts.googleapis.com/css2?family='+FONTS[f]+'&display=swap';document.head.appendChild(l)}
+        css+='.display,.big-title,.bm-track span,.qr-phone,.footer-word,.project-info-showcase h2{font-family:"'+f+'",Inter,sans-serif!important}'}
+      const s=parseFloat(t.radius);if(s>=0&&s!==1)css+=':root{--radius-xl:'+Math.round(156*s)+'px;--radius-lg:'+Math.round(72*s)+'px;--radius-md:'+Math.round(46*s)+'px}@media(max-width:900px){:root{--radius-xl:'+Math.round(106*s)+'px}}';
+      let st=q('#cms-theme');if(css){if(!st){st=document.createElement('style');st.id='cms-theme';document.head.appendChild(st)}st.textContent=css}else if(st)st.remove()}
+
+    // NAV: logo badge, links and the button are built from navigation.*
+    {const n=c.navigation||{},nav=q('nav.nav');if(nav){
+      const badge=q('.brand-badge',nav);if(badge){if(n.badge)badge.innerHTML=lines(n.badge);badge.hidden=n.badgeVisible===false}
+      const box=q('.nav-links',nav);if(box&&Array.isArray(n.items))box.innerHTML=n.items.filter(x=>x&&x.visible!==false&&x.label).map(it=>'<a href="'+E(link(it.href||'#'))+'"'+(ext(it.href)?' target="_blank" rel="noopener"':'')+'>'+E(it.label)+'</a>').join('');
+      const cta=q('.nav-contact',nav);if(cta){if(n.ctaLabel)cta.textContent=n.ctaLabel;if(n.ctaHref)cta.href=link(n.ctaHref);cta.hidden=n.ctaVisible===false}
+      if(n.visible===false)(q('.nav-wrap')||nav).style.display='none'}}
 
     // HERO
     replaceExact('Independent Visual Designer',c.home?.hero?.eyebrow);
     replaceExact('Selected Work.26',c.home?.hero?.indexLabel);
-    replaceExact('Nam Nguyen Design',c.home?.hero?.title);
-    replaceExact('NAM NGUYEN DESIGN',(c.home?.hero?.title||'').toUpperCase());
+    {const h1=q('.hero-copy h1');if(h1&&c.home?.hero?.title)h1.innerHTML=lines(c.home.hero.title)}
+    {const t=String(c.home?.hero?.title||'').replace(/\s+/g,' ').trim().toUpperCase();if(t)qa('.project-top span:first-child').forEach(s=>{s.textContent=t})}
     replaceExact('Brand identities, campaign visuals and digital experiences built with clarity, edge and intent.',c.home?.hero?.description);
     if(isHome&&c.home?.hero?.image){const hero=q('.hero-bg img')||q('.hero img');if(hero)hero.src=c.home.hero.image}
     hideByIdOrText('home','Independent Visual Designer',c.home?.hero?.visible);
@@ -48,10 +65,9 @@ window.__CMS_DONE__=(async function(){
     // INTRO / CLEAR IDEAS
     replaceExact('Visual Designer / Art Direction',c.home?.intro?.eyebrow);
     replaceExact('Clear ideas. Bold visual direction.',c.home?.intro?.title);
-    if(c.home?.intro?.description)replaceExact('',c.home.intro.description);
-    const serviceText=['Brand Identity','Campaign Design','Art Direction'];
-    (c.home?.intro?.services||[]).forEach((v,i)=>{if(serviceText[i])replaceExact(serviceText[i],v)});
-    if(c.home?.intro?.location)replaceExact('Ho Chi Minh City, Vietnam',c.home.intro.location);
+    {const m=qa('.intro-meta span'),it=c.home?.intro||{};
+      if(m[0]&&Array.isArray(it.services))m[0].innerHTML=it.services.filter(Boolean).map(E).join('<br>');
+      if(m[1]&&it.location)m[1].innerHTML=lines(String(it.location).replace(/,\s*/,'\n'))}
     if(isHome&&c.home?.intro?.image){const target=q('.intro-panel.image img');if(target)target.src=c.home.intro.image}
     hideByIdOrText('intro','Clear ideas. Bold visual direction.',c.home?.intro?.visible);
 
@@ -80,13 +96,16 @@ window.__CMS_DONE__=(async function(){
 
     // CLIENTS
     replaceExact('Selected Clients',c.home?.clients?.eyebrow);
-    replaceExact('Clients',c.home?.clients?.title);
-    const clientItems=(c.home?.clients?.items||[]).filter(x=>x.visible!==false);
-    const clientHost=q('.clients-marquee')||q('[class*="client"]');
-    if(clientHost&&clientItems.length){
-      const candidates=qa('a,span,div',clientHost).filter(el=>el.children.length===0&&(el.textContent||'').trim().length>1);
-      // every card on the strip gets a client name (the list repeats when there are more cards than clients)
-      candidates.forEach((el,i)=>{const it=clientItems[i%clientItems.length];el.textContent=it.name;if(el.tagName==='A'&&it.href)el.href=it.href});
+    {const h=q('#clients .section-head h2');if(h&&c.home?.clients?.title)h.textContent=c.home.clients.title}
+    {const d=q('#clients .section-head .copy'),v=c.home?.clients?.description;if(d&&v!=null)d.textContent=v}
+    // Client strip: one card per client (name, or logo image), repeated so the endless strip is always full
+    const clientItems=(c.home?.clients?.items||[]).filter(x=>x&&x.visible!==false&&(x.name||x.logo));
+    const track=q('#clients .client-track');
+    if(track&&clientItems.length){
+      const card=it=>{const inner=it.logo?'<img src="'+E(it.logo)+'" alt="'+E(it.name)+'" loading="lazy">':E(it.name);
+        return it.href?'<a class="client-card" href="'+E(it.href)+'" target="_blank" rel="noopener">'+inner+'</a>':'<div class="client-card">'+inner+'</div>'};
+      let set=clientItems;while(set.length<4)set=set.concat(clientItems);
+      track.innerHTML=set.concat(set).map(card).join('');   // the CSS loop scrolls exactly half the track
     }
     hideByIdOrText('clients','Selected Clients',c.home?.clients?.visible);
 
@@ -146,12 +165,13 @@ window.__CMS_DONE__=(async function(){
     hideByIdOrText('contact','Start a Project.26',c.home?.contact?.visible);
 
     // FOOTER
-    replaceExact('Independent visual design practice.',c.footer?.description);
-    replaceExact('© 2026 Nam Nguyen Design',c.footer?.copyright);
-    replaceExact('Nam Nguyen Design',c.footer?.brand,true);
-    const footer=q('footer');if(footer){
-      const links=qa('a',footer);(c.footer?.links||[]).forEach((it,i)=>{if(links[i]){links[i].textContent=it.label;links[i].href=link(it.href)}});
-      if(c.footer?.visible===false)footer.style.display='none';
+    // FOOTER: every text and link comes from footer.*
+    const footer=q('footer.footer');if(footer){const f=c.footer||{},set=(s,v,html)=>{const el=q(s,footer);if(el&&v!=null&&v!=='')html?el.innerHTML=lines(v):el.textContent=v};
+      set('.footer-top .mono',f.brand);set('.footer-top h3',f.description,1);set('.footer-top p.copy',f.tagline,1);
+      set('.footer-word',f.bigWord||f.brand);
+      const bs=qa('.footer-bottom span',footer);if(bs[0]&&f.copyright)bs[0].textContent=f.copyright;if(bs[1]&&f.note!=null)bs[1].textContent=f.note;
+      const box=q('.footer-links',footer);if(box&&Array.isArray(f.links))box.innerHTML=f.links.filter(x=>x&&x.label&&x.visible!==false).map((it,i)=>'<a href="'+E(link(it.href||'#'))+'"'+(ext(it.href)?' target="_blank" rel="noopener"':'')+'><span>'+E(it.label)+'</span><span>'+(/^#./.test(it.href||'')?String(i+1).padStart(2,'0'):'↗')+'</span></a>').join('');
+      if(f.visible===false)footer.style.display='none';
     }
 
   }catch(e){console.warn('CMS Full runtime:',e)}
