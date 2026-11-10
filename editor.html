@@ -39,6 +39,9 @@ details.item[open]>summary{margin-bottom:8px}details.item.hid>summary b{opacity:
 .prow{display:flex;align-items:center;gap:4px;background:#101010;border:1px solid var(--line);border-radius:12px;padding:6px 8px;margin-bottom:6px}
 .prow b{flex:1;font-size:12.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.prow input{width:auto}
 .addbtn{width:100%;justify-content:center;margin-top:2px}
+.lgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;margin:10px 0}.lgrid label{font-size:11.5px;color:#aaa}.lgrid input{margin-top:3px;padding:6px 8px}
+.lname{font-weight:700;font-size:14px;margin:6px 0 2px}.lsel{font:11px ui-monospace,Consolas,monospace;color:#777;word-break:break-all}
+#layBtn.primary{box-shadow:0 0 0 2px #fff3}
 .main{display:grid;grid-template-columns:1fr 340px;height:calc(100% - 56px)}
 .stage{position:relative;overflow:auto;background:#1a1a1a;display:flex;justify-content:center}
 iframe{border:0;width:100%;height:100%;background:#fff;transition:width .3s}
@@ -70,6 +73,7 @@ textarea{min-height:84px;resize:vertical}
   <select id="pagePick" title="Chọn trang để sửa"></select>
   <span class="status" id="status">Đang tải…</span>
   <span class="grow"></span>
+  <button id="layBtn" title="Kéo để đổi kích thước, bo góc, vị trí, khoảng cách">✥ Bố cục</button>
   <button id="undoBtn" title="Hoàn tác (Ctrl+Z)" disabled>↶ Hoàn tác</button>
   <div class="seg"><button class="on" data-view="desktop">Máy tính</button><button data-view="phone">Điện thoại</button></div>
   <button id="reloadBtn" title="Tải lại bản đã lưu">⟳</button>
@@ -79,6 +83,11 @@ textarea{min-height:84px;resize:vertical}
   <div class="stage" id="stage"><iframe id="site" title="Portfolio"></iframe></div>
   <aside id="aside">
     <details class="help"><summary>Cách dùng</summary><div class="tip">• <b>Bấm thẳng vào chữ</b> trên trang để gõ sửa (Enter = xong, Esc = huỷ).<br>• Nút <b>🖼 Đổi ảnh</b> trên mỗi ảnh để thay ảnh.<br>• Nút <b>⚙</b> ở góc mỗi mục (hoặc bấm vào vùng trống của mục) mở <b>toàn bộ tuỳ chỉnh</b> của mục đó ở bảng này: link, danh sách, ảnh, ẩn/hiện, thêm/xoá/đổi thứ tự.<br>• <b>🎨 Giao diện chung</b>: màu, font tiêu đề, độ bo góc, con trỏ, SEO.<br>• Ô chọn trang trên cùng: sửa từng dự án / bài Nhật ký.<br>• Xong bấm <b>Lưu</b> (Ctrl+S). Đưa lên mạng ở Admin → Xuất bản.</div></details>
+    <div id="layPanel" hidden>
+      <h3>✥ Bố cục: kéo để chỉnh</h3>
+      <div class="tip">• <b>Bấm</b> vào bất kỳ khối nào để chọn (bấm tiếp bên trong để chọn khối nhỏ hơn, nút <b>⬆ Khối cha</b> để chọn khối lớn hơn).<br>• <b>Kéo khối</b> = dời vị trí · ô <b>□ góc phải dưới</b> = đổi cỡ (giữ Shift = giữ tỉ lệ) · ô <b>□ cạnh</b> = rộng / cao · <b>● góc trái</b> kéo ngang = bo góc · <b>thanh cam</b> trên/dưới mục = khoảng trống.<br>• Phím mũi tên = nhích 1px (Shift = 10px).<br>• <b>Máy tính và Điện thoại chỉnh riêng</b>: đổi ở nút trên cùng.</div>
+      <div id="layInfo"></div>
+    </div>
     <div id="homePanel">
       <h3>Các mục trên trang</h3>
       <div id="secList" class="seclist"></div>
@@ -197,7 +206,17 @@ const FRAME_CSS=`
 [data-ve-block].ve-flash{outline:3px solid #4c6fff;outline-offset:-3px;transition:outline-color .6s}
 figure[data-ve-img]:empty{min-height:360px}
 .ve-badge.ve-sec{transform:translate(calc(-100% - 14px),14px);background:rgba(76,111,255,.92)}
-.ve-sel{outline:3px solid rgba(76,111,255,.9)!important;outline-offset:-3px}`;
+.ve-sel{outline:3px solid rgba(76,111,255,.9)!important;outline-offset:-3px}
+.ve-layout .ve-badge{display:none!important}.ve-layout .ve-sel{outline:none!important}
+.ve-layout,.ve-layout *{cursor:default!important}.ve-layout [data-ve-text]:hover{outline-color:transparent}
+.ve-hov{outline:1px dashed #4c6fff!important;outline-offset:-1px!important}
+.ve-box{position:absolute;border:2px solid #4c6fff;pointer-events:none;box-sizing:border-box;z-index:2147483001}
+.ve-box>b{position:absolute;left:-2px;top:-26px;background:#4c6fff;color:#fff;font:600 11px Inter,Arial,sans-serif;padding:5px 8px;border-radius:6px;white-space:nowrap}
+.ve-box>i{position:absolute;width:14px;height:14px;background:#fff;border:2px solid #4c6fff;border-radius:3px;pointer-events:auto;box-sizing:border-box}
+.ve-box>i[data-h=se]{right:-8px;bottom:-8px;cursor:nwse-resize!important}.ve-box>i[data-h=e]{right:-8px;top:calc(50% - 7px);cursor:ew-resize!important}
+.ve-box>i[data-h=s]{bottom:-8px;left:calc(50% - 7px);cursor:ns-resize!important}.ve-box>i[data-h=r]{left:8px;top:8px;border-radius:50%;background:#4c6fff;border-color:#fff;cursor:ew-resize!important}
+.ve-box>i[data-h=pt],.ve-box>i[data-h=pb]{left:calc(25% - 30px);width:60px;height:10px;border-radius:5px;background:#ffb347;border:0;cursor:ns-resize!important}
+.ve-box>i[data-h=pt]{top:4px}.ve-box>i[data-h=pb]{bottom:4px}`;
 
 function setupFrame(){
   fdoc=frame.contentDocument;const w=frame.contentWindow;
@@ -225,6 +244,7 @@ function setupFrame(){
     btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();selectSec(s.id,false)});badgeLayer.appendChild(btn);B.push({type:'sec',el,badge:btn})}
   // clicking anywhere inside a section selects it too (text editing still works)
   fdoc.addEventListener('click',e=>{if(e.target.closest('.ve-badge'))return;const s=secAt(e.target);if(s&&s.id!==curSec)selectSec(s.id,false)});
+  layHook();
   window.__B=B;placeBadges();highlightSec(false);
   clearInterval(window.__bt);window.__bt=setInterval(placeBadges,600);
   w.addEventListener('resize',placeBadges);
@@ -247,6 +267,7 @@ function placeBadges(){
     if(fdoc.defaultView.getComputedStyle(b.el).display==='none'||!b.el.offsetParent&&b.el.tagName!=='IMG')show=show&&!!b.el.getClientRects().length;
     b.badge.style.display=show?'':'none';
     b.badge.style.left=((b.type==='sec'?r.right:r.left)+w.scrollX)+'px';b.badge.style.top=(r.top+w.scrollY)+'px';}
+  if(lay.on)drawBox();
 }
 
 /* ---------- text editing ---------- */
@@ -419,7 +440,7 @@ function fillPicker(cur){
 }
 $('#pagePick').onchange=e=>showPage(e.target.value);
 function showPage(v){
-  closePop();
+  closePop();if(lay.on)setLayMode(false);
   if(v==='home'){mode='home';projIdx=-1;$('#homePanel').hidden=false;$('#projPanel').hidden=true;renderInspector();reloadHome(false);return}
   mode='project';projIdx=+v;const p=proj();
   if(!Array.isArray(p.blocks)){const r=PT.blocksOf(p);p.blocks=JSON.parse(JSON.stringify(r.blocks));if(!p.heroSize)p.heroSize=r.heroSize;saved=saved;markDirty()}
@@ -500,15 +521,118 @@ $('#projDup').onclick=()=>{const a=clone(state.projects),src=a[projIdx],id=Date.
 $('#projDel').onclick=()=>{const p=proj();if(!confirm('Xoá trang "'+(p.title||p.slug)+'"? (Hoàn tác được trước khi Lưu)'))return;
   const a=clone(state.projects);a.splice(projIdx,1);mode='home';setVal('projects',a);fillPicker('home');showPage('home');status('Đã xoá trang — bấm Hoàn tác nếu nhầm.')};
 
+/* ---------- layout mode: drag size, corners, position and spacing (home page) ---------- */
+// Saved as state.layout.desktop|mobile = { cssSelector: {w,h,r,x,y,pt,pb,d} }; cms-runtime.js turns it into <style id="cms-layout">.
+const lay={on:false,el:null,sel:'',box:null,hov:null};
+const devKey=()=>$('#stage').classList.contains('phone')?'mobile':'desktop';
+const layData=()=>((state.layout||{})[devKey()])||{};
+const BADCLS=/^(ve-|in$|reveal|active|is-|split|motion|on$|open$)/;
+function selFor(el){
+  const steps=[];let e=el;
+  while(e&&e.nodeType===1&&e!==fdoc.body&&e!==fdoc.documentElement){
+    if(e.id&&/^[A-Za-z][\w-]*$/.test(e.id)){steps.unshift('#'+e.id);break}
+    const p=e.parentElement,tag=e.tagName.toLowerCase(),sib=[...p.children];
+    const cls=[...e.classList].find(c=>!BADCLS.test(c)&&/^[A-Za-z][\w-]*$/.test(c)&&sib.filter(x=>x.classList.contains(c)).length===1);
+    steps.unshift(cls?tag+'.'+cls:tag+':nth-child('+(sib.indexOf(e)+1)+')');e=p}
+  const loose=steps.join(' ');try{const m=fdoc.querySelectorAll(loose);if(m.length===1&&m[0]===el)return loose}catch(_){}
+  const strict=steps.join('>');return strict.startsWith('#')?strict:'body>'+strict}
+const NM={IMG:'Ảnh',H1:'Tiêu đề',H2:'Tiêu đề',H3:'Tiêu đề',H4:'Tiêu đề',P:'Đoạn chữ',A:'Link / nút',SECTION:'Mục',FOOTER:'Chân trang',FIGURE:'Khung ảnh',UL:'Danh sách',LI:'Dòng danh sách',SPAN:'Chữ',BUTTON:'Nút',NAV:'Menu',ARTICLE:'Thẻ',SMALL:'Chữ nhỏ',STRONG:'Chữ đậm',VIDEO:'Video'};
+function secOf(el){return SECS.find(s=>s.sel&&secEl(s)===el)}
+function elName(el){const s=secOf(el);if(s)return 'Mục '+s.n;const c=[...el.classList].find(x=>!BADCLS.test(x));return (NM[el.tagName]||'Khối')+(c?' · '+c:'')}
+const isSecLike=el=>/^(SECTION|FOOTER|HEADER|MAIN)$/.test(el.tagName)||!!secOf(el);
+function layCss(L){const fn=fdoc&&fdoc.defaultView&&fdoc.defaultView.__cmsLayoutCss;return fn?fn(L):''}
+function writeLayCss(L){if(!fdoc||mode!=='home')return;let st=fdoc.getElementById('cms-layout');if(!st){st=fdoc.createElement('style');st.id='cms-layout';fdoc.head.appendChild(st)}st.textContent=layCss(L)}
+function applyLayout(){const L=state.layout;if(L&&typeof L==='object')for(const k of Object.keys(L))if(!L[k]||!Object.keys(L[k]).length)delete L[k];
+  if(!L||!Object.keys(L).length)delete state.layout;markDirty();writeLayCss(state.layout);if(lay.on){if(lay.sel&&(!lay.el||!lay.el.isConnected))lay.el=fdoc.querySelector(lay.sel);drawBox();renderLayPanel()}}
+function setLayout(sel,v){const old=clone(state.layout),L=clone(state.layout)||{},dev=devKey();L[dev]=L[dev]||{};
+  const keep=v&&Object.fromEntries(Object.entries(v).filter(([k,x])=>x!=null&&x!==''&&!(k==='x'||k==='y')||((k==='x'||k==='y')&&+x)));
+  if(keep&&Object.keys(keep).filter(k=>k!=='d').length)L[dev][sel]=keep;else delete L[dev][sel];
+  if(JSON.stringify(old||{})===JSON.stringify(L))return;
+  undo.push({path:'layout',old,apply:applyLayout});state.layout=L;markDirty();applyLayout();
+  status('Đã chỉnh bố cục ('+(dev==='mobile'?'điện thoại':'máy tính')+'). Nhớ bấm Lưu.')}
+function clearHov(){if(lay.hov)lay.hov.classList.remove('ve-hov');lay.hov=null}
+function pick(el){if(!el||el===fdoc.body||el===fdoc.documentElement)return;clearHov();lay.el=el;lay.sel=selFor(el);drawBox();renderLayPanel()}
+function drawBox(){if(!fdoc||!badgeLayer)return;let b=lay.box;
+  if(!lay.on||!lay.el||!lay.el.isConnected||!fdoc.defaultView){if(b)b.remove();lay.box=null;return}
+  if(!b||!b.isConnected||b.ownerDocument!==fdoc){b=fdoc.createElement('div');b.className='ve-box';
+    b.innerHTML='<b></b><i data-h="r" title="Kéo ngang: bo góc"></i><i data-h="pt" title="Kéo: khoảng trống phía trên"></i><i data-h="pb" title="Kéo: khoảng trống phía dưới"></i><i data-h="e" title="Kéo: chiều rộng"></i><i data-h="s" title="Kéo: chiều cao"></i><i data-h="se" title="Kéo: rộng + cao (Shift = giữ tỉ lệ)"></i>';
+    badgeLayer.appendChild(b);lay.box=b}
+  const w=fdoc.defaultView,r=lay.el.getBoundingClientRect();
+  Object.assign(b.style,{left:r.left+w.scrollX+'px',top:r.top+w.scrollY+'px',width:r.width+'px',height:r.height+'px'});
+  const sec=isSecLike(lay.el);b.querySelectorAll('[data-h=pt],[data-h=pb]').forEach(i=>i.style.display=sec?'':'none');
+  b.querySelector('b').textContent=elName(lay.el)+' · '+Math.round(r.width)+'×'+Math.round(r.height)}
+function startDrag(kind,e,target){const el=lay.el;if(!el)return;const w=fdoc.defaultView,cs=w.getComputedStyle(el),r=el.getBoundingClientRect();
+  const cur={...(layData()[lay.sel]||{})};
+  const s0={w:r.width,h:r.height,r:parseFloat(cs.borderTopLeftRadius)||0,x:+cur.x||0,y:+cur.y||0,pt:parseFloat(cs.paddingTop)||0,pb:parseFloat(cs.paddingBottom)||0};
+  const sx=e.clientX,sy=e.clientY;let moved=false,next=null;
+  const mm=ev=>{const dx=ev.clientX-sx,dy=ev.clientY-sy;if(!moved&&Math.abs(dx)+Math.abs(dy)<4)return;moved=true;const v={...cur};
+    if(kind==='move'){v.x=Math.round(s0.x+dx);v.y=Math.round(s0.y+dy)}
+    if(kind==='e'||kind==='se')v.w=Math.max(16,Math.round(s0.w+dx));
+    if(kind==='s')v.h=Math.max(16,Math.round(s0.h+dy));
+    if(kind==='se')v.h=Math.max(16,Math.round(ev.shiftKey?(s0.w+dx)*s0.h/s0.w:s0.h+dy));
+    if(kind==='r')v.r=Math.max(0,Math.round(s0.r+dx));
+    if(kind==='pt')v.pt=Math.max(0,Math.round(s0.pt+dy));
+    if(kind==='pb')v.pb=Math.max(0,Math.round(s0.pb+dy));
+    if(v.w!=null&&cs.display==='inline')v.d='inline-block';
+    next=v;const L=clone(state.layout)||{};L[devKey()]={...(L[devKey()]||{}),[lay.sel]:v};writeLayCss(L);drawBox()};
+  const mu=()=>{fdoc.removeEventListener('mousemove',mm,true);fdoc.removeEventListener('mouseup',mu,true);
+    if(moved&&next){writeLayCss(state.layout);setLayout(lay.sel,next)}else if(kind==='move'&&target&&target!==el)pick(target)};
+  fdoc.addEventListener('mousemove',mm,true);fdoc.addEventListener('mouseup',mu,true)}
+function layHook(){
+  fdoc.addEventListener('mousedown',e=>{if(!lay.on||e.button!==0)return;const h=e.target.closest('.ve-box>i');
+    if(h){e.preventDefault();e.stopPropagation();startDrag(h.dataset.h,e);return}
+    if(e.target.closest('.ve-layer'))return;e.preventDefault();e.stopPropagation();
+    if(lay.el&&lay.el.contains(e.target))startDrag('move',e,e.target);else{pick(e.target);startDrag('move',e,null)}},true);
+  fdoc.addEventListener('click',e=>{if(!lay.on||e.target.closest('.ve-layer'))return;e.preventDefault();e.stopPropagation()},true);
+  fdoc.addEventListener('mouseover',e=>{if(!lay.on||e.target.closest('.ve-layer'))return;clearHov();if(e.target!==lay.el&&e.target!==fdoc.body){lay.hov=e.target;lay.hov.classList.add('ve-hov')}});
+  fdoc.addEventListener('mouseleave',clearHov);
+  if(lay.on){fdoc.body.classList.add('ve-layout');lay.box=null;lay.el=lay.sel?fdoc.querySelector(lay.sel):null;drawBox();renderLayPanel()}}
+function renderLayPanel(){const host=$('#layInfo');if(!host||!lay.on)return;const dev=devKey(),D=layData();host.innerHTML='';
+  const devTxt=dev==='mobile'?'Điện thoại':'Máy tính';
+  if(lay.el&&lay.el.isConnected){const cur=D[lay.sel]||{},w=fdoc.defaultView,cs=w.getComputedStyle(lay.el),r=lay.el.getBoundingClientRect();
+    const box=document.createElement('div');
+    box.innerHTML='<div class="lname">'+esc(elName(lay.el))+'</div><div class="lsel">'+esc(lay.sel)+'</div>'
+      +'<div class="addrow"><button type="button" data-o="up">⬆ Khối cha</button><button type="button" data-o="down">⬇ Khối con</button></div>';
+    const F=[['w','Rộng (px)',Math.round(r.width)],['h','Cao (px)',Math.round(r.height)],['r','Bo góc (px)',Math.round(parseFloat(cs.borderTopLeftRadius)||0)],['x','Dời ngang (px)',0],['y','Dời dọc (px)',0]];
+    if(isSecLike(lay.el))F.push(['pt','Khoảng trên (px)',Math.round(parseFloat(cs.paddingTop)||0)],['pb','Khoảng dưới (px)',Math.round(parseFloat(cs.paddingBottom)||0)]);
+    const g=document.createElement('div');g.className='lgrid';
+    F.forEach(([k,l,ph])=>{const lb=document.createElement('label');lb.innerHTML=esc(l)+'<input type="number" step="1">';const i=lb.querySelector('input');
+      i.value=cur[k]??'';i.placeholder=String(ph);i.onchange=()=>{const v={...cur};v[k]=i.value===''?undefined:+i.value;if(k==='w'&&v.w!=null&&cs.display==='inline')v.d='inline-block';setLayout(lay.sel,v)};g.appendChild(lb)});
+    box.appendChild(g);
+    const n=document.createElement('div');n.className='note';n.textContent='Để trống = như thiết kế gốc. Đang chỉnh cho: '+devTxt+'.';box.appendChild(n);
+    const rs=document.createElement('button');rs.type='button';rs.className='addbtn';rs.style.marginTop='10px';rs.textContent='↺ Về như gốc (khối này)';rs.disabled=!D[lay.sel];rs.onclick=()=>setLayout(lay.sel,null);box.appendChild(rs);
+    box.querySelector('[data-o=up]').onclick=()=>{const p=lay.el.parentElement;if(p&&p!==fdoc.body)pick(p)};
+    const kid=[...lay.el.children].find(c=>!c.classList.contains('ve-layer'));const dn=box.querySelector('[data-o=down]');dn.disabled=!kid;dn.onclick=()=>kid&&pick(kid);
+    host.appendChild(box)}
+  else host.innerHTML='<p class="note" style="font-size:13px">Bấm vào một khối trên trang để chọn.</p>';
+  const keys=Object.keys(D);const h=document.createElement('h3');h.textContent='Đã chỉnh trên '+devTxt+' ('+keys.length+')';host.appendChild(h);
+  keys.forEach(sel=>{const el=fdoc&&(()=>{try{return fdoc.querySelector(sel)}catch(_){return null}})();const r=document.createElement('div');r.className='prow';
+    r.innerHTML='<b title="'+esc(sel)+'">'+esc(el?elName(el):'(không còn trên trang) '+sel)+'</b><button type="button" data-o="go">Chọn</button><button type="button" class="danger" data-o="del" title="Về như gốc">↺</button>';
+    r.onclick=e=>{const o=e.target.closest('button')?.dataset.o;if(o==='go'&&el){pick(el);el.scrollIntoView({behavior:'smooth',block:'center'})}if(o==='del')setLayout(sel,null)};host.appendChild(r)});
+  if(keys.length){const all=document.createElement('button');all.type='button';all.className='addbtn danger';all.textContent='↺ Về như gốc tất cả ('+devTxt+')';
+    all.onclick=()=>{if(!confirm('Bỏ mọi chỉnh bố cục trên '+devTxt+'? (Hoàn tác được trước khi Lưu)'))return;const old=clone(state.layout),L=clone(state.layout)||{};delete L[dev];
+      undo.push({path:'layout',old,apply:applyLayout});state.layout=L;markDirty();applyLayout()};host.appendChild(all)}}
+function setLayMode(on){if(on&&mode!=='home'){status('Bố cục kéo thả hiện dùng cho Trang chủ.');return}
+  lay.on=on;$('#layBtn').classList.toggle('primary',on);$('#layPanel').hidden=!on;$('#homePanel').hidden=on||mode!=='home';$('.help').hidden=on;
+  if(fdoc&&fdoc.body)fdoc.body.classList.toggle('ve-layout',on);if(!on){lay.el=null;clearHov()}
+  closePop();drawBox();renderLayPanel();if(!on)placeBadges();
+  status(on?'Bố cục: bấm chọn khối, kéo để dời, kéo ô vuông để đổi cỡ.':'Đã tắt Bố cục.')}
+$('#layBtn').onclick=()=>setLayMode(!lay.on);
+
 /* ---------- toolbar ---------- */
 async function save(){try{const d=await api('/api/content',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(state)});state=d.content;saved=JSON.stringify(state);markDirty();fillPicker(mode==='home'?'home':projIdx);status('Đã lưu ✓ (có bản sao lưu tự động)')}catch(e){status('Lưu lỗi: '+e.message)}}
 function doUndo(){const u=undo.pop();if(!u)return;setPath(state,u.path,u.old);if(u.apply)u.apply(u.old);markDirty();status('Đã hoàn tác.')}
-function hotkeys(e){const k=e.key.toLowerCase();if((e.ctrlKey||e.metaKey)&&k==='s'){e.preventDefault();save()}
+function hotkeys(e){const k=e.key.toLowerCase();
+  if(lay.on&&lay.el&&!/INPUT|TEXTAREA|SELECT/.test(e.target.tagName||'')&&!(e.target&&e.target.isContentEditable)){
+    const st=e.shiftKey?10:1,mv={arrowleft:[-st,0],arrowright:[st,0],arrowup:[0,-st],arrowdown:[0,st]}[k];
+    if(mv){e.preventDefault();const c={...(layData()[lay.sel]||{})};c.x=(+c.x||0)+mv[0];c.y=(+c.y||0)+mv[1];setLayout(lay.sel,c);return}
+    if(k==='escape'){lay.el=null;drawBox();renderLayPanel();return}}
+  if((e.ctrlKey||e.metaKey)&&k==='s'){e.preventDefault();save()}
   else if((e.ctrlKey||e.metaKey)&&k==='z'&&!(e.target&&e.target.isContentEditable)&&!/INPUT|TEXTAREA/.test(e.target.tagName||'')){e.preventDefault();doUndo()}}
 document.addEventListener('keydown',hotkeys);
 $('#saveBtn').onclick=save;$('#undoBtn').onclick=doUndo;
 $('#reloadBtn').onclick=()=>{if(markDirty()&&!confirm('Có thay đổi chưa lưu. Tải lại sẽ bỏ các thay đổi đó?'))return;load()};
-document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.seg button').forEach(x=>x.classList.toggle('on',x===b));$('#stage').classList.toggle('phone',b.dataset.view==='phone');setTimeout(placeBadges,400)});
+document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.seg button').forEach(x=>x.classList.toggle('on',x===b));$('#stage').classList.toggle('phone',b.dataset.view==='phone');setTimeout(()=>{placeBadges();if(lay.on){drawBox();renderLayPanel()}},400)});
 addEventListener('beforeunload',e=>{if(markDirty()){e.preventDefault();e.returnValue=''}});
 
 /* ---------- load ---------- */

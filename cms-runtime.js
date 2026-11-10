@@ -46,6 +46,21 @@ window.__CMS_DONE__=(async function(){
       const s=parseFloat(t.radius);if(s>=0&&s!==1)css+=':root{--radius-xl:'+Math.round(156*s)+'px;--radius-lg:'+Math.round(72*s)+'px;--radius-md:'+Math.round(46*s)+'px}@media(max-width:900px){:root{--radius-xl:'+Math.round(106*s)+'px}}';
       let st=q('#cms-theme');if(css){if(!st){st=document.createElement('style');st.id='cms-theme';document.head.appendChild(st)}st.textContent=css}else if(st)st.remove()}
 
+    // LAYOUT: sizes, corners, offsets and spacing dragged in the editor (layout.desktop / layout.mobile = { selector: {w,h,r,x,y,pt,pb,d} })
+    {const layoutCss=L=>{const px=n=>Math.round(+n||0)+'px';
+        const one=m=>Object.entries(m||{}).map(([s,v])=>{if(!v||/[{}<;]/.test(s))return'';const d=[];
+          if(v.d==='inline-block'||v.d==='block')d.push('display:'+v.d);
+          if(v.w!=null&&v.w!=='')d.push('width:'+px(v.w),'max-width:100%','flex:none');
+          if(v.h!=null&&v.h!=='')d.push('height:'+px(v.h),'min-height:0');
+          if((v.w!=null&&v.w!=='')||(v.h!=null&&v.h!==''))d.push('object-fit:cover');
+          if(v.r!=null&&v.r!=='')d.push('border-radius:'+px(v.r),'overflow:hidden');
+          if(+v.x||+v.y)d.push('translate:'+px(v.x)+' '+px(v.y));
+          if(v.pt!=null&&v.pt!=='')d.push('padding-top:'+px(v.pt));if(v.pb!=null&&v.pb!=='')d.push('padding-bottom:'+px(v.pb));
+          return d.length?s+'{'+d.map(x=>x+'!important').join(';')+'}':''}).join('');
+        const a=one(L&&L.desktop),b=one(L&&L.mobile);return (a?'@media (min-width:701px){'+a+'}':'')+(b?'@media (max-width:700px){'+b+'}':'')};
+      window.__cmsLayoutCss=layoutCss;
+      if(isHome){const css=layoutCss(raw.layout);let st=q('#cms-layout');if(css){if(!st){st=document.createElement('style');st.id='cms-layout';document.head.appendChild(st)}st.textContent=css}else if(st)st.remove()}}
+
     // NAV: logo badge, links and the button are built from navigation.*
     {const n=c.navigation||{},nav=q('nav.nav');if(nav){
       const badge=q('.brand-badge',nav);if(badge){if(n.badge)badge.innerHTML=lines(n.badge);badge.hidden=n.badgeVisible===false}
