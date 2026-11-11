@@ -124,6 +124,14 @@
     window.__I18N_STRINGS__ = out;
   }
 
+  // A private page fills its body after the password is typed: translate it then
+  window.__nndI18nApply = function () {
+    var dict = readDict(); if (!dict) return;
+    var lang = getLang();
+    if (lang === 'vi') { translate(makeLookup(dict)); root.lang = 'vi'; }
+    addSwitch(lang);
+  };
+
   function run() {
     if (/[?&]edit=1/.test(location.search) || window.__VE_EDIT__) { root.classList.remove('i18n-wait'); return; }   // visual editor edits the English page
     if (/[?&]i18nscan=1/.test(location.search)) { scan(); root.classList.remove('i18n-wait'); return; }

@@ -15,7 +15,7 @@
 .motion .article:hover img{transform:translateY(calc(var(--py,0) * 1px)) scale(1.24)}
 
 /* velocity marquee band */
-.big-marquee{background:#000;padding:8px;overflow:hidden}
+.big-marquee{background:var(--shell-bg,#000);transition:background-color .9s ease;padding:8px;overflow:hidden}
 .big-marquee .bm-inner{border-radius:var(--radius-lg,72px);background:var(--accent,#4c6fff);color:#fff;padding:clamp(22px,3vw,40px) 0;overflow:hidden}
 .bm-track{display:flex;width:max-content;will-change:transform}
 .bm-track span{font-family:"Space Grotesk",Inter,sans-serif;text-transform:uppercase;font-weight:600;letter-spacing:-.06em;line-height:.9;font-size:clamp(64px,11vw,190px);white-space:nowrap;padding-right:.35em}

@@ -177,6 +177,23 @@ window.__CMS_DONE__=(async function(){
     }
     hideByIdOrText('journal','Journal.26',c.home?.journal?.visible);
 
+    // EXPERIENCE: timeline from home.experience
+    {const xp=c.home?.experience,sec=q('#experience');
+      if(sec&&xp){if(xp.visible===false)sec.style.display='none';else{
+        const e=v=>String(v??'').replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+        const t=q('#experience .section-head h2'),d=q('#experience .section-head .copy'),ol=q('#experience .xp-list');
+        if(t&&xp.title)t.textContent=xp.title;if(d){d.textContent=xp.description||'';d.style.display=xp.description?'':'none'}
+        if(ol)ol.innerHTML=(xp.items||[]).filter(x=>x&&x.visible!==false&&(x.role||x.company)).map(x=>'<li class="xp-item"><span class="xp-years mono">'+e(x.years)+'</span><div><h3 class="xp-role">'+e(x.role)+'</h3><span class="xp-company">'+e(x.company)+'</span></div><p class="xp-note">'+e(x.note)+'</p></li>').join('')}}}
+    // CV download buttons (About + Contact)
+    {const cv=c.site?.cvUrl;qa('.cv-btn').forEach(a=>{if(cv){a.href=cv;a.textContent=c.site?.cvLabel||'Download CV ↓';a.hidden=false}else a.hidden=true})}
+    // "See all work" link under the project numbers
+    {const al=q('.all-work-link'),ps=c.home?.projectsSection||{};if(al){if(ps.allVisible===false)al.hidden=true;else{al.hidden=false;if(ps.allLabel)al.textContent=ps.allLabel;al.href=BASE+'projects/index.html'}}}
+    // Background colour per section while scrolling (motion.js does the switching)
+    if(c.site?.scrollColor===true){document.documentElement.dataset.scrollColor='on';
+      const pick=v=>/^#[0-9a-f]{6}$/i.test(v||'')&&!/^#0{6}$/i.test(v)?v:'';
+      [['#experience',c.home?.experience?.scrollBg],['#clients',c.home?.clients?.scrollBg],['#projects',c.home?.projectsSection?.scrollBg],['#journal',c.home?.journal?.scrollBg],['#contact',c.home?.contact?.scrollBg],['footer.footer',c.footer?.scrollBg]].forEach(([s,v])=>{const el=q(s);const z=el&&(el.closest('section')||el);if(z){const col=pick(v);if(col)z.setAttribute('data-scroll-bg',col);else z.removeAttribute('data-scroll-bg')}})}
+    else delete document.documentElement.dataset.scrollColor;
+
     // CONTACT
     replaceExact('Start a Project.26',c.home?.contact?.eyebrow);
     replaceExact('Get in touch',c.home?.contact?.title);
@@ -190,6 +207,9 @@ window.__CMS_DONE__=(async function(){
       if(ct.qrImage){qi.src=ct.qrImage;qi.hidden=false;qe.hidden=true}
       if(ct.qrCaption)qc.textContent=ct.qrCaption;
       if(ct.phone){qp.textContent=ct.phone;qp.href='tel:'+String(ct.phone).replace(/[^+\d]/g,'');qp.hidden=false}
+      // one tap to open Zalo (people on a phone cannot scan their own screen)
+      const qz=q('.qr-zalo',qrBox),zl=String(ct.zalo||ct.phone||'').trim();
+      if(qz){const url=/^https?:\/\//i.test(zl)?zl:(zl.replace(/\D/g,'')?'https://zalo.me/'+zl.replace(/\D/g,''):'');if(url){qz.href=url;qz.textContent=ct.zaloLabel||'Message on Zalo ↗';qz.hidden=false}else qz.hidden=true}
     }
     hideByIdOrText('contact','Start a Project.26',c.home?.contact?.visible);
 

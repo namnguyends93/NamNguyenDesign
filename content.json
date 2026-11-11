@@ -18,7 +18,10 @@
       "accentSoft": "#8ea1ff",
       "headingFont": "Space Grotesk",
       "radius": 1
-    }
+    },
+    "scrollColor": false,
+    "personName": "Nam Nguyen",
+    "organization": "Ngoc Dung Beauty Center"
   },
   "navigation": {
     "visible": true,
@@ -264,6 +267,62 @@
         "Campaign",
         "AI Visual",
         "Art Direction"
+      ]
+    },
+    "experience": {
+      "visible": true,
+      "title": "Experience",
+      "description": "From graphic designer to design leader, across beauty, fashion and real-estate brands.",
+      "items": [
+        {
+          "years": "2026 — Now",
+          "role": "Design Leader",
+          "company": "Ngoc Dung Beauty Center",
+          "note": "Leading the design team: 20 campaigns from key visual to social, print and in-store.",
+          "visible": true
+        },
+        {
+          "years": "2023 — 2025",
+          "role": "Graphic Designer",
+          "company": "Ngoc Dung Beauty Center & Zema Beauty More",
+          "note": "Key visuals, social content and beauty retouching.",
+          "visible": true
+        },
+        {
+          "years": "2022 — 2023",
+          "role": "Graphic Designer",
+          "company": "Maple Land",
+          "note": "Real-estate campaigns and sales materials.",
+          "visible": true
+        },
+        {
+          "years": "2021 — 2022",
+          "role": "Graphic Designer",
+          "company": "Seedcom Fashion Group (Juno, Hnoss)",
+          "note": "Fashion campaigns and e-commerce visuals.",
+          "visible": true
+        },
+        {
+          "years": "2020 — 2021",
+          "role": "Graphic Designer",
+          "company": "LinkHouse Services",
+          "note": "Real-estate branding and digital ads.",
+          "visible": true
+        },
+        {
+          "years": "2018 — 2020",
+          "role": "Graphic Designer",
+          "company": "Sinbad Company & Technology · Tu Trinh Spa & Academy",
+          "note": "First brand and social work in tech and beauty.",
+          "visible": true
+        },
+        {
+          "years": "2018 — 2020",
+          "role": "Education",
+          "company": "FPT Arena Multimedia",
+          "note": "Graduated in multimedia design.",
+          "visible": true
+        }
       ]
     }
   },
@@ -816,7 +875,38 @@
       "MORE ARTICLES": "BÀI VIẾT KHÁC",
       "VIEW ALL →": "XEM TẤT CẢ →",
       "Process": "Quy trình",
-      "AI Visual": "Hình ảnh AI"
+      "AI Visual": "Hình ảnh AI",
+      "Experience": "Kinh nghiệm",
+      "From graphic designer to design leader, across beauty, fashion and real-estate brands.": "Từ graphic designer đến trưởng nhóm thiết kế, qua các thương hiệu làm đẹp, thời trang và bất động sản.",
+      "Leading the design team: 20 campaigns from key visual to social, print and in-store.": "Dẫn dắt đội thiết kế: 20 chiến dịch từ key visual đến mạng xã hội, ấn phẩm in và tại chi nhánh.",
+      "Graphic Designer": "Graphic Designer",
+      "Key visuals, social content and beauty retouching.": "Key visual, nội dung mạng xã hội và retouch ảnh làm đẹp.",
+      "Real-estate campaigns and sales materials.": "Chiến dịch và ấn phẩm bán hàng bất động sản.",
+      "Fashion campaigns and e-commerce visuals.": "Chiến dịch thời trang và hình ảnh thương mại điện tử.",
+      "Real-estate branding and digital ads.": "Thương hiệu và quảng cáo số cho bất động sản.",
+      "First brand and social work in tech and beauty.": "Những dự án thương hiệu và mạng xã hội đầu tiên trong công nghệ và làm đẹp.",
+      "Education": "Học vấn",
+      "Graduated in multimedia design.": "Tốt nghiệp thiết kế đa phương tiện.",
+      "Download CV ↓": "Tải CV ↓",
+      "See all work →": "Xem tất cả dự án →",
+      "Message on Zalo ↗": "Nhắn Zalo ↗",
+      "Before": "Trước",
+      "After": "Sau",
+      "Results": "Kết quả",
+      "ALL WORK": "TẤT CẢ DỰ ÁN",
+      "All": "Tất cả",
+      "Campaigns, key visuals and visual systems.": "Chiến dịch, key visual và hệ thống hình ảnh.",
+      "← HOME": "← TRANG CHỦ",
+      "🔒 PRIVATE": "🔒 RIÊNG TƯ",
+      "🔒 Private project": "🔒 Dự án riêng tư",
+      "This project is protected. Enter the password to view it.": "Dự án này được bảo vệ. Nhập mật khẩu để xem.",
+      "Password": "Mật khẩu",
+      "Unlock": "Mở khoá",
+      "Wrong password.": "Sai mật khẩu.",
+      "Image viewer": "Xem ảnh",
+      "Close": "Đóng",
+      "Previous": "Ảnh trước",
+      "Next": "Ảnh sau"
     }
   }
 }

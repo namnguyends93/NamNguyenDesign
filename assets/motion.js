@@ -94,6 +94,21 @@
       host.addEventListener('mouseenter', function () { if (!reduce) scramble(el); });
     });
 
+    /* background colour follows the section in view (site.scrollColor + each section's scrollBg) */
+    if (doc.dataset.scrollColor === 'on' && 'IntersectionObserver' in window) {
+      var zones = Array.prototype.slice.call(document.querySelectorAll('main > section, main > footer, footer.footer'));
+      var zoneArea = new Map();   // section → visible height in px (the one filling most of the screen wins)
+      var pickZone = function () {
+        var best = null, most = 0;
+        zoneArea.forEach(function (px, el) { if (px > most) { most = px; best = el; } });
+        var c = best && best.getAttribute('data-scroll-bg');
+        if (c) doc.style.setProperty('--shell-bg', c); else doc.style.removeProperty('--shell-bg');
+      };
+      var steps = []; for (var s = 0; s <= 20; s++) steps.push(s / 20);
+      var zio = new IntersectionObserver(function (es) { es.forEach(function (e) { zoneArea.set(e.target, e.isIntersecting ? e.intersectionRect.height : 0); }); pickZone(); }, { threshold: steps });
+      zones.forEach(function (z) { zio.observe(z); });
+    }
+
     /* velocity marquee */
     var band = document.querySelector('.bm-track');
     var bandW = 0, bandX = 0, dir = -1, vel = 0;

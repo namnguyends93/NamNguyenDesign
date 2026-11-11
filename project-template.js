@@ -60,6 +60,18 @@ const BLOCKS = {
     { k: 't2', label: 'Bước 2 — tiêu đề', kind: 'text' }, { k: 'x2', label: 'Bước 2 — nội dung', kind: 'textarea' },
     { k: 't3', label: 'Bước 3 — tiêu đề', kind: 'text' }, { k: 'x3', label: 'Bước 3 — nội dung', kind: 'textarea' }] },
   statement: { label: 'Câu chữ lớn (Statement)', hint: 'Một câu chốt, chữ in hoa cỡ lớn.', fields: [{ k: 'text', label: 'Câu statement', kind: 'textarea' }] },
+  beforeafter: { label: 'Trước / Sau (kéo so sánh)', hint: 'Hai ảnh chồng lên nhau, người xem kéo thanh giữa để so sánh — hợp để khoe retouch, AI upscale (Magnific).', fields: [
+    { k: 'before', label: 'Ảnh TRƯỚC', kind: 'image', note: 'Hai ảnh phải cùng kích thước và cùng khung hình. Ngang 2400×1500 (16:10) hoặc dọc 1600×2000 (4:5).' },
+    { k: 'after', label: 'Ảnh SAU', kind: 'image', note: 'Cùng kích thước với ảnh Trước.' },
+    { k: 'beforeLabel', label: 'Chữ trên ảnh trước (mặc định: Before)', kind: 'text' },
+    { k: 'afterLabel', label: 'Chữ trên ảnh sau (mặc định: After)', kind: 'text' },
+    { k: 'caption', label: 'Chú thích dưới ảnh (không bắt buộc)', kind: 'text' }] },
+  results:   { label: 'Kết quả (con số)', hint: 'Tối đa 4 con số lớn: lượt tiếp cận, lịch hẹn, số ấn phẩm… Ô nào trống thì ẩn.', fields: [
+    { k: 'label', label: 'Nhãn nhỏ (mặc định: Results)', kind: 'text' },
+    { k: 'v1', label: 'Số 1 (vd 2.4M)', kind: 'text' }, { k: 'l1', label: 'Chú thích số 1', kind: 'text' },
+    { k: 'v2', label: 'Số 2', kind: 'text' }, { k: 'l2', label: 'Chú thích số 2', kind: 'text' },
+    { k: 'v3', label: 'Số 3', kind: 'text' }, { k: 'l3', label: 'Chú thích số 3', kind: 'text' },
+    { k: 'v4', label: 'Số 4', kind: 'text' }, { k: 'l4', label: 'Chú thích số 4', kind: 'text' }] },
   credits:   { label: 'Credits', hint: 'Dải Client / Category / Role / Scope / Year (lấy từ phần trên).', fields: [] },
 };
 
@@ -195,6 +207,38 @@ function renderBlock(b, p, base) {
     }
     case 'statement': return (b.text || VE) ? `
   <section class="section statement">${VE ? edT('p', '', bk('text'), b.text, 'Câu statement…') : `<p>${esc(b.text)}</p>`}</section>` : '';
+    case 'beforeafter': {
+      const bl = b.beforeLabel || 'Before', al = b.afterLabel || 'After';
+      if (VE) return `
+  <section class="section ba-edit">
+    <figure class="ba-pane"${ati(bk('before'))}>${b.before ? img(b.before, `${title} — before`, base) : ''}</figure>
+    <figure class="ba-pane"${ati(bk('after'))}>${b.after ? img(b.after, `${title} — after`, base) : ''}</figure>
+    ${edT('span', 'ba-tag ba-tag-b', bk('beforeLabel'), b.beforeLabel, 'Before')}${edT('span', 'ba-tag ba-tag-a', bk('afterLabel'), b.afterLabel, 'After')}
+    ${edT('p', 'ba-cap', bk('caption'), b.caption, 'Chú thích (không bắt buộc)')}
+  </section>`;
+      if (!b.before || !b.after) return '';
+      return `
+  <section class="section ba-wrap">
+    <figure class="ba" data-ba style="--pos:50%">
+      ${img(b.after, `${title} — ${al}`, base)}
+      <div class="ba-before">${img(b.before, `${title} — ${bl}`, base)}</div>
+      <span class="ba-line" aria-hidden="true"><span>↔</span></span>
+      <span class="ba-tag ba-tag-b">${esc(bl)}</span><span class="ba-tag ba-tag-a">${esc(al)}</span>
+      <input class="ba-range" type="range" min="0" max="100" value="50" aria-label="${esc(bl)} / ${esc(al)}">
+    </figure>
+    ${b.caption ? `<p class="ba-cap">${esc(b.caption)}</p>` : ''}
+  </section>`;
+    }
+    case 'results': {
+      const nums = [1, 2, 3, 4].map(n => [n, b['v' + n], b['l' + n]]);
+      const show = VE ? nums : nums.filter(([, v, l]) => !blank(v) || !blank(l));
+      if (!show.length) return '';
+      return `
+  <section class="section results">
+    ${VE ? edT('div', 'eyebrow', bk('label'), b.label, 'Results') : `<div class="eyebrow">${esc(b.label || 'Results')}</div>`}
+    <div class="results-grid cols-${show.length}">${show.map(([n, v, l]) => `<div class="result">${VE ? edT('strong', 'display', bk('v' + n), v, '00') + edT('span', '', bk('l' + n), l, 'Chú thích') : `<strong class="display">${esc(v)}</strong><span>${esc(l)}</span>`}</div>`).join('')}</div>
+  </section>`;
+    }
     case 'credits': {
       const rows = [['Client', p.client, 'client'], ['Category', p.category, 'category'], ['Role', p.role, 'role'], ['Scope', p.scope, 'scope'], ['Year', p.year, 'year']].filter(r => VE || r[1]);
       return rows.length ? `
@@ -227,6 +271,8 @@ function renderPage(content, slug) {
   const desc = p.description || '';
   const metaTags = [p.category, p.year].filter(Boolean).map(x => `<span>${esc(x)}</span>`).join('');
   const short = (p.heroSize || heroSize) === 'short';
+  // Password-protected page: build.js encrypts <main data-private>; the editor and dev server show it as is
+  const priv = !VE && !blank(p.password);
 
   const hero = `
   <section class="hero${short ? ' short' : ''}">
@@ -246,12 +292,12 @@ function renderPage(content, slug) {
   <section class="more">
     <div class="more-head">
       <h2 class="display">${isArticle ? 'MORE ARTICLES' : 'MORE PROJECTS'}</h2>
-      <a href="${isArticle ? '../index.html#journal' : '../index.html#projects'}">VIEW ALL →</a>
+      <a href="${isArticle ? '../index.html#journal' : 'index.html'}">VIEW ALL →</a>
     </div>
     <div class="more-grid" style="--cols:${Math.min(3, others.length)}">${others.map((o, i) => `
       <a class="more-card" href="${esc((o.slug || o.id) + '.html')}">
         ${o.cover ? img(o.cover, String(o.title || '').trim(), base) : ''}
-        <div class="more-copy"><small>${i === 0 ? (isArticle ? 'NEXT ARTICLE →' : 'NEXT PROJECT →') : [o.category, o.year].filter(Boolean).map(x => `<span>${esc(x)}</span>`).join(' · ')}</small><h3 class="display">${esc(String(o.title || '').trim())}</h3></div>
+        ${blank(o.password) ? '' : '<span class="lock">🔒 PRIVATE</span>'}<div class="more-copy"><small>${i === 0 ? (isArticle ? 'NEXT ARTICLE →' : 'NEXT PROJECT →') : [o.category, o.year].filter(Boolean).map(x => `<span>${esc(x)}</span>`).join(' · ')}</small><h3 class="display">${esc(String(o.title || '').trim())}</h3></div>
       </a>`).join('')}
     </div>
   </section>` : '';
@@ -262,7 +308,7 @@ function renderPage(content, slug) {
     return VE && h ? h.replace(/<(section|figure)/, m => `${m} data-ve-block="${i}"`) : h;
   }).join('');
   const accent = site.accent && /^#[0-9a-f]{3,8}$/i.test(site.accent) ? `:root{--accent:${site.accent}}` : '';
-  const metaDesc = paras(desc)[0] || `${title} project by ${brand}.`;
+  const metaDesc = priv ? 'Private project — password required.' : (paras(desc)[0] || `${title} project by ${brand}.`);
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -270,7 +316,7 @@ function renderPage(content, slug) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>${esc(title)} — ${esc(brand)}</title>
-<meta name="description" content="${esc(metaDesc)}">
+<meta name="description" content="${esc(metaDesc)}">${priv ? '\n<meta name="robots" content="noindex">' : ''}
 <script>(function(){try{var q=new URLSearchParams(location.search).get('lang');if((q||localStorage.getItem('nnd-lang'))==='vi'){var d=document.documentElement;d.classList.add('i18n-wait');setTimeout(function(){d.classList.remove('i18n-wait')},2500)}}catch(e){}})()</script><style>.i18n-wait body{opacity:0}</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -282,13 +328,14 @@ function renderPage(content, slug) {
   ${isArticle ? '<a href="../index.html#journal">← BACK TO JOURNAL</a>' : '<a href="../index.html#projects">← BACK TO WORK</a>'}
   <a href="../index.html#contact">START A PROJECT +</a>
 </nav>
-<main class="project-page">${body}${nextBlock}
+<main class="project-page"${priv ? ' data-private="1"' : ''}>${body}${nextBlock}
 </main>
 <footer class="footer">
   <span>${esc(copyright).toUpperCase()}</span>
   <span>INDEPENDENT · ${esc(location).toUpperCase()}</span>
 </footer>
 <script>${TRANSITION_JS}</script>
+${VE ? '' : `<script>${PAGE_JS}</script>`}
 ${i18nData(content)}
 <script src="../assets/to-top.js" defer></script>
 <script src="../assets/i18n.js" defer></script>
@@ -296,6 +343,100 @@ ${i18nData(content)}
 </html>
 `;
 }
+
+// "All work": every published project with category filter chips → projects/index.html
+function renderWorkPage(content) {
+  const site = content.site || {}, wp = content.workPage || {};
+  const brand = content.footer?.brand || content.navigation?.brand || site.name || 'Nam Nguyen Design';
+  const copyright = content.footer?.copyright || `© ${new Date().getFullYear()} ${brand}`;
+  const location = content.home?.intro?.location || 'Ho Chi Minh City';
+  const base = '../';
+  const list = (content.projects || []).filter(p => p.published !== false && p.kind !== 'journal');
+  const key = v => String(v || '').trim().toLowerCase();
+  const cats = [];
+  for (const p of list) if (!blank(p.category) && !cats.some(c => key(c) === key(p.category))) cats.push(String(p.category).trim());
+  const title = wp.title || 'ALL WORK';
+  const desc = wp.description || 'Campaigns, key visuals and visual systems.';
+  const accent = site.accent && /^#[0-9a-f]{3,8}$/i.test(site.accent) ? `:root{--accent:${site.accent}}` : '';
+  const cards = list.map(p => `
+    <a class="work-card" data-cat="${esc(key(p.category))}" href="${esc((p.slug || p.id) + '.html')}">
+      ${p.cover ? img(p.cover, String(p.title || '').trim(), base) : ''}
+      ${blank(p.password) ? '' : '<span class="lock">🔒 PRIVATE</span>'}
+      <div class="more-copy"><small>${[p.category, p.year].filter(Boolean).map(x => `<span>${esc(x)}</span>`).join(' · ')}</small><h3 class="display">${esc(String(p.title || '').trim())}</h3></div>
+    </a>`).join('');
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>${esc(title)} — ${esc(brand)}</title>
+<meta name="description" content="${esc(desc)}">
+<script>(function(){try{var q=new URLSearchParams(location.search).get('lang');if((q||localStorage.getItem('nnd-lang'))==='vi'){var d=document.documentElement;d.classList.add('i18n-wait');setTimeout(function(){d.classList.remove('i18n-wait')},2500)}}catch(e){}})()</script><style>.i18n-wait body{opacity:0}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Geist+Mono:wght@500&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+<style>${CSS}${accent}</style>
+</head>
+<body>
+<nav class="project-nav">
+  <a href="../index.html">← HOME</a>
+  <a href="../index.html#contact">START A PROJECT +</a>
+</nav>
+<main class="project-page work-page">
+  <section class="section work-head">
+    <h1 class="display">${esc(title)}</h1>
+    <p>${esc(desc)}</p>
+    <div class="work-filter" role="group" aria-label="Filter">
+      <button type="button" data-filter="*" aria-pressed="true"><span>All</span> <b>${list.length}</b></button>${cats.map(c => `<button type="button" data-filter="${esc(key(c))}" aria-pressed="false"><span>${esc(c)}</span> <b>${list.filter(p => key(p.category) === key(c)).length}</b></button>`).join('')}
+    </div>
+  </section>
+  <section class="work-grid">${cards}
+  </section>
+</main>
+<footer class="footer">
+  <span>${esc(copyright).toUpperCase()}</span>
+  <span>INDEPENDENT · ${esc(location).toUpperCase()}</span>
+</footer>
+<script>${TRANSITION_JS}</script>
+<script>${WORK_JS}</script>
+${i18nData(content)}
+<script src="../assets/to-top.js" defer></script>
+<script src="../assets/i18n.js" defer></script>
+</body>
+</html>
+`;
+}
+
+// Before/After drag + image viewer (lightbox). Exposed as __nndPageInit so a private page can run it after unlocking.
+const PAGE_JS = `
+(function(){
+  function initBA(){[].forEach.call(document.querySelectorAll('[data-ba]'),function(f){if(f._ba)return;f._ba=1;var r=f.querySelector('input');function set(){f.style.setProperty('--pos',r.value+'%')}r.addEventListener('input',set);set()})}
+  var lb=null,imgs=[],cur=0,last=null;
+  function big(im){var ss=im.getAttribute('srcset');if(ss){var best=ss.split(',').map(function(s){var p=s.trim().split(/\\s+/);return{u:p[0],w:parseInt(p[1],10)||0}}).sort(function(a,b){return b.w-a.w})[0];if(best&&best.u)return best.u}return im.currentSrc||im.src}
+  function build(){lb=document.createElement('div');lb.className='lb';lb.setAttribute('role','dialog');lb.setAttribute('aria-modal','true');lb.setAttribute('aria-label','Image viewer');
+    lb.innerHTML='<img alt=""><button type="button" class="lb-x" aria-label="Close">✕</button><button type="button" class="lb-p" aria-label="Previous">←</button><button type="button" class="lb-n" aria-label="Next">→</button><span class="lb-c"></span>';
+    document.body.appendChild(lb);
+    lb.addEventListener('click',function(e){var c=e.target.classList;if(e.target===lb||c.contains('lb-x'))close();else if(c.contains('lb-p'))go(-1);else if(c.contains('lb-n'))go(1)});
+    var sx=null;lb.addEventListener('touchstart',function(e){sx=e.touches[0].clientX},{passive:true});
+    lb.addEventListener('touchend',function(e){if(sx==null)return;var dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>50)go(dx<0?1:-1);sx=null})}
+  function show(){var im=imgs[cur],el=lb.querySelector('img');el.src=big(im);el.alt=im.alt||'';lb.querySelector('.lb-c').textContent=(cur+1)+' / '+imgs.length;lb.classList.toggle('single',imgs.length<2)}
+  function open(i){if(!lb)build();last=document.activeElement;cur=i;show();lb.classList.add('on');document.documentElement.style.overflow='hidden';lb.querySelector('.lb-x').focus()}
+  function close(){lb.classList.remove('on');document.documentElement.style.overflow='';if(last&&last.focus)last.focus()}
+  function go(d){cur=(cur+d+imgs.length)%imgs.length;show()}
+  document.addEventListener('keydown',function(e){if(!lb||!lb.classList.contains('on'))return;if(e.key==='Escape')close();else if(e.key==='ArrowRight')go(1);else if(e.key==='ArrowLeft')go(-1)});
+  function initLB(){imgs=[].slice.call(document.querySelectorAll('.gallery img, .bleed img, .chapter-media img'));
+    imgs.forEach(function(im){if(im._lb)return;im._lb=1;im.tabIndex=0;im.setAttribute('role','button');
+      im.addEventListener('click',function(){open(imgs.indexOf(im))});
+      im.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();open(imgs.indexOf(im))}})})}
+  window.__nndPageInit=function(){initBA();initLB()};
+  window.__nndPageInit();
+})();`;
+
+// All-work page: category filter chips
+const WORK_JS = `
+document.addEventListener('click',function(e){var b=e.target.closest('[data-filter]');if(!b)return;var f=b.getAttribute('data-filter');
+  [].forEach.call(document.querySelectorAll('[data-filter]'),function(x){x.setAttribute('aria-pressed',String(x===b))});
+  [].forEach.call(document.querySelectorAll('.work-card'),function(c){c.hidden=f!=='*'&&c.getAttribute('data-cat')!==f})});`;
 
 const CSS = `
 :root{--black:#080808;--dark:#141414;--white:#f7f5ef;--soft:#ebe8e1;--muted:#9a9a96;--accent:#4c6fff;--accent-soft:#8ea1ff}
@@ -394,6 +535,58 @@ figure{margin:0}
 /* next */
 .next{position:relative;min-height:620px;display:flex;align-items:flex-end;border-radius:100px;overflow:hidden;background:#1b1b1b}
 .next img{position:absolute;inset:0;transition:transform .9s cubic-bezier(.22,.75,.24,1)}
+/* before / after */
+.ba-wrap{padding-top:8px;padding-bottom:8px}
+.ba{position:relative;margin:0;border-radius:100px;overflow:hidden;background:#1b1b1b;user-select:none;touch-action:pan-y}
+.ba>img{display:block;width:100%;height:auto}
+.ba-before{position:absolute;inset:0;clip-path:inset(0 calc(100% - var(--pos)) 0 0)}
+.ba-before img{width:100%;height:100%;object-fit:cover}
+.ba-line{position:absolute;top:0;bottom:0;left:var(--pos);width:2px;margin-left:-1px;background:#fff;pointer-events:none}
+.ba-line span{position:absolute;top:50%;left:50%;width:54px;height:54px;margin:-27px 0 0 -27px;border-radius:50%;background:#fff;color:#000;display:grid;place-items:center;font-size:20px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.ba-range{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:ew-resize}
+.ba-tag{position:absolute;top:28px;padding:9px 14px;border-radius:999px;background:rgba(8,8,8,.55);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);font:11px "Geist Mono",monospace;text-transform:uppercase;pointer-events:none}
+.ba-tag-b{left:28px}.ba-tag-a{right:28px}
+.ba-cap{margin:16px 0 0;text-align:center;color:var(--muted);font-size:14px}
+.ba-edit{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ba-pane{margin:0;min-height:420px;border-radius:72px;overflow:hidden;background:#1b1b1b}
+.ba-edit .ba-tag{top:28px;pointer-events:auto}.ba-edit .ba-tag-a{right:auto;left:calc(50% + 28px)}.ba-edit .ba-cap{grid-column:1/-1}
+/* results */
+.results{padding:110px 6vw}
+.results-grid{display:grid;grid-template-columns:repeat(var(--n,4),minmax(0,1fr));gap:8px;margin-top:28px}
+.results-grid.cols-1{--n:1}.results-grid.cols-2{--n:2}.results-grid.cols-3{--n:3}.results-grid.cols-4{--n:4}
+.result{padding:40px 34px;border-radius:46px;background:#141414;border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:14px}
+.result strong{font-size:clamp(48px,6vw,96px);line-height:.9;color:var(--accent-soft)}
+.result span{color:#cfcfcf;font-size:15px;line-height:1.35}
+/* image viewer */
+.gallery img,.bleed img,.chapter-media img{cursor:zoom-in}
+.lb{position:fixed;inset:0;z-index:200;background:rgba(5,5,5,.94);display:none;align-items:center;justify-content:center;padding:70px 90px}
+.lb.on{display:flex}
+.lb img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;border-radius:18px}
+.lb button{position:absolute;width:52px;height:52px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(0,0,0,.4);color:#fff;font-size:20px;cursor:pointer}
+.lb button:hover{background:#fff;color:#000}
+.lb-x{top:18px;right:18px}.lb-p{left:18px;top:50%;margin-top:-26px}.lb-n{right:18px;top:50%;margin-top:-26px}
+.lb.single .lb-p,.lb.single .lb-n,.lb.single .lb-c{display:none}
+.lb-c{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);font:11px "Geist Mono",monospace;color:#bbb}
+/* private tag */
+.lock{position:absolute;z-index:3;top:26px;left:26px;padding:8px 12px;border-radius:999px;background:rgba(8,8,8,.6);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);font:11px "Geist Mono",monospace}
+/* all-work page */
+.work-head{padding:150px 6vw 50px}
+.work-head h1{margin:0;font-size:clamp(64px,11vw,190px)}
+.work-head p{max-width:560px;color:#cfcfcf;font-size:18px;line-height:1.4;margin:22px 0 34px}
+.work-filter{display:flex;flex-wrap:wrap;gap:8px}
+.work-filter button{display:inline-flex;gap:8px;align-items:center;padding:12px 18px;border-radius:999px;border:1px solid rgba(255,255,255,.2);background:transparent;color:#fff;font:12px "Geist Mono",monospace;text-transform:uppercase;cursor:pointer;transition:background .25s,color .25s}
+.work-filter button b{font-weight:500;opacity:.55}
+.work-filter button[aria-pressed="true"],.work-filter button:hover{background:var(--white);color:var(--black)}
+.work-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.work-card{position:relative;min-height:560px;display:flex;align-items:flex-end;border-radius:72px;overflow:hidden;background:#1b1b1b}
+.work-card[hidden]{display:none}
+.work-card img{position:absolute;inset:0;transition:transform .9s cubic-bezier(.22,.75,.24,1)}
+.work-card:hover img{transform:scale(1.04)}
+.work-card:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 35%,rgba(0,0,0,.78))}
+@media (max-width:900px){.ba,.ba-pane{border-radius:52px}.ba-edit{grid-template-columns:1fr}.ba-edit .ba-tag-a{left:28px;top:calc(50% + 28px)}.ba-tag{top:18px}.ba-tag-b{left:18px}.ba-tag-a{right:18px}
+  .results{padding:80px 28px}.results-grid{grid-template-columns:1fr 1fr}.result{padding:30px 24px;border-radius:36px}
+  .lb{padding:60px 12px}.lb-p,.lb-n{top:auto;bottom:14px;margin-top:0}.lb-c{bottom:30px}
+  .work-head{padding:120px 24px 36px}.work-grid{grid-template-columns:1fr}.work-card{min-height:420px;border-radius:52px}}
 .more{padding-top:90px}
 .more-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;padding:0 24px 28px}
 .more-head h2{margin:0;font-size:clamp(40px,5vw,76px)}
@@ -478,6 +671,6 @@ const TRANSITION_JS = `
 })();
 `;
 
-const api = { renderProjectPage, renderBlock, BLOCKS, PRESETS, GALLERY_STYLES, presetBlocks, material, blocksOf };
+const api = { renderWorkPage, renderProjectPage, renderBlock, BLOCKS, PRESETS, GALLERY_STYLES, presetBlocks, material, blocksOf };
 if (typeof module !== 'undefined' && module.exports) module.exports = api; else window.ProjectTemplate = api;
 })();

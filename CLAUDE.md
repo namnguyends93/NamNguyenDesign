@@ -22,6 +22,15 @@ Write replies to the owner in Vietnamese.
   - Admin → Xuất bản: "Build thử", "Đưa lên Cloudflare" (build + wrangler deploy) and "Lưu lên GitHub" (git add/commit/push). server.js runs one job at a time and the page polls `/api/publish/status` for the log.
   - Non-GET API calls from another origin get 403, so other websites cannot drive the local admin.
   - server.js injects cms-runtime.js into site pages only, never into admin.html.
+- Features added 2026-11-11 (the owner said no video and no testimonials):
+  - Project modules `beforeafter` (drag slider; side by side in the editor) and `results` (up to 4 big numbers). Images in galleries, full-width and chapter modules open in a lightbox (`PAGE_JS` in project-template.js, exposed as `window.__nndPageInit`).
+  - All-work page `projects/index.html` (`renderWorkPage`, category filter chips; `workPage.title/description`). Home has a "See all work →" link (`home.projectsSection.allLabel/allVisible`); "VIEW ALL" on project pages goes there.
+  - Private projects: `password` on a project. build.js encrypts the page body and its Vietnamese entries (PBKDF2 150k + AES-GCM) and leaves a password form; noindex, not in the sitemap. The dev server and editor show the page unlocked. Unlocking calls `__nndPageInit` and `__nndI18nApply`.
+  - Each built page keeps only the Vietnamese entries for its own text (`trimDictionary`); add runtime-only labels to `RUNTIME_STRINGS` in build.js.
+  - Home "Experience" timeline (`home.experience`), CV buttons (`site.cvUrl` PDF, uploads accept PDF and the build copies /uploads/*.pdf), "Message on Zalo" button (`home.contact.zalo`, falls back to the phone number).
+  - Build adds 404.html (finds the site root itself), JSON-LD (Person/WebSite on home, CreativeWork on projects; `site.personName`, `site.organization`), hreflang en/vi, image preload, and Cloudflare Web Analytics when `site.analyticsToken` (32 hex) is set.
+  - Background colour per section while scrolling: `site.scrollColor` on + `scrollBg` on experience, clients, projectsSection, journal, contact (black = no change). Shells use `var(--shell-bg,#000)`; motion.js picks the section filling most of the screen.
+  - Experience notes and years are drafted from the 2024 Behance CV: the owner should check them.
 - `npm run build` writes `dist/`. It prerenders with jsdom, converts images to WebP with sharp, and minifies the HTML.
 - `npm run demo` writes demo pages of the 5 presets into `dist/`.
 - Owner (2026): Nam Nguyen, Design Leader at Ngoc Dung Beauty Center (Thẩm mỹ viện Ngọc Dung), led 20 campaigns in 2026; designer since 2019 (FPT Arena). Earlier: Sinbad, Tu Trinh Spa, LinkHouse, Seedcom (Juno, Hnoss), Maple Land, Ngoc Dung & Zema. Old portfolio: https://www.behance.net/gallery/199409315/Portfolio-2024

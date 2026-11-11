@@ -40,7 +40,7 @@ async function uploadToR2(cfg,name,buf,type){
   const item={name,url:cfg.publicUrl.replace(/\/$/,'')+'/'+encodeURIComponent(name),size:buf.length,modified:new Date().toISOString(),storage:'r2'};
   const list=await readManifest();list.unshift(item);await writeManifest(list);return item}
 
-const MIME={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'application/javascript; charset=utf-8','.json':'application/json; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.webp':'image/webp','.gif':'image/gif','.svg':'image/svg+xml','.ico':'image/x-icon','.woff':'font/woff','.woff2':'font/woff2','.mp4':'video/mp4','.webm':'video/webm'};
+const MIME={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'application/javascript; charset=utf-8','.json':'application/json; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.webp':'image/webp','.gif':'image/gif','.svg':'image/svg+xml','.ico':'image/x-icon','.pdf':'application/pdf','.woff':'font/woff','.woff2':'font/woff2','.mp4':'video/mp4','.webm':'video/webm'};
 
 function send(res,status,body,type='text/plain; charset=utf-8'){const b=Buffer.isBuffer(body)?body:Buffer.from(String(body));res.writeHead(status,{'Content-Type':type,'Content-Length':b.length,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(b)}
 function sendJSON(res,status,obj){send(res,status,JSON.stringify(obj,null,2),'application/json; charset=utf-8')}
@@ -57,6 +57,7 @@ async function listMedia(){await ensureDirs();const out=[];for(const name of awa
 async function listBackups(){await ensureDirs();const files=(await fsp.readdir(BACKUPS)).filter(x=>x.endsWith('.json')).sort().reverse();const out=[];for(const name of files){const st=await fsp.stat(path.join(BACKUPS,name));out.push({name,size:st.size,modified:st.mtime.toISOString()})}return out}
 
 const TEMPLATE_FILE=path.join(ROOT,'project-template.js');
+async function serveWork(res){delete require.cache[require.resolve(TEMPLATE_FILE)];const {renderWorkPage}=require(TEMPLATE_FILE);return send(res,200,renderWorkPage(await readContent()),MIME['.html'])}
 async function serveProject(res,slug){delete require.cache[require.resolve(TEMPLATE_FILE)];const {renderProjectPage}=require(TEMPLATE_FILE);const html=renderProjectPage(await readContent(),slug);return html?send(res,200,html,MIME['.html']):send(res,404,'Project not found (or unpublished): '+slug)}
 const CMS_RUNTIME_FILE=path.join(ROOT,'cms-runtime.js');
 
@@ -112,7 +113,7 @@ async function handleAPI(req,res,u){
   if(u.pathname==='/api/media'&&req.method==='GET')return sendJSON(res,200,{ok:true,media:await listMedia()});
   if(u.pathname==='/api/media/upload'&&req.method==='POST'){
     const body=await readJSONBody(req);const type=String(body.type||'');
-    if(!/^image\/(jpeg|png|webp|gif|svg\+xml)$/.test(type))return sendJSON(res,415,{ok:false,error:'Only image files are allowed'});
+    if(!/^(image\/(jpeg|png|webp|gif|svg\+xml)|application\/pdf)$/.test(type))return sendJSON(res,415,{ok:false,error:'Only images or PDF files are allowed'});
     const buf=Buffer.from(String(body.base64||''),'base64');if(!buf.length||buf.length>20*1024*1024)return sendJSON(res,413,{ok:false,error:'Image too large or empty'});
     const name=cleanName(body.name||'upload.jpg');
     const cfg=r2Config();
@@ -131,4 +132,4 @@ async function handleAPI(req,res,u){
   return sendJSON(res,404,{ok:false,error:'API route not found'});
 }
 
-(async()=>{await ensureDirs();http.createServer(async(req,res)=>{try{const u=new URL(req.url,'http://127.0.0.1');if(u.pathname.startsWith('/api/'))return await handleAPI(req,res,u);if(u.pathname==='/cms-runtime.js')return send(res,200,await fsp.readFile(CMS_RUNTIME_FILE),'application/javascript; charset=utf-8');{const pm=u.pathname.match(/^\/projects\/([^/]+)\.html$/i);if(pm)return await serveProject(res,decodeURIComponent(pm[1]))}if(u.pathname==='/admin')return await serveStatic(res,'/admin.html');if(u.pathname==='/edit')return await serveStatic(res,'/editor.html');return await serveStatic(res,u.pathname)}catch(e){console.error(e);return sendJSON(res,500,{ok:false,error:e.message||'Server error'})}}).listen(PORT,HOST,()=>{console.log('');console.log('NAM NGUYEN DESIGN CMS FULL');console.log('Website : http://127.0.0.1:'+PORT+'/');console.log('CMS     : http://127.0.0.1:'+PORT+'/admin');console.log('')})})();
+(async()=>{await ensureDirs();http.createServer(async(req,res)=>{try{const u=new URL(req.url,'http://127.0.0.1');if(u.pathname.startsWith('/api/'))return await handleAPI(req,res,u);if(u.pathname==='/cms-runtime.js')return send(res,200,await fsp.readFile(CMS_RUNTIME_FILE),'application/javascript; charset=utf-8');{if(/^\/projects\/(index\.html)?$/i.test(u.pathname))return await serveWork(res);const pm=u.pathname.match(/^\/projects\/([^/]+)\.html$/i);if(pm)return await serveProject(res,decodeURIComponent(pm[1]))}if(u.pathname==='/admin')return await serveStatic(res,'/admin.html');if(u.pathname==='/edit')return await serveStatic(res,'/editor.html');return await serveStatic(res,u.pathname)}catch(e){console.error(e);return sendJSON(res,500,{ok:false,error:e.message||'Server error'})}}).listen(PORT,HOST,()=>{console.log('');console.log('NAM NGUYEN DESIGN CMS FULL');console.log('Website : http://127.0.0.1:'+PORT+'/');console.log('CMS     : http://127.0.0.1:'+PORT+'/admin');console.log('')})})();

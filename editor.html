@@ -175,6 +175,9 @@ function bindings(d){
     subs.forEach(s=>{const ai=s.classList.contains('skills-sub-ai'),key=ai?'aiTools':'tools';text(s,ai?'home.about.skills.aiTitle':'home.about.skills.toolsTitle');
       const ix=(SK[key]||[]).map((t,i)=>t&&t.name&&t.visible!==false?i:-1).filter(i=>i>=0);
       [...s.nextElementSibling.querySelectorAll('.tool')].forEach((li,k)=>{if(ix[k]==null)return;text(li.querySelector('.tool-name'),'home.about.skills.'+key+'.'+ix[k]+'.name');del(li,'home.about.skills.'+key,ix[k],SK[key][ix[k]].name)})})}
+  text(q('#experience .section-head h2'),'home.experience.title');text(q('#experience .section-head .copy'),'home.experience.description',1);
+  {const xi=(state.home?.experience?.items||[]).map((x,i)=>({x,i})).filter(o=>o.x&&o.x.visible!==false&&(o.x.role||o.x.company));
+    qa('#experience .xp-item').forEach((li,k)=>{const o=xi[k];if(!o)return;const b='home.experience.items.'+o.i;text(li.querySelector('.xp-years'),b+'.years');text(li.querySelector('.xp-role'),b+'.role');text(li.querySelector('.xp-company'),b+'.company');text(li.querySelector('.xp-note'),b+'.note',1)})}
   text(q('#clients .section-head h2'),'home.clients.title');
   {const it=state.home?.clients?.items||[],ix=it.map((x,i)=>x&&x.visible!==false&&(x.name||x.logo)?i:-1).filter(i=>i>=0);
     if(ix.length)qa('#clients .client-card').forEach((c,k)=>{const i=ix[k%ix.length];del(c,'home.clients.items',i,it[i].name||'logo')})}
@@ -349,7 +352,7 @@ const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&
 const clone=v=>JSON.parse(JSON.stringify(v??null));
 const T=(p,l,o)=>({k:'text',p,l,...o}),A=(p,l,o)=>({k:'area',p,l,...o}),U=(p,l,o)=>({k:'url',p,l,...o}),Bo=(p,l,o)=>({k:'bool',p,l,...o}),
   C=(p,l,def,css)=>({k:'color',p,l,def,css}),S=(p,l,opts,def,o)=>({k:'select',p,l,opts,def,...o}),R=(p,l,min,max,step,def)=>({k:'range',p,l,min,max,step,def}),
-  I=(p,l,hint,o)=>({k:'img',p,l,hint,...o}),L=(p,l,o)=>({k:'list',p,l,...o}),IT=(p,l,fields,make,title)=>({k:'items',p,l,fields,make,title}),P=(kind,l)=>({k:'pages',kind,l});
+  I=(p,l,hint,o)=>({k:'img',p,l,hint,...o}),F=(p,l,o)=>({k:'file',p,l,...o}),L=(p,l,o)=>({k:'list',p,l,...o}),IT=(p,l,fields,make,title)=>({k:'items',p,l,fields,make,title}),P=(kind,l)=>({k:'pages',kind,l});
 const ICONS=[['ps','Photoshop'],['ai','Illustrator'],['id','InDesign'],['ae','After Effects'],['pr','Premiere'],['lr','Lightroom'],['xd','Adobe XD'],['figma','Figma'],['blender','Blender'],['c4d','Cinema 4D'],['canva','Canva'],['davinci','DaVinci Resolve'],['procreate','Procreate'],['other','Khác (2 chữ cái đầu)']];
 const FONTS=['Space Grotesk','Inter','Syne','Archivo','Unbounded','Bricolage Grotesque','Playfair Display','DM Serif Display','Anton','Be Vietnam Pro'];
 const toolFields=[T('name','Tên'),S('icon','Icon có sẵn',ICONS,'other'),I('image','Icon riêng (vuông, PNG) — thay icon có sẵn','<b>Vuông 256×256, PNG.</b>'),Bo('visible','Hiện')];
@@ -362,7 +365,11 @@ const SECS=[
     Bo('site.cursorRing','Vòng chữ xoay theo chuột'),T('site.cursorText','Chữ trên vòng xoay'),
     T('site.name','Tên thương hiệu'),T('site.email','Email liên hệ (mọi nút gửi mail)'),
     T('site.seoTitle','Tiêu đề trên Google / khi chia sẻ link'),A('site.seoDescription','Mô tả trên Google / khi chia sẻ link'),
-    T('site.siteUrl','Địa chỉ web',{note:'Khi có tên miền riêng thì đổi ở đây.'})]},
+    T('site.siteUrl','Địa chỉ web',{note:'Khi có tên miền riêng thì đổi ở đây.'}),
+    Bo('site.scrollColor','Đổi màu nền khi cuộn',{note:'Bật rồi chọn màu cho từng mục (Dự án, Nhật ký, Liên hệ…). Xem hiệu ứng ở trang thật.'}),
+    F('site.cvUrl','File CV (PDF) — hiện nút tải CV ở Giới thiệu và Liên hệ',{note:'Để trống = ẩn nút.'}),T('site.cvLabel','Chữ trên nút CV (mặc định: Download CV ↓)'),
+    T('site.personName','Tên của bạn (cho Google)'),T('site.organization','Nơi làm việc hiện tại (cho Google)'),
+    T('site.analyticsToken','Mã Cloudflare Web Analytics',{note:'Cloudflare → Analytics & Logs → Web Analytics → Add a site → copy "token" (32 ký tự). Có mã thì mỗi lần build sẽ gắn thống kê lượt xem, không cần banner cookie.'})]},
   {id:'nav',n:'Menu',sel:'.nav-wrap',vis:'navigation.visible',f:[
     A('navigation.badge','Logo chữ tròn (Enter = xuống dòng)'),Bo('navigation.badgeVisible','Hiện logo chữ'),
     IT('navigation.items','Các link trong menu',[T('label','Chữ'),U('href','Link tới'),Bo('visible','Hiện')],()=>({label:'New',href:'#contact',visible:true}),'label'),
@@ -380,6 +387,10 @@ const SECS=[
     L('home.about.skills.disciplines','Các thẻ kỹ năng (mỗi dòng 1 thẻ)'),T('home.about.skills.toolsTitle','Tiêu đề nhóm phần mềm'),
     IT('home.about.skills.tools','Phần mềm',toolFields,()=>({name:'New App',icon:'other',visible:true}),'name'),
     T('home.about.skills.aiTitle','Tiêu đề nhóm AI'),IT('home.about.skills.aiTools','Công cụ AI',toolFields,()=>({name:'New AI Tool',icon:'other',visible:true}),'name')]},
+  {id:'experience',n:'Kinh nghiệm',sel:'#experience',vis:'home.experience.visible',f:[
+    T('home.experience.title','Tiêu đề'),A('home.experience.description','Đoạn mô tả (để trống = ẩn)'),
+    IT('home.experience.items','Các mốc (mới nhất ở trên)',[T('years','Thời gian (vd 2023 — 2025)'),T('role','Vị trí'),T('company','Công ty'),A('note','Mô tả ngắn'),Bo('visible','Hiện')],()=>({years:'2026',role:'New role',company:'Company',note:'',visible:true}),'company'),
+    C('home.experience.scrollBg','Màu nền khi cuộn tới mục này','#000000'),]},
   {id:'clients',n:'Khách hàng',sel:'#clients',vis:'home.clients.visible',f:[
     T('home.clients.title','Tiêu đề'),A('home.clients.description','Đoạn mô tả'),
     S('home.clients.shape','Hình thẻ logo',[['rounded','Vuông bo tròn (mặc định)'],['circle','Tròn'],['square','Vuông, bo nhẹ'],['pill','Viên thuốc ngang'],['wide','Chữ nhật ngang'],['portrait','Chữ nhật dọc']],'rounded'),
@@ -387,18 +398,23 @@ const SECS=[
     R('home.clients.logoSize','Cỡ logo trong thẻ',.3,.95,.05,.62),
     S('home.clients.logoColor','Màu logo',[['','Như hiện tại (hơi mờ)'],['original','Màu gốc, rõ nét'],['white','Đổi hết thành trắng'],['gray','Xám mờ, hiện màu khi rê chuột']],'',{note:'Logo màu tối trên nền tối → chọn "Đổi hết thành trắng".'}),
     S('home.clients.cardBg','Nền thẻ',[['glass','Kính mờ (mặc định)'],['white','Trắng'],['outline','Chỉ viền mảnh'],['none','Không nền']],'glass'),
-    R('home.clients.speed','Tốc độ chạy (giây mỗi vòng, nhỏ = nhanh)',8,60,1,22),
+    R('home.clients.speed','Tốc độ chạy (giây mỗi vòng, nhỏ = nhanh)',8,60,1,22),C('home.clients.scrollBg','Màu nền khi cuộn tới mục Khách hàng','#000000'),
     IT('home.clients.items','Khách hàng (dải thẻ chạy ngang)',[T('name','Tên'),I('logo','Logo (thay cho tên)','<b>PNG hoặc SVG nền trong suốt, ngang khoảng 600 px.</b> Cắt sát mép logo, không chừa viền trống.'),U('href','Link (tuỳ chọn)'),Bo('visible','Hiện')],()=>({name:'NEW CLIENT',logo:'',href:'',visible:true}),'name')]},
   {id:'projects',n:'Dự án',sel:'#projects',vis:'home.projectsSection.visible',f:[
     T('home.projectsSection.eyebrow','Chữ nhỏ'),T('home.projectsSection.title','Tiêu đề'),A('home.projectsSection.description','Đoạn mô tả'),
     IT('home.projectsSection.stats','Con số nổi bật',[T('value','Số'),T('label','Chú thích')],()=>({value:'10+',label:'New number'}),'value'),
-    T('home.projectsSection.homeLimit','Số dự án tối đa trên slider',{note:'Để trống = hiện tất cả.'}),P('project','Các dự án (thứ tự = thứ tự trên slider)')]},
+    T('home.projectsSection.homeLimit','Số dự án tối đa trên slider',{note:'Để trống = hiện tất cả.'}),
+    Bo('home.projectsSection.allVisible','Hiện nút "Xem tất cả dự án"'),T('home.projectsSection.allLabel','Chữ trên nút (mặc định: See all work →)'),
+    T('workPage.title','Trang Tất cả dự án — tiêu đề (mặc định: ALL WORK)'),A('workPage.description','Trang Tất cả dự án — mô tả'),
+    C('home.projectsSection.scrollBg','Màu nền khi cuộn tới mục Dự án','#000000'),P('project','Các dự án (thứ tự = thứ tự trên slider)')]},
   {id:'marquee',n:'Dải chữ chạy',sel:'.big-marquee',vis:'home.marquee.visible',f:[L('home.marquee.words','Các cụm chữ (mỗi dòng 1 cụm; cụm thứ 2, 4… là chữ viền)')]},
   {id:'journal',n:'Nhật ký',sel:'#journal',vis:'home.journal.visible',f:[
-    T('home.journal.title','Tiêu đề'),A('home.journal.description','Đoạn mô tả'),P('journal','Các bài Nhật ký (3 bài = lưới, từ 4 bài = trượt ngang)')]},
+    T('home.journal.title','Tiêu đề'),A('home.journal.description','Đoạn mô tả'),C('home.journal.scrollBg','Màu nền khi cuộn tới mục Nhật ký','#000000'),P('journal','Các bài Nhật ký (3 bài = lưới, từ 4 bài = trượt ngang)')]},
   {id:'contact',n:'Liên hệ',sel:'#contact',vis:'home.contact.visible',f:[
     T('home.contact.eyebrow','Chữ nhỏ'),T('home.contact.title','Tiêu đề'),A('home.contact.description','Đoạn mô tả'),I('home.contact.image','Ảnh nền',HINT.contact),
-    I('home.contact.qrImage','Mã QR Zalo',HINT.qr),A('home.contact.qrCaption','Chữ cạnh QR'),T('home.contact.phone','Số điện thoại (hiện dưới QR, để trống = ẩn)')]},
+    I('home.contact.qrImage','Mã QR Zalo',HINT.qr),A('home.contact.qrCaption','Chữ cạnh QR'),T('home.contact.phone','Số điện thoại (hiện dưới QR, để trống = ẩn)'),
+    T('home.contact.zalo','Zalo: số điện thoại hoặc link zalo.me',{note:'Hiện nút "Nhắn Zalo" bấm được (người xem trên điện thoại không tự quét được màn hình). Để trống = dùng số điện thoại ở trên.'}),T('home.contact.zaloLabel','Chữ trên nút Zalo (mặc định: Message on Zalo ↗)'),
+    C('home.contact.scrollBg','Màu nền khi cuộn tới mục Liên hệ','#000000')]},
   {id:'footer',n:'Chân trang',sel:'footer.footer',vis:'footer.visible',f:[
     T('footer.brand','Chữ nhỏ trên cùng'),A('footer.description','Câu lớn'),A('footer.tagline','Dòng phụ'),
     IT('footer.links','Các link',[T('label','Chữ'),U('href','Link tới'),Bo('visible','Hiện')],()=>({label:'New link',href:'https://',visible:true}),'label'),
@@ -426,6 +442,8 @@ function ctl(f,path){
     r.oninput=()=>{o.textContent=(+r.value).toFixed(2)};r.onchange=()=>setVal(path,+r.value)}
   else if(f.k==='img'){w.innerHTML=lab+'<div class="imgf">'+(v?'<img src="'+esc(v)+'" alt="">':'<span class="noimg">Trống</span>')+'<button type="button" class="primary">🖼 Đổi ảnh</button>'+(v?'<button type="button" class="danger">Xoá</button>':'')+'</div>';
     const [ch,rm]=w.querySelectorAll('button');ch.onclick=()=>openPopAt({path,label:f.l,hint:f.hint||'',apply:()=>{}},ch.getBoundingClientRect());if(rm)rm.onclick=()=>setVal(path,'')}
+  else if(f.k==='file'){w.innerHTML=lab+'<div class="imgf"><span class="noimg" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(v?esc(String(v).split('/').pop()):'Chưa có file')+'</span><button type="button" class="primary">⬆ Tải PDF lên</button>'+(v?'<button type="button" class="danger">Xoá</button>':'')+'</div>'+(f.note?'<small class="hint">'+esc(f.note)+'</small>':'');
+    const [up,rm]=w.querySelectorAll('button');up.onclick=()=>{const inp=document.createElement('input');inp.type='file';inp.accept='application/pdf';inp.onchange=async()=>{const fl=inp.files[0];if(!fl)return;try{status('Đang tải file lên…');setVal(path,await uploadOne(fl))}catch(err){status('Tải file lỗi: '+err.message)}};inp.click()};if(rm)rm.onclick=()=>setVal(path,'')}
   else if(f.k==='items'){const arr=Array.isArray(v)?v:[];w.innerHTML=lab;
     arr.forEach((it,i)=>{const key=path+'.'+i,d=document.createElement('details');d.className='item'+(it&&it.visible===false?' hid':'');d.open=openItems.has(key);
       d.innerHTML='<summary><b>'+esc((it&&it[f.title])||('#'+(i+1)))+'</b><button type="button" data-o="up" '+(i?'':'disabled')+'>↑</button><button type="button" data-o="down" '+(i<arr.length-1?'':'disabled')+'>↓</button><button type="button" data-o="dup" title="Nhân bản">⧉</button><button type="button" class="danger" data-o="del">✕</button></summary>';
@@ -528,6 +546,7 @@ function projFields(){const b='projects.'+projIdx+'.',p=proj();return [
   T(b+'slug','Đường dẫn trang',{clean:slugClean,note:'Trang nằm ở projects/'+(p.slug||'…')+'.html. Đổi = link cũ không còn.'}),
   ...(p.kind==='journal'?[]:[U(b+'link','Link ngoài (tuỳ chọn)',{note:'Có link thì slider mở link này thay vì trang dự án.'})]),
   S(b+'heroSize','Chiều cao ảnh đầu trang',[['full','Cao full màn hình'],['short','Thấp (gọn)']],'full'),
+  T(b+'password','Mật khẩu (để trống = công khai)',{note:'Có mật khẩu: trên mạng trang bị khoá và nội dung được mã hoá, người xem phải nhập mật khẩu; Google không đưa trang lên. Ảnh bìa và tên vẫn hiện ở trang chủ.'}),
   I(b+'cover','Ảnh bìa (Cover)',HINT.cover),...(p.kind==='journal'?[I(b+'thumbnail','Ảnh thẻ Nhật ký (dọc)',HINT.card,{note:'Để trống = dùng ảnh bìa.'})]:[])]}
 function fillProjPanel(){
   const p=proj();if(!p)return;$('#projName').textContent=(p.kind==='journal'?'Bài Nhật ký · ':'Dự án · ')+(p.title||p.slug);
