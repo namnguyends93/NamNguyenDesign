@@ -350,7 +350,13 @@ const SECS=[
     T('home.about.skills.aiTitle','Tiêu đề nhóm AI'),IT('home.about.skills.aiTools','Công cụ AI',toolFields,()=>({name:'New AI Tool',icon:'other',visible:true}),'name')]},
   {id:'clients',n:'Khách hàng',sel:'#clients',vis:'home.clients.visible',f:[
     T('home.clients.title','Tiêu đề'),A('home.clients.description','Đoạn mô tả'),
-    IT('home.clients.items','Khách hàng (dải thẻ chạy ngang)',[T('name','Tên'),I('logo','Logo (thay cho tên)','<b>PNG nền trong suốt, logo trắng, ngang khoảng 600 px.</b>'),U('href','Link (tuỳ chọn)'),Bo('visible','Hiện')],()=>({name:'NEW CLIENT',logo:'',href:'',visible:true}),'name')]},
+    S('home.clients.shape','Hình thẻ logo',[['rounded','Vuông bo tròn (mặc định)'],['circle','Tròn'],['square','Vuông, bo nhẹ'],['pill','Viên thuốc ngang'],['wide','Chữ nhật ngang'],['portrait','Chữ nhật dọc']],'rounded'),
+    R('home.clients.cardSize','Cỡ thẻ (1 = mặc định)',.5,1.4,.05,1),
+    R('home.clients.logoSize','Cỡ logo trong thẻ',.3,.95,.05,.62),
+    S('home.clients.logoColor','Màu logo',[['','Như hiện tại (hơi mờ)'],['original','Màu gốc, rõ nét'],['white','Đổi hết thành trắng'],['gray','Xám mờ, hiện màu khi rê chuột']],'',{note:'Logo màu tối trên nền tối → chọn "Đổi hết thành trắng".'}),
+    S('home.clients.cardBg','Nền thẻ',[['glass','Kính mờ (mặc định)'],['white','Trắng'],['outline','Chỉ viền mảnh'],['none','Không nền']],'glass'),
+    R('home.clients.speed','Tốc độ chạy (giây mỗi vòng, nhỏ = nhanh)',8,60,1,22),
+    IT('home.clients.items','Khách hàng (dải thẻ chạy ngang)',[T('name','Tên'),I('logo','Logo (thay cho tên)','<b>PNG hoặc SVG nền trong suốt, ngang khoảng 600 px.</b> Cắt sát mép logo, không chừa viền trống.'),U('href','Link (tuỳ chọn)'),Bo('visible','Hiện')],()=>({name:'NEW CLIENT',logo:'',href:'',visible:true}),'name')]},
   {id:'projects',n:'Dự án',sel:'#projects',vis:'home.projectsSection.visible',f:[
     T('home.projectsSection.eyebrow','Chữ nhỏ'),T('home.projectsSection.title','Tiêu đề'),A('home.projectsSection.description','Đoạn mô tả'),
     IT('home.projectsSection.stats','Con số nổi bật',[T('value','Số'),T('label','Chú thích')],()=>({value:'10+',label:'New number'}),'value'),

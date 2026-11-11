@@ -122,6 +122,20 @@ window.__CMS_DONE__=(async function(){
       let set=clientItems;while(set.length<4)set=set.concat(clientItems);
       track.innerHTML=set.concat(set).map(card).join('');   // the CSS loop scrolls exactly half the track
     }
+    // Client card look: shape, size, logo size and colour, card background, speed (home.clients.*)
+    {const cl=c.home?.clients||{},k=Math.min(1.5,Math.max(.4,parseFloat(cl.cardSize)||1)),px=n=>Math.round(n)+'px';
+      const SH={rounded:[366,357,72],circle:[340,340,'50%'],square:[340,340,24],pill:[460,200,'999px'],wide:[460,280,48],portrait:[300,400,60]};
+      const sh=SH[cl.shape]||SH.rounded,rad=v=>typeof v==='string'?v:px(v*k);let css='';
+      if((cl.shape&&cl.shape!=='rounded')||k!==1)css+='#clients .client-card{width:'+px(sh[0]*k)+';height:'+px(sh[1]*k)+';border-radius:'+rad(sh[2])+'}@media (max-width:520px){#clients .client-card{width:'+px(sh[0]*k*.82)+';height:'+px(sh[1]*k*.82)+'}}';
+      const ls=parseFloat(cl.logoSize);if(ls>0)css+='#clients .client-card img{max-width:'+Math.round(ls*100)+'%;max-height:'+Math.round(ls*68)+'%}';
+      if(cl.logoColor==='white')css+='#clients .client-card img{filter:brightness(0) invert(1);opacity:.85}';
+      if(cl.logoColor==='original')css+='#clients .client-card img{opacity:1}';
+      if(cl.logoColor==='gray')css+='#clients .client-card img{filter:grayscale(1);opacity:.5;transition:filter .3s,opacity .3s}#clients .client-card:hover img{filter:none;opacity:1}';
+      if(cl.cardBg==='white')css+='#clients .client-card{background:#fff;backdrop-filter:none;color:rgba(0,0,0,.45)}';
+      if(cl.cardBg==='none')css+='#clients .client-card{background:transparent;backdrop-filter:none}';
+      if(cl.cardBg==='outline')css+='#clients .client-card{background:transparent;backdrop-filter:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.18)}';
+      const sp=parseFloat(cl.speed);if(sp>0&&sp!==22)css+='#clients .client-track{animation-duration:'+sp+'s}';
+      let st=q('#cms-clients');if(css){if(!st){st=document.createElement('style');st.id='cms-clients';document.head.appendChild(st)}st.textContent=css}else if(st)st.remove()}
     hideByIdOrText('clients','Selected Clients',c.home?.clients?.visible);
 
     // PROJECTS
