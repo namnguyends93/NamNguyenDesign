@@ -376,7 +376,7 @@ let curSec='site';const openItems=new Set();
 const curPage=()=>mode==='home'?'home':projIdx;
 function afterChange(){refresh();if(mode==='home')renderInspector();else fillProjPanel();fillPicker(curPage())}
 function setVal(path,v){const old=getPath(state,path);if(JSON.stringify(old)===JSON.stringify(v))return;
-  undo.push({path,old:clone(old),apply:afterChange});setPath(state,path,v);markDirty();afterChange();status('Đã sửa — nhớ bấm Lưu.')}
+  undo.push({path,old:old===undefined?undefined:clone(old),apply:afterChange});setPath(state,path,v);markDirty();afterChange();status('Đã sửa — nhớ bấm Lưu.')}
 let refreshT=0;function refresh(){clearTimeout(refreshT);refreshT=setTimeout(()=>{if(mode==='home')reloadHome(true);else renderProject(true)},200)}
 
 function ctl(f,path){
