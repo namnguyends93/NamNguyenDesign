@@ -95,16 +95,13 @@
           "Art Direction",
           "Design Team Leadership",
           "Branding",
-          "Social Content",
           "Packaging",
           "Web & UI Design",
           "Beauty Retouch",
-          "Photography",
+          "Prompt Direction",
           "Video Editing",
           "AI Image Generation",
-          "AI Upscale & Retouch",
-          "AI Motion & Video",
-          "Prompt Direction"
+          "AI Motion & Video"
         ],
         "tools": [
           {

@@ -308,7 +308,9 @@ function startEdit(b){
   if(el.contentEditable!=='plaintext-only')el.contentEditable='true';
   el.focus();const sel=fdoc.getSelection();sel.selectAllChildren(el);sel.collapseToEnd();
   const done=()=>{el.removeAttribute('contenteditable');el.removeEventListener('blur',done);el.removeEventListener('keydown',key);
-    const v=b.multi?el.innerText.replace(/\n{3,}/g,'\n\n').trim():norm(el.innerText);
+    // innerText follows CSS text-transform (uppercase labels): read the real letters, not the displayed capitals
+    const tt=el.style.textTransform;el.style.textTransform='none';const raw=el.innerText;el.style.textTransform=tt;
+    const v=b.multi?raw.replace(/\n{3,}/g,'\n\n').trim():norm(raw);
     if(String(before??'')!==v){undo.push({path:b.path,old:getPath(state,b.path),apply:v=>{b.apply(v);if(mode==='home')renderInspector()}});setPath(state,b.path,v);status('Đã sửa — nhớ bấm Lưu.');if(mode==='home')renderInspector();else fillProjPanel()}
     markDirty()};
   const key=e=>{if(e.key==='Escape'){el.textContent=before;el.blur()}else if(e.key==='Enter'&&(!b.multi||e.ctrlKey)){e.preventDefault();el.blur()}};
