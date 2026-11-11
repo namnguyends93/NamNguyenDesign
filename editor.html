@@ -55,6 +55,17 @@ input,textarea{width:100%;background:#0f0f0f;color:#fff;border:1px solid var(--l
 textarea{min-height:84px;resize:vertical}
 .links{display:grid;gap:8px;margin-top:8px}
 /* image popover + media picker */
+.tcbar{position:fixed;z-index:55;display:none;align-items:center;gap:6px;padding:7px 8px 7px 12px;background:#111;border:1px solid #333;border-radius:999px;box-shadow:0 14px 34px rgba(0,0,0,.5);font-size:12px;white-space:nowrap}
+.tcbar.on{display:flex}
+.tcbar .tc-l{color:#bbb;margin-right:2px}
+.tcbar .tc-sw{display:flex;gap:5px}
+.tcbar .tc-sw button{width:22px;height:22px;padding:0;border-radius:50%;border:1px solid rgba(255,255,255,.35);cursor:pointer}
+.tcbar .tc-sw button[aria-pressed="true"]{outline:2px solid #fff;outline-offset:2px}
+.tcbar .tc-sw i{width:1px;height:18px;background:#333;margin:0 2px;align-self:center}
+.tcbar .tc-pick{position:relative;width:26px;height:26px;border-radius:50%;overflow:hidden;cursor:pointer;background:conic-gradient(#f44,#fd4,#4f6,#4df,#46f,#d4f,#f44)}
+.tcbar .tc-pick input{position:absolute;inset:-6px;width:40px;height:40px;opacity:0;cursor:pointer}
+.tcbar .tc-hex{width:76px;padding:5px 8px;border-radius:999px;font:12px "Geist Mono",monospace}
+.tcbar button.tc-b{padding:6px 9px;font-size:12px}
 .pop{position:fixed;z-index:50;width:290px;background:#111;border:1px solid #333;border-radius:16px;padding:12px;box-shadow:0 18px 40px rgba(0,0,0,.5);display:none}
 .pop.open{display:block}.pop h4{margin:0 0 6px;font-size:14px}.pop .hint{font-size:12px;color:#9eabff;line-height:1.45;margin-bottom:10px}
 .pop .acts{display:flex;gap:6px;flex-wrap:wrap}
@@ -110,6 +121,7 @@ textarea{min-height:84px;resize:vertical}
   </aside>
 </div>
 
+<div class="tcbar" id="tcbar" role="toolbar" aria-label="Màu chữ"><span class="tc-l">Màu chữ</span><div class="tc-sw"></div><label class="tc-pick" title="Chọn màu bất kỳ"><input type="color" aria-label="Chọn màu bất kỳ"></label><input class="tc-hex" maxlength="7" placeholder="#hex" aria-label="Mã màu"><button class="tc-b tc-reset" type="button" title="Về màu gốc">↺ Gốc</button><button class="tc-b tc-x" type="button" title="Đóng">✕</button></div>
 <div class="pop" id="pop"><h4 id="popTitle"></h4><div class="hint" id="popHint"></div><div class="acts"><button class="primary" id="popUpload">Tải ảnh lên</button><button id="popMedia">Chọn từ Media</button><button id="popRemove" class="danger" hidden>Xoá ảnh này</button><button id="popClose">Đóng</button></div></div>
 <div class="modal" id="mediaModal"><div class="modal-box"><div style="display:flex;justify-content:space-between;align-items:center"><strong>Chọn ảnh từ Media</strong><button id="mediaClose">Đóng</button></div><div class="grid" id="mediaGrid"></div></div></div>
 <input type="file" id="file" accept="image/*" hidden>
@@ -271,6 +283,7 @@ function setupFrame(){
   w.addEventListener('resize',placeBadges);
   fdoc.addEventListener('keydown',hotkeys);
   status('Sẵn sàng. Bấm chữ để sửa, 🖼 đổi ảnh, ⚙ mở tuỳ chỉnh của mục.');
+  retargetTc();
 }
 function reloadHome(keep){
   const y=keep&&frame.contentWindow&&!frame.hasAttribute('srcdoc')?frame.contentWindow.scrollY:0;
@@ -305,6 +318,7 @@ function delMany(list){if(!list.length)return;const by={};list.forEach(b=>(by[b.
 
 /* ---------- text editing ---------- */
 function startEdit(b){
+  showTc(b);
   const el=b.el, before=getPath(state,b.path)??(el.classList.contains('ve-empty')?'':norm(el.textContent));
   if(el.classList.contains('ve-empty')){el.textContent='';el.classList.remove('ve-empty')}
   try{el.contentEditable='plaintext-only'}catch(e){el.contentEditable='true'}
@@ -502,7 +516,7 @@ function fillPicker(cur){
 }
 $('#pagePick').onchange=e=>showPage(e.target.value);
 function showPage(v){
-  closePop();if(lay.on)setLayMode(false);
+  closePop();hideTc();if(lay.on)setLayMode(false);
   if(v==='home'){mode='home';projIdx=-1;$('#homePanel').hidden=false;$('#projPanel').hidden=true;renderInspector();reloadHome(false);return}
   mode='project';projIdx=+v;const p=proj();
   if(!Array.isArray(p.blocks)){const r=PT.blocksOf(p);p.blocks=JSON.parse(JSON.stringify(r.blocks));if(!p.heroSize)p.heroSize=r.heroSize;saved=saved;markDirty()}
@@ -540,6 +554,7 @@ function setupProjectFrame(){
   window.__B=B;placeBadges();clearInterval(window.__bt);window.__bt=setInterval(placeBadges,600);
   fdoc.addEventListener('keydown',hotkeys);
   status('Đang sửa: '+(proj().title||proj().slug)+'. Bấm chữ để sửa, 🖼 để đổi ảnh.');
+  retargetTc();
 }
 /* module panel */
 const BLOCKS=PT.BLOCKS, STYLES=PT.GALLERY_STYLES;
@@ -597,7 +612,7 @@ const lay={on:false,el:null,sel:'',box:null,hov:null,more:[],boxes2:[]};   // el
 const selAll=()=>[...(lay.el?[{el:lay.el,sel:lay.sel}]:[]),...lay.more].filter(x=>x.el&&x.el.isConnected);
 const devKey=()=>$('#stage').classList.contains('phone')?'mobile':'desktop';
 const layData=()=>((state.layout||{})[devKey()])||{};
-const BADCLS=/^(ve-|in$|reveal|active|is-|split|motion|on$|open$)/;
+const BADCLS=/^(ve-|fx-|in$|reveal|active|is-|split|motion|on$|open$)/;
 function selFor(el){
   const steps=[];let e=el;
   while(e&&e.nodeType===1&&e!==fdoc.body&&e!==fdoc.documentElement){
@@ -711,6 +726,58 @@ function setLayMode(on){if(on&&mode!=='home'){status('Bố cục kéo thả hi�
   closePop();drawBox();renderLayPanel();if(!on)placeBadges();
   status(on?'Bố cục: bấm chọn khối, kéo để dời, kéo ô vuông để đổi cỡ.':'Đã tắt Bố cục.')}
 $('#layBtn').onclick=()=>setLayMode(!lay.on);
+
+/* ---------- text colour (floating bar over the selected text) ----------
+   Home page: state.textColors = { cssSelector: '#hex' } (selector from selFor, like layout mode).
+   Project / article pages: the colour sits next to the text field: project.colors.title, block.colors.text … */
+let tcT=null;
+const tcBar=$('#tcbar');
+const tcKey=b=>mode==='home'?{home:true,sel:selFor(b.el),path:b.path}:{home:false,path:b.path.replace(/\.([^.]+)$/,'.colors.$1'),text:b.path};
+const tcCur=t=>t.home?((state.textColors||{})[t.sel]||''):(getPath(state,t.path)||'');
+function tcRecent(){try{return JSON.parse(localStorage.getItem('nnd-recent-colors')||'[]').filter(c=>/^#[0-9a-f]{6}$/i.test(c)).slice(0,6)}catch(_){return[]}}
+function tcRemember(c){try{const r=[c,...tcRecent().filter(x=>x.toLowerCase()!==c.toLowerCase())].slice(0,6);localStorage.setItem('nnd-recent-colors',JSON.stringify(r))}catch(_){}}
+function renderTc(){
+  if(!tcT)return;const s=state.site||{},th=s.theme||{},cur=tcCur(tcT).toLowerCase();
+  const base=[['#ffffff','Trắng'],[th.white||'#f7f5ef','Trắng ngà'],['#cfcfcf','Xám sáng'],['#9a9a96','Xám'],[th.black||'#080808','Đen'],[s.accent||'#4c6fff','Màu nhấn'],[th.accentSoft||'#8ea1ff','Màu nhấn nhạt']];
+  const rec=tcRecent().filter(c=>!base.some(b=>b[0].toLowerCase()===c.toLowerCase()));
+  const sw=([c,n])=>'<button type="button" data-c="'+esc(c)+'" title="'+esc(n)+' '+esc(c)+'" aria-pressed="'+(cur===c.toLowerCase())+'" style="background:'+esc(c)+'"></button>';
+  tcBar.querySelector('.tc-sw').innerHTML=base.map(sw).join('')+(rec.length?'<i></i>'+rec.map(c=>sw([c,'Màu vừa dùng'])).join(''):'');
+  const hex=tcBar.querySelector('.tc-hex'),pick=tcBar.querySelector('.tc-pick input');hex.value=cur;pick.value=/^#[0-9a-f]{6}$/i.test(cur)?cur:'#ffffff';
+}
+function placeTc(){
+  if(!tcT||!tcT.el||!tcT.el.isConnected||!fdoc){tcBar.classList.remove('on');return}
+  const fr=frame.getBoundingClientRect(),r=tcT.el.getBoundingClientRect();
+  if(r.bottom<0||r.top>fr.height){tcBar.classList.remove('on');return}
+  tcBar.classList.add('on');
+  let top=fr.top+r.top-48;if(top<fr.top+6)top=fr.top+r.bottom+8;
+  tcBar.style.top=Math.min(innerHeight-52,top)+'px';
+  tcBar.style.left=Math.max(8,Math.min(innerWidth-tcBar.offsetWidth-8,fr.left+r.left))+'px';
+}
+function showTc(b){if(lay&&lay.on)return;tcT={...tcKey(b),el:b.el};renderTc();placeTc()}
+function hideTc(){tcT=null;tcBar.classList.remove('on')}
+function applyTc(hex){
+  const t=tcT;if(!t)return;hex=hex?String(hex).toLowerCase():'';
+  if(hex&&!/^#[0-9a-f]{6}$/.test(hex))return;
+  if(hex)tcRemember(hex);
+  if(t.home){const o=clone(state.textColors||{})||{};if(hex)o[t.sel]=hex;else delete o[t.sel];setVal('textColors',o)}
+  else setVal(t.path,hex||undefined);
+  if(t.el)t.el.style.color=hex;renderTc();status(hex?'Đã đổi màu chữ — nhớ bấm Lưu.':'Đã trả về màu gốc — nhớ bấm Lưu.');
+}
+// After the preview is redrawn, find the same text again and keep the bar on it
+function retargetTc(){
+  if(fdoc&&!fdoc._tc){fdoc._tc=1;fdoc.addEventListener('mousedown',ev=>{if(!ev.target.closest('[data-ve-text]'))hideTc()},true)}
+  if(!tcT)return;const B=window.__B||[];
+  const hit=B.find(b=>b.type==='text'&&(tcT.home?selFor(b.el)===tcT.sel:b.path===tcT.text));
+  if(hit){tcT.el=hit.el;renderTc();placeTc()}else hideTc();
+}
+tcBar.addEventListener('mousedown',ev=>{if(!ev.target.closest('input'))ev.preventDefault()});   // keep the text in edit while clicking
+tcBar.addEventListener('click',ev=>{const sw=ev.target.closest('[data-c]');if(sw){applyTc(sw.dataset.c);return}
+  if(ev.target.closest('.tc-reset'))applyTc('');if(ev.target.closest('.tc-x'))hideTc()});
+tcBar.querySelector('.tc-pick input').addEventListener('input',ev=>{if(tcT&&tcT.el)tcT.el.style.color=ev.target.value;tcBar.querySelector('.tc-hex').value=ev.target.value});
+tcBar.querySelector('.tc-pick input').addEventListener('change',ev=>applyTc(ev.target.value));
+tcBar.querySelector('.tc-hex').addEventListener('change',ev=>{let v=ev.target.value.trim();if(v&&v[0]!=='#')v='#'+v;if(/^#[0-9a-f]{3}$/i.test(v))v='#'+v.slice(1).split('').map(x=>x+x).join('');if(/^#[0-9a-f]{6}$/i.test(v))applyTc(v);else renderTc()});
+setInterval(placeTc,300);
+addEventListener('keydown',ev=>{if(ev.key==='Escape'&&tcT&&!(ev.target&&ev.target.isContentEditable))hideTc()});
 
 /* ---------- toolbar ---------- */
 async function save(){try{const d=await api('/api/content',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(state)});state=d.content;saved=JSON.stringify(state);markDirty();fillPicker(mode==='home'?'home':projIdx);status('Đã lưu ✓ (có bản sao lưu tự động)')}catch(e){status('Lưu lỗi: '+e.message)}}

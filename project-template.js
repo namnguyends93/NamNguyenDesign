@@ -41,10 +41,18 @@ const atv = path => VE ? ` data-ve-vid="${esc(path)}"` : '';
 const bk = k => 'blocks.' + (VE ? VE.i : 0) + '.' + k;
 const blank = v => !String(v ?? '').trim();
 // editable text: element tag, classes, path, value, placeholder, multi-paragraph?
+// Text colour chosen in the editor: project.colors[field] or, inside a module, block.colors[field]
+const CUR = { p: null, b: null };
+function cs(path) {
+  const m = String(path).match(/^blocks\.\d+\.(.+)$/);
+  const c = m ? (CUR.b && CUR.b.colors && CUR.b.colors[m[1]]) : (CUR.p && CUR.p.colors && CUR.p.colors[path]);
+  return /^#[0-9a-f]{3,8}$/i.test(c || '') ? ` style="color:${c}"` : '';
+}
+const metaSpans = p => [['category', p.category], ['year', p.year]].filter(x => x[1]).map(([k, v]) => `<span${cs(k)}>${esc(v)}</span>`).join('');
 function edT(tag, cls, path, value, ph, multi) {
   const empty = blank(value);
   const inner = empty ? (multi ? `<p>${esc(ph)}</p>` : esc(ph)) : (multi ? P(value) : esc(value));
-  return `<${tag}${cls || empty ? ` class="${[cls, empty ? 've-empty' : ''].filter(Boolean).join(' ')}"` : ''}${at(path)}>${inner}</${tag}>`;
+  return `<${tag}${cls || empty ? ` class="${[cls, empty ? 've-empty' : ''].filter(Boolean).join(' ')}"` : ''}${at(path)}${cs(path)}>${inner}</${tag}>`;
 }
 
 // ---------- module definitions (admin builds its forms from this) ----------
@@ -175,22 +183,22 @@ const DETAIL_FIELDS = [['client', 'Client'], ['role', 'Role'], ['scope', 'Scope'
 function details(p) {
   const items = DETAIL_FIELDS.map(([k, label]) => [label, p[k], k]).filter(([, v]) => VE || (v && String(v).trim()));
   if (!items.length) return '';
-  return `<div class="details">${items.map(([l, v, k]) => `<div class="detail"><b>${esc(l)}</b>${VE ? edT('span', '', k, v, '—') : `<span>${esc(v)}</span>`}</div>`).join('')}</div>`;
+  return `<div class="details">${items.map(([l, v, k]) => `<div class="detail"><b>${esc(l)}</b>${VE ? edT('span', '', k, v, '—') : `<span${cs(k)}>${esc(v)}</span>`}</div>`).join('')}</div>`;
 }
 
 function renderBlock(b, p, base) {
   const title = String(p.title || '').trim();
   const desc = p.description || '';
-  const metaTags = [p.category, p.year].filter(Boolean).map(x => `<span>${esc(x)}</span>`).join('');
+  const metaTags = metaSpans(p);
   switch (b.type) {
     case 'overview': return `
   <section class="section overview">
-    <div><div class="eyebrow">Project Overview</div><h2 class="display"${at('headline')}>${p.headline ? H(p.headline) : 'Direction<br>&amp; System'}</h2></div>
-    <div>${VE ? edT('div', 'overview-copy', 'description', desc, 'Nhập mô tả dự án…', true) : desc ? `<div class="overview-copy">${P(desc)}</div>` : ''}${details(p)}</div>
+    <div><div class="eyebrow">Project Overview</div><h2 class="display"${at('headline')}${cs('headline')}>${p.headline ? H(p.headline) : 'Direction<br>&amp; System'}</h2></div>
+    <div>${VE ? edT('div', 'overview-copy', 'description', desc, 'Nhập mô tả dự án…', true) : desc ? `<div class="overview-copy"${cs('description')}>${P(desc)}</div>` : ''}${details(p)}</div>
   </section>`;
     case 'intro': return (desc || metaTags || VE) ? `
   <section class="section intro-mini">
-    ${VE ? `<div class="meta">${edT('span', '', 'category', p.category, 'Chuyên mục')}${edT('span', '', 'year', p.year, 'Năm')}</div>` + edT('div', 'intro-text', 'description', desc, 'Nhập mô tả…', true) : `${metaTags ? `<div class="meta">${metaTags}</div>` : ''}${desc ? `<div class="intro-text">${P(desc)}</div>` : ''}`}${details(p)}
+    ${VE ? `<div class="meta">${edT('span', '', 'category', p.category, 'Chuyên mục')}${edT('span', '', 'year', p.year, 'Năm')}</div>` + edT('div', 'intro-text', 'description', desc, 'Nhập mô tả…', true) : `${metaTags ? `<div class="meta">${metaTags}</div>` : ''}${desc ? `<div class="intro-text"${cs('description')}>${P(desc)}</div>` : ''}`}${details(p)}
   </section>` : '';
     case 'gallery': return gallery(list(b.images), b.style, title, base);
     case 'image': return (b.image || VE) ? `
@@ -202,18 +210,18 @@ function renderBlock(b, p, base) {
     <figure class="chapter-media"${ati(bk('image'))}>${b.image ? img(b.image, `${title} — ${b.label || 'detail'}`, base) : ''}</figure>
   </section>`;
       if (!b.text && !b.image) return '';
-      const eyebrow = b.label ? `<div class="eyebrow">${esc(b.label)}</div>` : '';
+      const eyebrow = b.label ? `<div class="eyebrow"${cs(bk('label'))}>${esc(b.label)}</div>` : '';
       if (!b.image) return renderBlock({ type: 'text', label: b.label, text: b.text }, p, base);
       return `
   <section class="chapter-split${b.side === 'left' ? ' reverse' : ''}">
-    <div class="section chapter-copy">${eyebrow}${b.text ? `<div class="chapter-text">${P(b.text)}</div>` : ''}</div>
+    <div class="section chapter-copy">${eyebrow}${b.text ? `<div class="chapter-text"${cs(bk('text'))}>${P(b.text)}</div>` : ''}</div>
     <figure class="chapter-media">${img(b.image, `${title} — ${b.label || 'detail'}`, base)}</figure>
   </section>`;
     }
     case 'text': if (VE) return `
   <section class="section chapter solo"><div class="chapter-copy">${edT('div', 'eyebrow', bk('label'), b.label, 'Nhãn (không bắt buộc)')}${edT('div', 'chapter-text', bk('text'), b.text, 'Nhập nội dung…', true)}</div></section>`;
       return b.text ? `
-  <section class="section chapter solo"><div class="chapter-copy">${b.label ? `<div class="eyebrow">${esc(b.label)}</div>` : ''}<div class="chapter-text">${P(b.text)}</div></div></section>` : '';
+  <section class="section chapter solo"><div class="chapter-copy">${b.label ? `<div class="eyebrow"${cs(bk('label'))}>${esc(b.label)}</div>` : ''}<div class="chapter-text"${cs(bk('text'))}>${P(b.text)}</div></div></section>` : '';
     case 'process': {
       if (VE) return `
   <section class="section process">
@@ -224,18 +232,18 @@ function renderBlock(b, p, base) {
       return steps.length ? `
   <section class="section process">
     <div class="eyebrow">Process</div>
-    <div class="process-grid cols-${steps.length}">${steps.map(([n, t, x]) => `<div class="step"><span class="step-num">${n}</span>${t ? `<h3 class="display">${esc(t)}</h3>` : ''}${P(x)}</div>`).join('')}</div>
+    <div class="process-grid cols-${steps.length}">${steps.map(([n, t, x]) => `<div class="step"><span class="step-num">${n}</span>${t ? `<h3 class="display"${cs(bk('t' + (+n)))}>${esc(t)}</h3>` : ''}${P(x).replace(/<p>/g, '<p' + cs(bk('x' + (+n))) + '>')}</div>`).join('')}</div>
   </section>` : '';
     }
     case 'statement': return (b.text || VE) ? `
-  <section class="section statement">${VE ? edT('p', '', bk('text'), b.text, 'Câu statement…') : `<p>${esc(b.text)}</p>`}</section>` : '';
+  <section class="section statement">${VE ? edT('p', '', bk('text'), b.text, 'Câu statement…') : `<p${cs(bk('text'))}>${esc(b.text)}</p>`}</section>` : '';
     case 'video': {
       const r = ['wide', 'full', 'vertical', 'square'].includes(b.ratio) ? b.ratio : 'wide';
       const emb = embedUrl(b.embed);
       const frame = media => `
   <section class="section vid-wrap">
     <figure class="vid-frame r-${r}"${atv(bk('video'))}>${media}</figure>
-    ${VE ? edT('p', 'vid-cap', bk('caption'), b.caption, 'Chú thích (không bắt buộc)') : b.caption ? `<p class="vid-cap">${esc(b.caption)}</p>` : ''}
+    ${VE ? edT('p', 'vid-cap', bk('caption'), b.caption, 'Chú thích (không bắt buộc)') : b.caption ? `<p class="vid-cap"${cs(bk('caption'))}>${esc(b.caption)}</p>` : ''}
   </section>`;
       const iframe = emb ? `<iframe src="${esc(emb)}" title="${esc(b.caption || title)}" loading="lazy" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>` : '';
       if (b.video) return frame(vidTag(b.video, b.poster, base, b.mode));
@@ -258,10 +266,10 @@ function renderBlock(b, p, base) {
       ${img(b.after, `${title} — ${al}`, base)}
       <div class="ba-before">${img(b.before, `${title} — ${bl}`, base)}</div>
       <span class="ba-line" aria-hidden="true"><span>↔</span></span>
-      <span class="ba-tag ba-tag-b">${esc(bl)}</span><span class="ba-tag ba-tag-a">${esc(al)}</span>
+      <span class="ba-tag ba-tag-b"${cs(bk('beforeLabel'))}>${esc(bl)}</span><span class="ba-tag ba-tag-a"${cs(bk('afterLabel'))}>${esc(al)}</span>
       <input class="ba-range" type="range" min="0" max="100" value="50" aria-label="${esc(bl)} / ${esc(al)}">
     </figure>
-    ${b.caption ? `<p class="ba-cap">${esc(b.caption)}</p>` : ''}
+    ${b.caption ? `<p class="ba-cap"${cs(bk('caption'))}>${esc(b.caption)}</p>` : ''}
   </section>`;
     }
     case 'results': {
@@ -270,14 +278,14 @@ function renderBlock(b, p, base) {
       if (!show.length) return '';
       return `
   <section class="section results">
-    ${VE ? edT('div', 'eyebrow', bk('label'), b.label, 'Results') : `<div class="eyebrow">${esc(b.label || 'Results')}</div>`}
-    <div class="results-grid cols-${show.length}">${show.map(([n, v, l]) => `<div class="result">${VE ? edT('strong', 'display', bk('v' + n), v, '00') + edT('span', '', bk('l' + n), l, 'Chú thích') : `<strong class="display">${esc(v)}</strong><span>${esc(l)}</span>`}</div>`).join('')}</div>
+    ${VE ? edT('div', 'eyebrow', bk('label'), b.label, 'Results') : `<div class="eyebrow"${cs(bk('label'))}>${esc(b.label || 'Results')}</div>`}
+    <div class="results-grid cols-${show.length}">${show.map(([n, v, l]) => `<div class="result">${VE ? edT('strong', 'display', bk('v' + n), v, '00') + edT('span', '', bk('l' + n), l, 'Chú thích') : `<strong class="display"${cs(bk('v' + n))}>${esc(v)}</strong><span${cs(bk('l' + n))}>${esc(l)}</span>`}</div>`).join('')}</div>
   </section>`;
     }
     case 'credits': {
       const rows = [['Client', p.client, 'client'], ['Category', p.category, 'category'], ['Role', p.role, 'role'], ['Scope', p.scope, 'scope'], ['Year', p.year, 'year']].filter(r => VE || r[1]);
       return rows.length ? `
-  <section class="section credits">${rows.map(([l, v, k]) => `<div><b>${l}</b>${VE ? edT('span', '', k, v, '—') : `<span>${esc(v)}</span>`}</div>`).join('')}</section>` : '';
+  <section class="section credits">${rows.map(([l, v, k]) => `<div><b>${l}</b>${VE ? edT('span', '', k, v, '—') : `<span${cs(k)}>${esc(v)}</span>`}</div>`).join('')}</section>` : '';
     }
     default: return '';
   }
@@ -304,7 +312,8 @@ function renderPage(content, slug) {
   const location = content.home?.intro?.location || 'Ho Chi Minh City';
   const copyright = content.footer?.copyright || `© ${new Date().getFullYear()} ${brand}`;
   const desc = p.description || '';
-  const metaTags = [p.category, p.year].filter(Boolean).map(x => `<span>${esc(x)}</span>`).join('');
+  CUR.p = p; CUR.b = null;
+  const metaTags = metaSpans(p);
   const short = (p.heroSize || heroSize) === 'short';
   // Password-protected page: build.js encrypts <main data-private>; the editor and dev server show it as is
   const priv = !VE && !blank(p.password);
@@ -313,10 +322,10 @@ function renderPage(content, slug) {
   <section class="hero${short ? ' short' : ''}">
     <div class="hero-media"${ati('cover')}>${p.cover ? img(p.cover, title, base) : ''}${p.coverVideo ? vidTag(p.coverVideo, p.cover, base, 'loop') : ''}</div>
     <div class="hero-copy">
-      <h1 class="display"${at('title')}>${esc(title)}</h1>
+      <h1 class="display"${at('title')}${cs('title')}>${esc(title)}</h1>
       <div class="hero-side">
         ${VE ? `<div class="meta">${edT('span', '', 'category', p.category, 'Chuyên mục')}${edT('span', '', 'year', p.year, 'Năm')}</div>` : metaTags ? `<div class="meta">${metaTags}</div>` : ''}
-        ${VE && paras(desc).length <= 1 ? edT('p', '', 'description', desc, 'Mô tả ngắn…') : desc ? `<p>${esc(paras(desc)[0])}</p>` : ''}
+        ${VE && paras(desc).length <= 1 ? edT('p', '', 'description', desc, 'Mô tả ngắn…') : desc ? `<p${cs('description')}>${esc(paras(desc)[0])}</p>` : ''}
       </div>
     </div>
   </section>`;
@@ -339,7 +348,9 @@ function renderPage(content, slug) {
 
   const body = hero + blocks.map((b, i) => {
     if (VE) VE.i = i;
+    CUR.b = b;
     const h = renderBlock(b, p, base);
+    CUR.b = null;
     return VE && h ? h.replace(/<(section|figure)/, m => `${m} data-ve-block="${i}"`) : h;
   }).join('');
   const accent = site.accent && /^#[0-9a-f]{3,8}$/i.test(site.accent) ? `:root{--accent:${site.accent}}` : '';

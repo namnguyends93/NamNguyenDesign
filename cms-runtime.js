@@ -63,6 +63,10 @@ window.__CMS_DONE__=(async function(){
         const a=one(L&&L.desktop),b=one(L&&L.mobile);return (a?'@media (min-width:701px){'+a+'}':'')+(b?'@media (max-width:700px){'+b+'}':'')};
       window.__cmsLayoutCss=layoutCss;
       if(isHome){const css=layoutCss(raw.layout);let st=q('#cms-layout');if(css){if(!st){st=document.createElement('style');st.id='cms-layout';document.head.appendChild(st)}st.textContent=css}else if(st)st.remove()}}
+    // TEXT COLOURS picked in the editor (textColors = { selector: '#hex' }, every screen size)
+    {const tcCss=tc=>Object.entries(tc||{}).filter(([s,v])=>s&&!/[{}<;]/.test(s)&&/^#[0-9a-f]{3,8}$/i.test(v||'')).map(([s,v])=>s+'{color:'+v+'!important}').join('');
+      window.__cmsTextCss=tcCss;
+      if(isHome){const css=tcCss(raw.textColors);let st=q('#cms-text');if(css){if(!st){st=document.createElement('style');st.id='cms-text';document.head.appendChild(st)}st.textContent=css}else if(st)st.remove()}}
 
     // NAV: logo badge, links and the button are built from navigation.*
     {const n=c.navigation||{},nav=q('nav.nav');if(nav){
