@@ -19,7 +19,7 @@ const UPLOADS=path.join(ROOT,'uploads');
 const BACKUPS=path.join(ROOT,'backups');
 const HOST='127.0.0.1';
 const PORT=Number(process.env.PORT||3000);
-const MAX_BODY=35*1024*1024;
+const MAX_BODY=170*1024*1024;   // a 120 MB video as base64
 
 // ---- Cloudflare R2 (optional) ----
 // media.config.json: {"r2":{"bucket":"…","publicUrl":"https://pub-….r2.dev"}}. When set, uploads go to R2
@@ -40,7 +40,7 @@ async function uploadToR2(cfg,name,buf,type){
   const item={name,url:cfg.publicUrl.replace(/\/$/,'')+'/'+encodeURIComponent(name),size:buf.length,modified:new Date().toISOString(),storage:'r2'};
   const list=await readManifest();list.unshift(item);await writeManifest(list);return item}
 
-const MIME={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'application/javascript; charset=utf-8','.json':'application/json; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.webp':'image/webp','.gif':'image/gif','.svg':'image/svg+xml','.ico':'image/x-icon','.pdf':'application/pdf','.woff':'font/woff','.woff2':'font/woff2','.mp4':'video/mp4','.webm':'video/webm'};
+const MIME={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'application/javascript; charset=utf-8','.json':'application/json; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.webp':'image/webp','.gif':'image/gif','.svg':'image/svg+xml','.ico':'image/x-icon','.pdf':'application/pdf','.mp4':'video/mp4','.webm':'video/webm','.mov':'video/quicktime','.woff':'font/woff','.woff2':'font/woff2','.mp4':'video/mp4','.webm':'video/webm'};
 
 function send(res,status,body,type='text/plain; charset=utf-8'){const b=Buffer.isBuffer(body)?body:Buffer.from(String(body));res.writeHead(status,{'Content-Type':type,'Content-Length':b.length,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(b)}
 function sendJSON(res,status,obj){send(res,status,JSON.stringify(obj,null,2),'application/json; charset=utf-8')}
@@ -113,8 +113,8 @@ async function handleAPI(req,res,u){
   if(u.pathname==='/api/media'&&req.method==='GET')return sendJSON(res,200,{ok:true,media:await listMedia()});
   if(u.pathname==='/api/media/upload'&&req.method==='POST'){
     const body=await readJSONBody(req);const type=String(body.type||'');
-    if(!/^(image\/(jpeg|png|webp|gif|svg\+xml)|application\/pdf)$/.test(type))return sendJSON(res,415,{ok:false,error:'Only images or PDF files are allowed'});
-    const buf=Buffer.from(String(body.base64||''),'base64');if(!buf.length||buf.length>20*1024*1024)return sendJSON(res,413,{ok:false,error:'Image too large or empty'});
+    if(!/^(image\/(jpeg|png|webp|gif|svg\+xml)|application\/pdf|video\/(mp4|webm|quicktime))$/.test(type))return sendJSON(res,415,{ok:false,error:'Only images, PDF or MP4/WebM videos are allowed'});
+    const buf=Buffer.from(String(body.base64||''),'base64');if(!buf.length||buf.length>(/^video/.test(type)?120:20)*1024*1024)return sendJSON(res,413,{ok:false,error:'Image too large or empty'});
     const name=cleanName(body.name||'upload.jpg');
     const cfg=r2Config();
     if(cfg){const item=await uploadToR2(cfg,name,buf,type);return sendJSON(res,201,{ok:true,name,url:item.url,storage:'r2'})}

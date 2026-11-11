@@ -16,6 +16,20 @@ const src = (s, base) => !s ? '' : /^(https?:|data:)/i.test(s) ? s : base + Stri
 const img = (s, alt, base) => `<img src="${esc(src(s, base))}" alt="${esc(alt)}">`;
 const list = v => Array.isArray(v) ? v.filter(Boolean) : paras(v);
 
+// ---------- video ----------
+const isVid = s => /\.(mp4|webm|mov)([?#]|$)/i.test(String(s || ''));
+// mode "player" = normal player with sound; otherwise muted, looped, plays while visible (assets/fx.js)
+const vidTag = (s, poster, base, mode) => `<video class="vid" data-src="${esc(src(s, base))}"${poster ? ` poster="${esc(src(poster, base))}"` : ''}${mode === 'player' ? ' data-mode="player" controls preload="metadata"' : ' muted loop playsinline preload="none"'}></video>`;
+function embedUrl(u) {
+  u = String(u || '').trim(); let m;
+  if ((m = u.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([\w-]{11})/))) return 'https://www.youtube-nocookie.com/embed/' + m[1] + '?rel=0&modestbranding=1&playsinline=1';
+  if ((m = u.match(/vimeo\.com\/(?:video\/)?(\d+)/))) return 'https://player.vimeo.com/video/' + m[1] + '?dnt=1';
+  return '';
+}
+// Effects switched on in the editor (site.effects) → <html data-fx="…"> read by assets/fx.js
+const fxAttr = content => { const e = (content.site && content.site.effects) || {}; return ' data-fx="' + ['intro', 'transitions', 'reveal', 'count'].filter(k => e[k] !== false).join(' ') + '"'; };
+const FX_HEAD = "<script>(function(){try{var d=document.documentElement,q=location.search,a=d.getAttribute('data-fx'),on=function(k){return a==null?k!=='intro':(' '+a+' ').indexOf(' '+k+' ')>=0},rm=matchMedia('(prefers-reduced-motion: reduce)').matches;if(/[?&](edit|i18nscan)=1/.test(q)||rm)return;if(on('transitions')&&!('onpagereveal' in window)&&sessionStorage.getItem('nnd-curtain'))d.classList.add('fx-curtain-in');if(on('intro')&&document.querySelector&&!sessionStorage.getItem('nnd-intro')&&/(^|\\/)(index\\.html)?$/.test(location.pathname))d.classList.add('fx-intro-on')}catch(e){}})()</script>";
+
 // ---------- visual editor (/edit) ----------
 // renderProjectPage(content, slug, { edit: true }) marks every editable spot: data-ve="path" (text),
 // data-ve-img="path" (image), data-ve-block="i" (module). Paths are relative to the project.
@@ -23,6 +37,7 @@ const list = v => Array.isArray(v) ? v.filter(Boolean) : paras(v);
 let VE = null;                                   // { i: current block index } while rendering for the editor
 const at = path => VE ? ` data-ve="${esc(path)}"` : '';
 const ati = path => VE ? ` data-ve-img="${esc(path)}"` : '';
+const atv = path => VE ? ` data-ve-vid="${esc(path)}"` : '';
 const bk = k => 'blocks.' + (VE ? VE.i : 0) + '.' + k;
 const blank = v => !String(v ?? '').trim();
 // editable text: element tag, classes, path, value, placeholder, multi-paragraph?
@@ -60,6 +75,13 @@ const BLOCKS = {
     { k: 't2', label: 'Bước 2 — tiêu đề', kind: 'text' }, { k: 'x2', label: 'Bước 2 — nội dung', kind: 'textarea' },
     { k: 't3', label: 'Bước 3 — tiêu đề', kind: 'text' }, { k: 'x3', label: 'Bước 3 — nội dung', kind: 'textarea' }] },
   statement: { label: 'Câu chữ lớn (Statement)', hint: 'Một câu chốt, chữ in hoa cỡ lớn.', fields: [{ k: 'text', label: 'Câu statement', kind: 'textarea' }] },
+  video:     { label: 'Video', hint: 'File video (tự chạy, tắt tiếng, lặp lại — hoặc có nút phát + tiếng) hoặc link YouTube / Vimeo.', fields: [
+    { k: 'video', label: 'File video (MP4)', kind: 'video', note: 'MP4 (H.264), 1080p, 5–15 giây, dưới khoảng 30 MB. Ngang 1920×1080 · dọc 1080×1920 · vuông 1080×1080.' },
+    { k: 'poster', label: 'Ảnh poster (hiện trước khi video chạy)', kind: 'image', note: 'Cùng khung hình với video, lấy 1 khung đẹp nhất của clip.' },
+    { k: 'embed', label: 'Hoặc link YouTube / Vimeo (video dài, có tiếng)', kind: 'text' },
+    { k: 'ratio', label: 'Khung hình', kind: 'select', options: [['wide', 'Ngang 16:9'], ['full', 'Tràn màn hình'], ['vertical', 'Dọc 9:16 (Reels / TikTok)'], ['square', 'Vuông 1:1']] },
+    { k: 'mode', label: 'Cách chạy', kind: 'select', options: [['loop', 'Tự chạy, tắt tiếng, lặp lại'], ['player', 'Có nút phát và âm thanh']] },
+    { k: 'caption', label: 'Chú thích (không bắt buộc)', kind: 'text' }] },
   beforeafter: { label: 'Trước / Sau (kéo so sánh)', hint: 'Hai ảnh chồng lên nhau, người xem kéo thanh giữa để so sánh — hợp để khoe retouch, AI upscale (Magnific).', fields: [
     { k: 'before', label: 'Ảnh TRƯỚC', kind: 'image', note: 'Hai ảnh phải cùng kích thước và cùng khung hình. Ngang 2400×1500 (16:10) hoặc dọc 1600×2000 (4:5).' },
     { k: 'after', label: 'Ảnh SAU', kind: 'image', note: 'Cùng kích thước với ảnh Trước.' },
@@ -143,7 +165,7 @@ function gallery(images, style, alt, base) {
     const want = pattern[r++ % pattern.length];
     const n = Math.min(want, images.length - i);
     rows.push(`<div class="g-row cols-${n}${want === 1 ? ' tall' : ''}">` +
-      images.slice(i, i + n).map((s, k) => `<figure class="g-item"${ati(bk('images.' + (i + k)))}>${img(s, `${alt} — image ${i + k + 1}`, base)}</figure>`).join('') + '</div>');
+      images.slice(i, i + n).map((s, k) => `<figure class="g-item"${ati(bk('images.' + (i + k)))}>${isVid(s) ? vidTag(s, '', base, 'loop') : img(s, `${alt} — image ${i + k + 1}`, base)}</figure>`).join('') + '</div>');
     i += n;
   }
   return `<section class="gallery ${cls}">${rows.join('')}</section>`;
@@ -207,6 +229,19 @@ function renderBlock(b, p, base) {
     }
     case 'statement': return (b.text || VE) ? `
   <section class="section statement">${VE ? edT('p', '', bk('text'), b.text, 'Câu statement…') : `<p>${esc(b.text)}</p>`}</section>` : '';
+    case 'video': {
+      const r = ['wide', 'full', 'vertical', 'square'].includes(b.ratio) ? b.ratio : 'wide';
+      const emb = embedUrl(b.embed);
+      const frame = media => `
+  <section class="section vid-wrap">
+    <figure class="vid-frame r-${r}"${atv(bk('video'))}>${media}</figure>
+    ${VE ? edT('p', 'vid-cap', bk('caption'), b.caption, 'Chú thích (không bắt buộc)') : b.caption ? `<p class="vid-cap">${esc(b.caption)}</p>` : ''}
+  </section>`;
+      const iframe = emb ? `<iframe src="${esc(emb)}" title="${esc(b.caption || title)}" loading="lazy" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>` : '';
+      if (b.video) return frame(vidTag(b.video, b.poster, base, b.mode));
+      if (iframe) return frame(iframe);
+      return VE ? frame('') : '';
+    }
     case 'beforeafter': {
       const bl = b.beforeLabel || 'Before', al = b.afterLabel || 'After';
       if (VE) return `
@@ -276,7 +311,7 @@ function renderPage(content, slug) {
 
   const hero = `
   <section class="hero${short ? ' short' : ''}">
-    <div class="hero-media"${ati('cover')}>${p.cover ? img(p.cover, title, base) : ''}</div>
+    <div class="hero-media"${ati('cover')}>${p.cover ? img(p.cover, title, base) : ''}${p.coverVideo ? vidTag(p.coverVideo, p.cover, base, 'loop') : ''}</div>
     <div class="hero-copy">
       <h1 class="display"${at('title')}>${esc(title)}</h1>
       <div class="hero-side">
@@ -311,16 +346,18 @@ function renderPage(content, slug) {
   const metaDesc = priv ? 'Private project — password required.' : (paras(desc)[0] || `${title} project by ${brand}.`);
 
   return `<!DOCTYPE html>
-<html lang="en">
+<html lang="en"${VE ? '' : fxAttr(content)}>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>${esc(title)} — ${esc(brand)}</title>
-<meta name="description" content="${esc(metaDesc)}">${priv ? '\n<meta name="robots" content="noindex">' : ''}
+<meta name="description" content="${esc(metaDesc)}">
+${VE ? '' : FX_HEAD}${priv ? '\n<meta name="robots" content="noindex">' : ''}
 <script>(function(){try{var q=new URLSearchParams(location.search).get('lang');if((q||localStorage.getItem('nnd-lang'))==='vi'){var d=document.documentElement;d.classList.add('i18n-wait');setTimeout(function(){d.classList.remove('i18n-wait')},2500)}}catch(e){}})()</script><style>.i18n-wait body{opacity:0}</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Geist+Mono:wght@500&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/fx.css">
 <style>${CSS}${accent}</style>
 </head>
 <body>
@@ -334,8 +371,8 @@ function renderPage(content, slug) {
   <span>${esc(copyright).toUpperCase()}</span>
   <span>INDEPENDENT · ${esc(location).toUpperCase()}</span>
 </footer>
-<script>${TRANSITION_JS}</script>
 ${VE ? '' : `<script>${PAGE_JS}</script>`}
+<script src="../assets/fx.js" defer></script>
 ${i18nData(content)}
 <script src="../assets/to-top.js" defer></script>
 <script src="../assets/i18n.js" defer></script>
@@ -365,16 +402,18 @@ function renderWorkPage(content) {
       <div class="more-copy"><small>${[p.category, p.year].filter(Boolean).map(x => `<span>${esc(x)}</span>`).join(' · ')}</small><h3 class="display">${esc(String(p.title || '').trim())}</h3></div>
     </a>`).join('');
   return `<!DOCTYPE html>
-<html lang="en">
+<html lang="en"${fxAttr(content)}>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>${esc(title)} — ${esc(brand)}</title>
 <meta name="description" content="${esc(desc)}">
+${FX_HEAD}
 <script>(function(){try{var q=new URLSearchParams(location.search).get('lang');if((q||localStorage.getItem('nnd-lang'))==='vi'){var d=document.documentElement;d.classList.add('i18n-wait');setTimeout(function(){d.classList.remove('i18n-wait')},2500)}}catch(e){}})()</script><style>.i18n-wait body{opacity:0}</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Geist+Mono:wght@500&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/fx.css">
 <style>${CSS}${accent}</style>
 </head>
 <body>
@@ -397,8 +436,8 @@ function renderWorkPage(content) {
   <span>${esc(copyright).toUpperCase()}</span>
   <span>INDEPENDENT · ${esc(location).toUpperCase()}</span>
 </footer>
-<script>${TRANSITION_JS}</script>
 <script>${WORK_JS}</script>
+<script src="../assets/fx.js" defer></script>
 ${i18nData(content)}
 <script src="../assets/to-top.js" defer></script>
 <script src="../assets/i18n.js" defer></script>
@@ -428,7 +467,7 @@ const PAGE_JS = `
     imgs.forEach(function(im){if(im._lb)return;im._lb=1;im.tabIndex=0;im.setAttribute('role','button');
       im.addEventListener('click',function(){open(imgs.indexOf(im))});
       im.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();open(imgs.indexOf(im))}})})}
-  window.__nndPageInit=function(){initBA();initLB()};
+  window.__nndPageInit=function(){initBA();initLB();if(window.__nndFx)window.__nndFx.refresh()};
   window.__nndPageInit();
 })();`;
 
@@ -642,10 +681,6 @@ figure{margin:0}
 
 /* page transition */
 .page-transition-overlay{position:fixed;inset:0;z-index:9999;pointer-events:none;background:var(--black,#080808);opacity:0}
-html.page-enter body{opacity:0;transform:translateY(14px)}
-body{transition:opacity .52s cubic-bezier(.22,.75,.24,1),transform .52s cubic-bezier(.22,.75,.24,1)}
-html.page-ready body{opacity:1;transform:none}
-html.page-leaving body{opacity:.18;transform:translateY(-10px)}
 @media (prefers-reduced-motion:reduce){body{transition:none!important;transform:none!important}}
 `;
 

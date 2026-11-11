@@ -1,0 +1,68 @@
+/* Nam Nguyen Design — shared effects and video styles (see fx.js) */
+
+/* ---- page transitions: the browser animates between pages ---- */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+}
+::view-transition-old(root) { animation: fx-vt-out .55s cubic-bezier(.7,0,.25,1) both; }
+::view-transition-new(root) { animation: fx-vt-in .75s cubic-bezier(.7,0,.25,1) both; }
+@keyframes fx-vt-out { to { opacity: .35; transform: translateY(-4vh) scale(.985); } }
+@keyframes fx-vt-in { from { clip-path: inset(100% 0 0 0); } to { clip-path: inset(0 0 0 0); } }
+/* the clicked cover grows into the project hero */
+.hero-media { view-transition-name: nnd-cover; }
+::view-transition-group(nnd-cover) { animation-duration: .85s; animation-timing-function: cubic-bezier(.7,0,.25,1); z-index: 5; }
+::view-transition-old(nnd-cover), ::view-transition-new(nnd-cover) { width: 100%; height: 100%; object-fit: cover; }
+
+/* older browsers: an accent curtain */
+.fx-curtain { position: fixed; inset: 0; z-index: 10000; background: var(--accent, #4c6fff); transform: translateY(100%); transition: transform .48s cubic-bezier(.7,0,.25,1); pointer-events: none; }
+.fx-curtain.on { transform: none; }
+.fx-curtain.on.out { transform: translateY(-100%); transition-duration: .75s; }
+html.fx-curtain-in::after { content: ""; position: fixed; inset: 0; z-index: 10000; background: var(--accent, #4c6fff); }
+
+/* ---- intro (home, first visit) ---- */
+.fx-intro { display: none; }
+html.fx-intro-on { overflow: hidden; }
+html.fx-intro-on .fx-intro {
+  display: flex; position: fixed; inset: 0; z-index: 10001; flex-direction: column; justify-content: space-between;
+  padding: clamp(24px, 5vw, 72px); background: var(--black, #080808); color: var(--white, #f7f5ef);
+  transition: transform 1s cubic-bezier(.76,0,.24,1);
+}
+html.fx-intro-out .fx-intro { transform: translateY(-100%); }
+.fx-intro-top { display: flex; justify-content: space-between; font: 500 12px/1 "Geist Mono", monospace; text-transform: uppercase; opacity: .6; }
+.fx-intro-bottom { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; }
+.fx-intro-name { display: block; overflow: hidden; font: 600 clamp(52px, 10vw, 170px)/.9 "Space Grotesk", Inter, sans-serif; letter-spacing: -.06em; text-transform: uppercase; }
+.fx-intro-name > span { display: inline-block; animation: fx-rise 1s cubic-bezier(.2,.75,.2,1) both .1s; }
+.fx-intro-count { font: 600 clamp(52px, 10vw, 170px)/.9 "Space Grotesk", Inter, sans-serif; letter-spacing: -.06em; color: var(--accent-soft, #8ea1ff); font-variant-numeric: tabular-nums; }
+.fx-intro-count::after { content: "%"; font-size: .4em; vertical-align: top; margin-left: .05em; }
+@keyframes fx-rise { from { transform: translateY(105%); } to { transform: none; } }
+
+/* ---- images unveil when scrolled to ---- */
+.fx-clip { clip-path: inset(30% 0 0 0); transition: clip-path 1.15s cubic-bezier(.2,.75,.2,1); }
+.fx-clip.fx-in { clip-path: inset(0 0 0 0); }
+.fx-clip > img, .fx-clip > video, .fx-clip > .ba-before img { transform: scale(1.12); transition: transform 1.5s cubic-bezier(.2,.75,.2,1); }
+.fx-clip.fx-in > img, .fx-clip.fx-in > video { transform: none; }
+
+/* ---- numbers ---- */
+.stat strong, .result strong { font-variant-numeric: tabular-nums; }
+
+/* ---- video ---- */
+.vid { display: block; width: 100%; height: 100%; object-fit: cover; background: #111; }
+.vid-wrap { padding-top: 8px; padding-bottom: 8px; }
+.vid-frame { position: relative; margin: 0; border-radius: 100px; overflow: hidden; background: #1b1b1b; }
+.vid-frame.r-wide { aspect-ratio: 16 / 9; }
+.vid-frame.r-full { height: min(92vh, 980px); }
+.vid-frame.r-square { aspect-ratio: 1 / 1; max-width: min(100%, 92vh); margin: 0 auto; }
+.vid-frame.r-vertical { aspect-ratio: 9 / 16; height: min(92vh, 980px); max-width: 100%; margin: 0 auto; border-radius: 60px; }
+.vid-frame > .vid, .vid-frame > iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.vid-cap { margin: 16px 0 0; text-align: center; color: var(--muted, #9a9a96); font-size: 14px; }
+.g-item > .vid { position: absolute; inset: 0; }
+.g-item { position: relative; }
+.hero-media > .vid { position: absolute; inset: 0; }
+.project-image > .vid { position: absolute; inset: 0; z-index: 0; }
+@media (max-width: 900px) {
+  .vid-frame { border-radius: 52px; }
+  .vid-frame.r-vertical { border-radius: 44px; height: auto; width: min(100%, 420px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fx-clip, .fx-clip > img, .fx-clip > video { clip-path: none !important; transform: none !important; transition: none !important; }
+}

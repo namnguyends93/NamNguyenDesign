@@ -315,6 +315,12 @@ async function prerender(file, html, useRuntime = true) {
     else if (!img.hasAttribute('loading')) img.setAttribute('loading', 'lazy');
   }
 
+  // Video posters become WebP like other images
+  for (const v of [...doc.querySelectorAll('video[poster]')]) {
+    const r = await optimizeImage(v.getAttribute('poster'), file);
+    if (r) v.setAttribute('poster', base + r.outs.at(-1).rel);
+  }
+
   // Inline style background images, e.g. style="--project-bg:url('...')"
   for (const el of [...doc.querySelectorAll('[style]')].filter(e => e.getAttribute('style').includes('url('))) {
     let style = el.getAttribute('style');
@@ -378,9 +384,12 @@ async function copyStatic(src, dst) {
   // All work, with category filter
   await write('projects/index.html', renderWorkPage(content), false);
   // Files that are not images (CV PDF) are copied as they are
-  for (const m of new Set(JSON.stringify(content).match(/\/uploads\/[^"?#]+\.pdf/gi) || [])) {
+  for (const m of new Set(JSON.stringify(content).match(/\/uploads\/[^"?#]+\.(pdf|mp4|webm|mov)/gi) || [])) {
     const srcF = path.join(ROOT, decodeURIComponent(m));
-    if (fs.existsSync(srcF)) { await fsp.mkdir(path.dirname(path.join(DIST, m)), { recursive: true }); await fsp.copyFile(srcF, path.join(DIST, decodeURIComponent(m))); }
+    if (fs.existsSync(srcF)) {
+      if (fs.statSync(srcF).size > 25 * 1024 * 1024) console.warn('  ! ' + m + ' is over 25 MB: Cloudflare will refuse it. Upload videos with R2 on, or make the file smaller.');
+      await fsp.mkdir(path.dirname(path.join(DIST, m)), { recursive: true }); await fsp.copyFile(srcF, path.join(DIST, decodeURIComponent(m)));
+    }
   }
   await fsp.writeFile(path.join(DIST, '404.html'), page404());
   for (const s of STATIC) if (fs.existsSync(path.join(ROOT, s))) await copyStatic(path.join(ROOT, s), path.join(DIST, s));

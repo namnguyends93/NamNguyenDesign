@@ -79,7 +79,9 @@
       var hio = new IntersectionObserver(function (es) {
         es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('on'); hio.unobserve(e.target); } });
       }, { threshold: 0.2 });
-      Array.prototype.forEach.call(heads, function (h) { split(h); hio.observe(h); });
+      Array.prototype.forEach.call(heads, function (h) { split(h); });
+      var watchHeads = function () { Array.prototype.forEach.call(heads, function (h) { hio.observe(h); }); };
+      if (doc.classList.contains('fx-intro-on')) document.addEventListener('nnd:intro-done', watchHeads, { once: true }); else watchHeads();
     }
 
     /* scramble on hover */

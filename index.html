@@ -7,6 +7,7 @@
 <meta name="description" content="Nam Nguyen Design — independent visual design practice for brand identity, campaign design and art direction." />
 
 <script>(function(){try{var q=new URLSearchParams(location.search).get('lang');if((q||localStorage.getItem('nnd-lang'))==='vi'){var d=document.documentElement;d.classList.add('i18n-wait');setTimeout(function(){d.classList.remove('i18n-wait')},2500)}}catch(e){}})()</script><style>.i18n-wait body{opacity:0}</style>
+<script>(function(){try{var d=document.documentElement,q=location.search,a=d.getAttribute('data-fx'),on=function(k){return a==null?k!=='intro':(' '+a+' ').indexOf(' '+k+' ')>=0},rm=matchMedia('(prefers-reduced-motion: reduce)').matches;if(/[?&](edit|i18nscan)=1/.test(q)||rm)return;if(on('transitions')&&!('onpagereveal' in window)&&sessionStorage.getItem('nnd-curtain'))d.classList.add('fx-curtain-in');if(on('intro')&&document.querySelector&&!sessionStorage.getItem('nnd-intro')&&/(^|\/)(index\.html)?$/.test(location.pathname))d.classList.add('fx-intro-on')}catch(e){}})()</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Geist+Mono:wght@500&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
@@ -819,9 +820,11 @@ html.page-leaving body{
 
 </style>
 <link rel="stylesheet" href="assets/motion.css">
+<link rel="stylesheet" href="assets/fx.css">
 </head>
 
 <body>
+<div class="fx-intro" aria-hidden="true"><div class="fx-intro-top"><span class="fx-intro-brand">Nam Nguyen Design</span><span>Portfolio · 2026</span></div><div class="fx-intro-bottom"><span class="fx-intro-name"><span>Nam Nguyen</span></span><span class="fx-intro-count">0</span></div></div>
 <div class="nav-wrap">
   <nav class="nav">
     <a class="brand-badge" href="#home">NAM<br>NGUYEN</a>
@@ -1163,6 +1166,7 @@ function showProject(index){
   projectIndex = index;
   projectSlides.forEach(slide => slide.classList.remove("active"));
   projectSlides[index].classList.add("active");
+  if(window.__nndFx)window.__nndFx.refreshVideos();
   const total = document.querySelector(".total-project");
   if(total) total.textContent = String(projectSlides.length).padStart(2,"0");
 
@@ -1196,62 +1200,12 @@ if(slidesNow().length){
 </script>
 <script>
 
-(function(){
-  const root = document.documentElement;
-  root.classList.add("page-enter");
-
-  requestAnimationFrame(()=>{
-    requestAnimationFrame(()=>{
-      root.classList.remove("page-enter");
-      root.classList.add("page-ready");
-    });
-  });
-
-  const isInternalHtmlLink = (a)=>{
-    if(!a || !a.href) return false;
-    if(a.target && a.target !== "_self") return false;
-    if(a.hasAttribute("download")) return false;
-
-    const url = new URL(a.href, window.location.href);
-    if(url.origin !== window.location.origin) return false;
-
-    const samePageHashOnly =
-      url.pathname === window.location.pathname &&
-      url.search === window.location.search &&
-      url.hash;
-
-    if(samePageHashOnly) return false;
-
-    return /\.html$/i.test(url.pathname);
-  };
-
-  document.addEventListener("click",(event)=>{
-    if(event.defaultPrevented) return;
-    if(event.button !== 0) return;
-    if(event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-
-    const a = event.target.closest("a");
-    if(!isInternalHtmlLink(a)) return;
-
-    event.preventDefault();
-    const destination = a.href;
-
-    root.classList.add("page-leaving");
-
-    window.setTimeout(()=>{
-      window.location.href = destination;
-    }, 390);
-  });
-
-  window.addEventListener("pageshow",()=>{
-    root.classList.remove("page-leaving","page-enter");
-    root.classList.add("page-ready");
-  });
-})();
+/* page transitions: assets/fx.js */
 
 </script>
 <script src="assets/to-top.js" defer></script>
 <script src="assets/i18n.js" defer></script>
+<script src="assets/fx.js" defer></script>
 <script src="assets/motion.js" defer></script>
 </body>
 </html>
