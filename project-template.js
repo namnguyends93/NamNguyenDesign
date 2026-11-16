@@ -496,7 +496,11 @@ ${i18nData(content)}
 }
 
 // "All work": every published project with category filter chips → projects/index.html
-function renderWorkPage(content) {
+function renderWorkPage(content, opts) {
+  VE = opts && opts.edit ? { i: 0 } : null;
+  try { return renderWork(content); } finally { VE = null; }
+}
+function renderWork(content) {
   const site = content.site || {}, wp = content.workPage || {};
   const brand = content.footer?.brand || content.navigation?.brand || site.name || 'Nam Nguyen Design';
   const copyright = content.footer?.copyright || `© ${new Date().getFullYear()} ${brand}`;
@@ -510,10 +514,9 @@ function renderWorkPage(content) {
   const desc = wp.description || 'Campaigns, key visuals and visual systems.';
   const accent = site.accent && /^#[0-9a-f]{3,8}$/i.test(site.accent) ? `:root{--accent:${site.accent}}` : '';
   const cards = list.map(p => `
-    <a class="work-card" data-cat="${esc(key(p.category))}" href="${esc((p.slug || p.id) + '.html')}">
-      ${p.cover ? img(p.cover, String(p.title || '').trim(), base) : ''}
-      ${blank(p.password) ? '' : '<span class="lock">🔒 PRIVATE</span>'}
-      <div class="more-copy"><small>${[p.category, p.year].filter(Boolean).map(x => `<span>${esc(x)}</span>`).join(' · ')}</small><h3 class="display">${esc(String(p.title || '').trim())}</h3></div>
+    <a class="work-card" data-cat="${esc(key(p.category))}" href="${esc((p.slug || p.id) + '.html')}"${VE ? ` data-ve-card="${(content.projects || []).indexOf(p)}"` : ''}>
+      <div class="wc-media">${p.cover ? img(p.cover, String(p.title || '').trim(), base) : ''}${blank(p.password) ? '' : '<span class="lock">🔒 PRIVATE</span>'}</div>
+      <div class="wc-row"><b>${esc(String(p.title || '').trim())}</b><span>${esc(p.category || '')}${p.year ? ' · ' + esc(p.year) : ''}</span></div>
     </a>`).join('');
   return `<!DOCTYPE html>
 <html lang="en"${fxAttr(content)}>
@@ -537,8 +540,8 @@ ${FX_HEAD}
 </nav>
 <main class="project-page work-page">
   <section class="section work-head">
-    <h1 class="display">${esc(title)}</h1>
-    <p>${esc(desc)}</p>
+    ${VE ? edT('h1', 'display', 'workPage.title', wp.title, 'ALL WORK') + edT('p', '', 'workPage.description', wp.description, 'Campaigns, key visuals and visual systems.') : `<h1 class="display">${esc(title)}</h1>
+    <p>${esc(desc)}</p>`}
     <div class="work-filter" role="group" aria-label="Filter">
       <button type="button" data-filter="*" aria-pressed="true"><span>All</span> <b>${list.length}</b></button>${cats.map(c => `<button type="button" data-filter="${esc(key(c))}" aria-pressed="false"><span>${esc(c)}</span> <b>${list.filter(p => key(p.category) === key(c)).length}</b></button>`).join('')}
     </div>
@@ -550,7 +553,7 @@ ${FX_HEAD}
   <span>${esc(copyright).toUpperCase()}</span>
   <span>INDEPENDENT · ${esc(location).toUpperCase()}</span>
 </footer>
-<script>${WORK_JS}</script>
+${VE ? '' : `<script>${WORK_JS}</script>`}
 <script src="../assets/fx.js" defer></script>
 ${VE ? '' : '<script src="../assets/smooth.js" defer></script>'}
 ${i18nData(content)}
@@ -996,6 +999,21 @@ body{background:#000}
 .pn a:hover b{color:var(--accent-soft)}
 .pn-prev:hover b{transform:translateX(-10px)}.pn-next:hover b{transform:translateX(10px)}
 .footer{margin:0 max(32px,calc((100vw - 1856px)/2));padding:32px 0 40px;border-top:1px solid rgba(255,255,255,.1)}
+/* all-work page, Vexoo /portfolio style */
+.work-head{padding:116px 0 28px}
+.work-head h1{margin:0;max-width:980px;font:500 clamp(34px,3.6vw,56px)/1.08 Inter,sans-serif;letter-spacing:-.035em;text-transform:none}
+.work-head p{max-width:620px;margin:14px 0 26px;color:var(--muted);font-size:16px;line-height:1.55}
+.work-filter button{padding:9px 14px;font:500 13px Inter,sans-serif;text-transform:none}
+.work-grid{gap:24px}
+.work-card{display:block;min-height:0;padding:14px;border-radius:28px;background:#111;overflow:hidden;transition:background .3s}
+.work-card:hover{background:#181818}
+.wc-media{position:relative;aspect-ratio:16/11;border-radius:18px;overflow:hidden;background:#1b1b1b}
+.wc-media img{transition:transform .9s cubic-bezier(.2,.7,.2,1)}
+.work-card:hover .wc-media img{transform:scale(1.04)}
+.wc-row{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:16px 8px 4px}
+.wc-row b{font:500 18px/1.25 Inter,sans-serif;letter-spacing:-.01em}
+.wc-row span{flex:none;color:var(--muted);font:500 15px Inter,sans-serif}
+@media(max-width:850px){.work-head{padding:88px 4px 20px}.work-grid{grid-template-columns:1fr;gap:12px}.work-card{min-height:0;padding:10px;border-radius:22px}.wc-media{border-radius:14px}}
 img.px{transform:scale(1.14);will-change:transform}
 @media(max-width:850px){
   .project-page{padding:0 12px;gap:12px}

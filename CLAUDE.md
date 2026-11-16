@@ -151,3 +151,30 @@ Write replies to the owner in Vietnamese.
 - 17 templates in FRAMES (project-template.js): n frames per group, container ratio + grid columns/rows/areas. More images than n → the template repeats; a partial last group renders as an even row (.frest).
 - Editor: visual template picker (.tplpick) under the module; empty cells (.ve-cell) are clickable to add a photo. Phone: every template becomes 2 columns, first frame full width.
 - Deployed to Cloudflare 2026-11-17. GitHub push failed: git is not installed on the PC after the reset (spawn git ENOENT).
+
+## Home hero "big name" style (like hana.framer.media) — 2026-11-17
+- `site.heroStyle`: 'name' (default) or 'card' (old rounded card). cms-runtime.js toggles <html class="hn">; assets/hero-name.js runs it; CSS at the end of index.html's main <style>.
+- Full-screen pinned hero (sticky; every other #home section gets z-index 1 + white bg and slides over it, the hero darkens / zooms via --hs).
+- Load: portrait zooms 1.2 → 1 and fades in, giant name slides up (hn-in). Name = home.hero.name || site.personName, font size fitted to the width.
+- Mouse over hero: portrait 1.05 + cursor card (.hero-tip: home.hero.tipTitle "Hey, I'm Nam" + home.hero.description). The h1 stays in the page for SEO but is visually hidden.
+
+## "All work" page (projects/index.html) in the editor — 2026-11-17
+- Page picker has "📂 Trang Tất cả dự án" (mode 'work'): renderWorkPage(state,{edit:true}); title / description (workPage.*) click-to-edit; clicking a card opens that project; side panel #workPanel lists projects with ↑ ↓ (order) and 👁 (published).
+- Restyled like Vexoo /portfolio: sentence-style title, card = dark rounded box with a 16:11 image and "title · category" row underneath (.wc-media / .wc-row).
+
+## Sideways scrolling on the home page — 2026-11-17
+- assets/hscroll.js + data-hs on #home sections (cms-runtime.js from site.sectionScroll[id]; defaults: journal = pin, intro/about/experience/clients/projects/contact = drift).
+- drift: blocks glide in from left / right (alternating per section, split sections from both sides) using CSS `translate` (not transform), settle at mid-screen, drift slightly out.
+- pin (Journal only): section height = card + travel, .journal sticky top 8px (section overflow visible), vertical scroll sets .journal-grid scrollLeft. Off ≤860px, in the editor, in iframes, with reduced motion.
+- Editor: "↔ Cuộn ngang khi lướt trang" select at the top of each of those sections.
+
+- 2026-11-17 update: default is now `hold` — each section is wrapped in .hs-hold (height = section + 70vh), the section sticks (centred if shorter than the screen, else top 0) and its blocks slide in sideways (+ fade 35%→100%) while the page stands still; split sections open from both sides. `drift` stays as an option; Journal `pin` uses the same wrapper.
+
+## Contact + footer styles — 2026-11-17
+- site.contactStyle / site.footerStyle = full (as before) · compact · line → <html data-contact / data-footer> (cms-runtime.js); CSS in index.html ("Contact + footer styles"). URL ?contact=…&footer=… overrides for previews.
+- Demo of all 6: /tools/demo-contact-footer.html (iframes of the home page, linked from the editor fields; not deployed — tools/ is local only).
+- compact contact shows the email link (.contact-mail, filled from home.contact.email).
+
+## Home page shell — 2026-11-17
+- site.shellStyle = cards (rounded boxes, as before) · bleed (edge to edge, no corners / white gaps) · open (one dark page, no box backgrounds, pictures 24px corners, hairlines) → <html data-shell> (cms-runtime.js, ?shell=… overrides). CSS "Page shell" block in index.html. Editor: 🎨 Giao diện chung → Bố cục trang chủ.
+- Demo: /tools/demo-layout.html (3 columns × 6 spots of the real home page, local only).

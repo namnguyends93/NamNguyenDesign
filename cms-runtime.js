@@ -105,6 +105,11 @@ const typeFontsHref = fams => { const f = [...new Set(fams)].filter(x => TYPE_FO
     // HERO
     replaceExact('Independent Visual Designer',c.home?.hero?.eyebrow);
     replaceExact('Selected Work.26',c.home?.hero?.indexLabel);
+    // Hero style: big name over the portrait (default, like hana.framer.media) or the old rounded card
+    {const hs=c.site?.heroStyle||'name';document.documentElement.classList.toggle('hn',hs!=='card');
+      const nm=q('.hero-name span');if(nm)nm.textContent=String(c.home?.hero?.name||c.site?.personName||'Nam Nguyen').trim();
+      const tb=q('.hero-tip b'),tp=q('.hero-tip p');if(tb)tb.textContent=c.home?.hero?.tipTitle||"Hey, I'm Nam";if(tp)tp.textContent=c.home?.hero?.description||'';
+      if(window.__nndHeroFit)setTimeout(window.__nndHeroFit,30)}
     {const h1=q('.hero-copy h1');if(h1&&c.home?.hero?.title)h1.innerHTML=lines(c.home.hero.title)}
     {const t=String(c.home?.hero?.title||'').replace(/\s+/g,' ').trim().toUpperCase();if(t)qa('.project-top span:first-child').forEach(s=>{s.textContent=t})}
     replaceExact('Brand identities, campaign visuals and digital experiences built with clarity, edge and intent.',c.home?.hero?.description);
@@ -128,6 +133,11 @@ const typeFontsHref = fams => { const f = [...new Set(fams)].filter(x => TYPE_FO
     if(isHome&&c.home?.intro?.image)setMedia('.intro-panel.image',c.home.intro.image);
     // Section effects chosen in the editor: site.sectionFx (on scroll) → data-sfx, site.sectionHover (mouse) → data-shov (assets/fx.js)
     if(isHome){const SFX={hero:'.hero',intro:'.intro-grid',about:'#about',experience:'#experience',clients:'#clients',projects:'#projects',marquee:'.big-marquee',journal:'#journal',contact:'#contact',footer:'footer.footer'},OK=['curtain','rise','tilt'],HV=['hover3d','spotlight','depth','glow','scatter'],m=c.site?.sectionFx||{},h=c.site?.sectionHover||{};
+      // Sideways scrolling (assets/hscroll.js): site.sectionScroll[id] = drift | pin | none; default drift, Journal pin
+      {const ss=c.site?.sectionScroll||{},DEF={intro:'hold',about:'hold',experience:'hold',clients:'hold',projects:'hold',journal:'pin',contact:'hold'};
+        for(const [k,sel] of Object.entries(SFX)){let el=q(sel);if(!el)continue;el=el.closest('#home>section')||el;const v=ss[k]||DEF[k]||'none';
+          if(v==='drift'||v==='hold'||(v==='pin'&&k==='journal'))el.setAttribute('data-hs',v);else el.removeAttribute('data-hs')}
+        if(window.__nndHsSetup)setTimeout(window.__nndHsSetup,60)}
       for(const [k,sel] of Object.entries(SFX)){const el=q(sel);if(!el)continue;if(OK.includes(m[k]))el.setAttribute('data-sfx',m[k]);else el.removeAttribute('data-sfx');if(HV.includes(h[k]))el.setAttribute('data-shov',h[k]);else el.removeAttribute('data-shov')}}
     // Intro: share of the width for the image column (home.intro.split, 20–80 %). Used from 1101px; 901–1100px = half / half; ≤900px stacked.
     if(isHome){const sp=Math.round(+c.home?.intro?.split||0);let st=q('#cms-intro');
@@ -249,6 +259,11 @@ const typeFontsHref = fams => { const f = [...new Set(fams)].filter(x => TYPE_FO
     replaceExact('If you are building a brand, campaign or visual system and need a clear creative direction, send over the brief. I am open to selected freelance and collaborative projects.',c.home?.contact?.description);
     if(isHome&&c.home?.contact?.image)setMedia('.contact-bg',c.home.contact.image);
     if(c.home?.contact?.email)replaceExact('hello@namnguyen.design',c.home.contact.email,true);
+    // Contact + footer style (full · compact · line); ?contact=…&footer=… previews another one
+    {const sh=new URLSearchParams(location.search).get('shell')||c.site?.shellStyle;document.documentElement.setAttribute('data-shell',['bleed','open'].includes(sh)?sh:'cards')}
+    {const P=new URLSearchParams(location.search),ok=['full','compact','line'],cs=P.get('contact')||c.site?.contactStyle,fs=P.get('footer')||c.site?.footerStyle;
+      document.documentElement.setAttribute('data-contact',ok.includes(cs)?cs:'full');document.documentElement.setAttribute('data-footer',ok.includes(fs)?fs:'full');
+      const ml=q('#contact .contact-mail'),em=c.home?.contact?.email;if(ml&&em){ml.href='mailto:'+em;ml.textContent=em+' ↗'}}
     // Zalo QR frame: image, caption and phone come from home.contact
     const qrBox=q('#contact .contact-qr');
     if(qrBox){

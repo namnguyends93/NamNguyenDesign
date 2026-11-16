@@ -187,6 +187,13 @@ textarea{min-height:84px;resize:vertical}
       <div id="secList" class="seclist"></div>
       <div id="insp" class="insp"></div>
     </div>
+    <div id="workPanel" hidden>
+      <h3>Trang Tất cả dự án</h3>
+      <div id="workFields"></div>
+      <h3>Thẻ dự án trên trang</h3>
+      <p style="color:var(--muted);font-size:12px;margin:0 0 8px">Ảnh, tên, hạng mục lấy từ từng dự án. Thứ tự = thứ tự dự án (dùng ↑ ↓). Nút lọc tự tạo theo Hạng mục. Bấm vào thẻ trên trang để mở dự án đó.</p>
+      <div id="workList"></div>
+    </div>
     <div id="projPanel" hidden>
       <h3 id="projName">Project</h3>
       <div id="projFields"></div>
@@ -489,6 +496,7 @@ const FONTS=['Space Grotesk','Inter','Syne','Archivo','Unbounded','Bricolage Gro
 const toolFields=[T('name','Tên'),S('icon','Icon có sẵn',ICONS,'other'),I('image','Icon riêng (vuông, PNG) — thay icon có sẵn','<b>Vuông 256×256, PNG.</b>'),Bo('visible','Hiện')];
 const SECS=[
   {id:'site',n:'🎨 Giao diện chung',f:[
+    S('site.shellStyle','Bố cục trang chủ',[['cards','1 · Ô bo tròn (như hiện tại)'],['bleed','2 · Tràn viền: các mục chạy sát mép, không bo, không khe trắng'],['open','3 · Mở thoáng: nền tối liền một mạch, bỏ khung, chỉ ảnh bo nhẹ']],'cards',{noteHtml:'So sánh 3 kiểu: <a href="/tools/demo-layout.html" target="_blank" style="color:#8ea1ff">mở trang demo ↗</a>. Đổi ở đây thì khung xem cập nhật ngay; bấm Lưu mới lưu.'}),
     C('site.accent','Màu nhấn (nút, dải chữ chạy, điểm nhấn)','#4c6fff','--accent'),C('site.theme.accentSoft','Màu nhấn nhạt (chữ nhỏ trên nền tối)','#8ea1ff','--accent-soft'),
     C('site.theme.black','Màu nền trang','#080808','--black'),C('site.theme.dark','Màu khối tối','#141414','--dark'),C('site.theme.white','Màu sáng (chữ sáng, khối sáng)','#f7f5ef','--white'),
     S('site.theme.headingFont','Font tiêu đề lớn',FONTS.map(x=>[x,x]),'Space Grotesk',{note:'Be Vietnam Pro hiển thị dấu tiếng Việt đẹp nhất.'}),
@@ -508,6 +516,8 @@ const SECS=[
     IT('navigation.items','Các link trong menu',[T('label','Chữ'),U('href','Link tới'),Bo('visible','Hiện')],()=>({label:'New',href:'#contact',visible:true}),'label'),
     T('navigation.ctaLabel','Chữ nút bên phải'),U('navigation.ctaHref','Link nút'),Bo('navigation.ctaVisible','Hiện nút')]},
   {id:'hero',n:'Hero',sel:'.hero',vis:'home.hero.visible',f:[
+    S('site.heroStyle','Kiểu hero',[['name','Tên lớn + nhân vật chuyển động (kiểu Hana)'],['card','Thẻ bo góc (kiểu cũ)']],'name'),
+    T('home.hero.name','Chữ tên lớn (mặc định: Nam Nguyen)',{note:'Chữ tự giãn cho vừa đúng bề ngang màn hình.'}),T('home.hero.tipTitle',"Thẻ theo chuột — dòng chào (mặc định: Hey, I'm Nam)",{note:'Đoạn mô tả bên dưới lấy từ ô Đoạn mô tả.'}),
     T('home.hero.eyebrow','Chữ nhỏ góc trái'),T('home.hero.indexLabel','Chữ nhỏ góc phải'),A('home.hero.title','Tiêu đề lớn (Enter = xuống dòng)'),
     A('home.hero.description','Đoạn mô tả'),I('home.hero.image','Ảnh / video nền',HINT.hero+VID_OK,{accept:'both'})]},
   {id:'intro',n:'Intro',sel:'.intro-grid',vis:'home.intro.visible',f:[
@@ -544,21 +554,23 @@ const SECS=[
   {id:'journal',n:'Nhật ký',sel:'#journal',vis:'home.journal.visible',f:[
     T('home.journal.title','Tiêu đề'),A('home.journal.description','Đoạn mô tả'),C('home.journal.scrollBg','Màu nền khi cuộn tới mục Nhật ký','#000000'),P('journal','Các bài Nhật ký (3 bài = lưới, từ 4 bài = trượt ngang)')]},
   {id:'contact',n:'Liên hệ',sel:'#contact',vis:'home.contact.visible',f:[
+    S('site.contactStyle','Kiểu khung liên hệ',[['full','1 · Đầy đủ (ảnh nền + QR)'],['compact','2 · Gọn (khung tối, email + QR nhỏ)'],['line','3 · Tối giản (tiêu đề + email)']],'full',{noteHtml:'Xem trước cả 3 kiểu: <a href="/tools/demo-contact-footer.html" target="_blank" style="color:#8ea1ff">mở trang demo ↗</a>. Đổi ở đây thì khung xem cập nhật ngay; bấm Lưu mới lưu.'}),
     T('home.contact.eyebrow','Chữ nhỏ'),T('home.contact.title','Tiêu đề'),A('home.contact.description','Đoạn mô tả'),I('home.contact.image','Ảnh / video nền',HINT.contact+VID_OK,{accept:'both'}),
     I('home.contact.qrImage','Mã QR Zalo',HINT.qr),A('home.contact.qrCaption','Chữ cạnh QR'),T('home.contact.phone','Số điện thoại (hiện dưới QR, để trống = ẩn)'),
     T('home.contact.zalo','Zalo: số điện thoại hoặc link zalo.me',{note:'Hiện nút "Nhắn Zalo" bấm được (người xem trên điện thoại không tự quét được màn hình). Để trống = dùng số điện thoại ở trên.'}),T('home.contact.zaloLabel','Chữ trên nút Zalo (mặc định: Message on Zalo ↗)'),
     C('home.contact.scrollBg','Màu nền khi cuộn tới mục Liên hệ','#000000')]},
   {id:'footer',n:'Chân trang',sel:'footer.footer',vis:'footer.visible',f:[
+    S('site.footerStyle','Kiểu chân trang',[['full','1 · Đầy đủ (câu lớn + lưới link + chữ tên)'],['compact','2 · Gọn (một thanh tối)'],['line','3 · Tối giản (một dòng chữ nhỏ)']],'full',{noteHtml:'Xem trước cả 3 kiểu: <a href="/tools/demo-contact-footer.html" target="_blank" style="color:#8ea1ff">mở trang demo ↗</a>.'}),
     T('footer.brand','Chữ nhỏ trên cùng'),A('footer.description','Câu lớn'),A('footer.tagline','Dòng phụ'),
     IT('footer.links','Các link',[T('label','Chữ'),U('href','Link tới'),Bo('visible','Hiện')],()=>({label:'New link',href:'https://',visible:true}),'label'),
     T('footer.bigWord','Chữ khổng lồ'),T('footer.copyright','Bản quyền (dưới trái)'),T('footer.note','Dòng dưới phải')]}
 ];
 let curSec='site';const openItems=new Set();
-const curPage=()=>mode==='home'?'home':projIdx;
-function afterChange(){refresh();if(mode==='home')renderInspector();else fillProjPanel();fillPicker(curPage())}
+const curPage=()=>mode==='home'?'home':mode==='work'?'work':projIdx;
+function afterChange(){refresh();if(mode==='home')renderInspector();else if(mode==='work')fillWorkPanel();else fillProjPanel();fillPicker(curPage())}
 function setVal(path,v){const old=getPath(state,path);if(JSON.stringify(old)===JSON.stringify(v))return;
   undo.push({path,old:old===undefined?undefined:clone(old),apply:afterChange});setPath(state,path,v);markDirty();afterChange();status('Đã sửa — nhớ bấm Lưu.')}
-let refreshT=0;function refresh(){clearTimeout(refreshT);refreshT=setTimeout(()=>{if(mode==='home')reloadHome(true);else renderProject(true)},200)}
+let refreshT=0;function refresh(){clearTimeout(refreshT);refreshT=setTimeout(()=>{if(mode==='home')reloadHome(true);else if(mode==='work')renderWork(true);else renderProject(true)},200)}
 
 const SFX_OPTS=[['none','Không có (như hiện tại)'],['curtain','1 · Rèm vén: mục hiện ra từ dưới lên như kéo rèm'],['rise','2 · Trồi từng lớp: chữ, ảnh, thẻ lần lượt bay lên'],['tilt','3 · Lật 3D: mục nghiêng ra sau rồi dựng thẳng']];
 const SHOV_OPTS=[['none','Không có'],['hover3d','A · Thẻ nghiêng 3D theo chuột, có vệt sáng lướt'],['spotlight','B · Đèn soi: vùng sáng theo chuột, phần còn lại tối đi'],['depth','C · Chiều sâu: chữ, nút trôi theo lớp khi rê chuột'],['glow','D · Viền sáng: ánh xanh chạy theo chuột dọc mép thẻ'],['scatter','E · Chữ né chuột: các chữ tiêu đề lớn dạt ra khi chuột tới gần']];
@@ -575,7 +587,7 @@ function ctl(f,path){
       el.scrollIntoView({block:'start',behavior:'instant'});fn(el,s.value)};
     // stored as one object (site.sectionFx) so undo / 'none' leave no empty leftovers
     s.onchange=()=>{const cur={...(getPath(state,store)||{})};if(s.value==='none')delete cur[f.sec];else cur[f.sec]=s.value;setVal(store,Object.keys(cur).length?cur:undefined);setTimeout(play,900)};b.onclick=play}
-  else if(f.k==='select'){w.innerHTML=lab+'<select style="width:100%">'+f.opts.map(([k,n])=>'<option value="'+esc(k)+'">'+esc(n)+'</option>').join('')+'</select>';const s=w.querySelector('select');s.value=v??f.def;if(s.selectedIndex<0)s.value=f.def;s.onchange=()=>setVal(path,s.value)}
+  else if(f.k==='select'){w.innerHTML=lab+'<select style="width:100%">'+f.opts.map(([k,n])=>'<option value="'+esc(k)+'">'+esc(n)+'</option>').join('')+'</select>'+(f.noteHtml||f.note?'<div class="note">'+(f.noteHtml||esc(f.note))+'</div>':'');const s=w.querySelector('select');s.value=v??f.def;if(s.selectedIndex<0)s.value=f.def;s.onchange=()=>setVal(path,s.value)}
   else if(f.k==='color'){w.innerHTML=lab+'<div class="colorf"><input type="color"><input type="text" maxlength="7"><button type="button" title="Về màu mặc định">↺</button></div>';const [c,t,r]=w.querySelectorAll('input,button');
     const val=/^#[0-9a-f]{6}$/i.test(v||'')?v:f.def;c.value=val;t.value=val;
     c.oninput=()=>{t.value=c.value;if(f.css&&fdoc)fdoc.documentElement.style.setProperty(f.css,c.value)};c.onchange=()=>setVal(path,c.value);
@@ -619,6 +631,8 @@ $('#secList').onclick=e=>{const b=e.target.closest('[data-s]');if(b)selectSec(b.
 function renderInspector(){const s=SECS.find(x=>x.id===curSec)||SECS[0],host=$('#insp'),y=$('#aside').scrollTop;host.innerHTML='<h3>'+esc(s.n)+'</h3>';
   if(s.vis)host.appendChild(ctl(Bo(s.vis,'Hiện mục này trên web'),s.vis));s.f.forEach(f=>host.appendChild(ctl(f,f.p)));renderSecList();$('#aside').scrollTop=y}
 // every home section gets the effect picker as its first setting
+const HS_DEF={intro:'hold',about:'hold',experience:'hold',clients:'hold',projects:'hold',journal:'pin',contact:'hold'};
+SECS.forEach(s=>{if(HS_DEF[s.id])s.f.unshift(S('site.sectionScroll.'+s.id,'↔ Cuộn ngang khi lướt trang',[['hold','Đứng yên tại chỗ, nội dung trượt ngang vào (trái / phải xen kẽ)'],['drift','Trượt ngang khi cuộn (không dừng)'],...(s.id==='journal'?[['pin','Ghim lại: cuộn dọc = lướt ngang qua các bài']]:[]),['none','Không (cuộn dọc bình thường)']],HS_DEF[s.id],{note:'Xem ở trang thật (Xem trang như khách); trong trình chỉnh sửa tắt để dễ kéo thả.'}))});
 SECS.forEach(s=>{if(s.sel&&!['nav','skills'].includes(s.id))s.f.unshift({k:'sfx',p:'site.sectionFx.'+s.id,l:'✨ Hiệu ứng khi cuộn tới',sec:s.id},{k:'sfx',hov:true,p:'site.sectionHover.'+s.id,l:'🖱 Hiệu ứng khi rê chuột',sec:s.id})});
 function secEl(s){return s&&s.sel&&fdoc?fdoc.querySelector(s.sel):null}
 function highlightSec(scroll){if(!fdoc)return;fdoc.querySelectorAll('.ve-sel').forEach(e=>e.classList.remove('ve-sel'));const el=secEl(SECS.find(x=>x.id===curSec));
@@ -637,7 +651,7 @@ const HINT_BLOCK={frames:'Ảnh điền vào ô theo thứ tự (ô lớn = ản
 function fillPicker(cur){
   const ps=(state.projects||[]).map((p,i)=>({p,i}));
   const opt=(v,t)=>`<option value="${v}">${t.replace(/</g,'&lt;')}</option>`;
-  $('#pagePick').innerHTML=opt('home','🏠 Trang chủ')
+  $('#pagePick').innerHTML=opt('home','🏠 Trang chủ')+opt('work','📂 Trang Tất cả dự án')
     +'<optgroup label="Dự án">'+ps.filter(x=>x.p.kind!=='journal').map(x=>opt(x.i,(x.p.published===false?'(ẩn) ':'')+(x.p.title||x.p.slug))).join('')+'</optgroup>'
     +'<optgroup label="Bài Nhật ký">'+ps.filter(x=>x.p.kind==='journal').map(x=>opt(x.i,(x.p.published===false?'(ẩn) ':'')+(x.p.title||x.p.slug))).join('')+'</optgroup>';
   $('#pagePick').value=String(cur);
@@ -645,11 +659,39 @@ function fillPicker(cur){
 $('#pagePick').onchange=e=>showPage(e.target.value);
 function showPage(v){
   closePop();hideTc();if(lay.on)setLayMode(false);
+  $('#workPanel').hidden=v!=='work';
   if(v==='home'){mode='home';projIdx=-1;$('#homePanel').hidden=false;$('#projPanel').hidden=true;renderInspector();reloadHome(false);return}
+  if(v==='work'){mode='work';projIdx=-1;$('#homePanel').hidden=true;$('#projPanel').hidden=true;fillWorkPanel();renderWork(false);return}
   mode='project';projIdx=+v;const p=proj();
   if(!Array.isArray(p.blocks)){const r=PT.blocksOf(p);p.blocks=JSON.parse(JSON.stringify(r.blocks));if(!p.heroSize)p.heroSize=r.heroSize;saved=saved;markDirty()}
   $('#homePanel').hidden=true;$('#projPanel').hidden=false;fillProjPanel();renderProject(false);
 }
+/* "All work" page (projects/index.html): title + description editable on the page, cards come from the projects */
+function renderWork(keepScroll){
+  const y=keepScroll&&frame.contentWindow?frame.contentWindow.scrollY:0;
+  let html=PT.renderWorkPage(state,{edit:true}).replace('<head>','<head><base href="/projects/"><script>window.__VE_EDIT__=1<\/script>');
+  frame.onload=()=>{setupWorkFrame();if(y)frame.contentWindow.scrollTo(0,y)};
+  frame.removeAttribute('src');frame.srcdoc=html;
+}
+function setupWorkFrame(){
+  fdoc=frame.contentDocument;fdoc.documentElement.classList.add('page-ready');
+  const st=fdoc.createElement('style');st.textContent=FRAME_CSS;fdoc.head.appendChild(st);
+  fdoc.addEventListener('click',e=>{const c=e.target.closest('[data-ve-card]');if(c){e.preventDefault();fillPicker(c.dataset.veCard);showPage(c.dataset.veCard);return}const a=e.target.closest('a');if(a)e.preventDefault()},true);
+  const B=[];fdoc.querySelectorAll('[data-ve]').forEach(el=>{const path=el.getAttribute('data-ve');B.push({type:'text',el,path,multi:false})});
+  for(const b of B){b.el.setAttribute('data-ve-text',b.path);b.apply=()=>renderWork(true);b.el.addEventListener('click',ev=>{ev.preventDefault();ev.stopPropagation();if(b.el.isContentEditable)return;startEdit(b)})}
+  window.__B=B;fdoc.addEventListener('keydown',hotkeys);
+  status('Trang Tất cả dự án: bấm tiêu đề / mô tả để sửa, bấm thẻ để mở dự án đó.');
+}
+function fillWorkPanel(){
+  const host=$('#workFields');host.innerHTML='';[T('workPage.title','Tiêu đề (mặc định: ALL WORK)'),A('workPage.description','Mô tả')].forEach(f=>host.appendChild(ctl(f,f.p)));
+  const a=state.projects||[];
+  $('#workList').innerHTML=a.map((p,i)=>p.kind==='journal'?'':`<div class="mod"><div class="mod-head"><b data-wk="open" data-i="${i}" title="Mở trang dự án này">${p.published===false?'(ẩn) ':''}${(p.title||p.slug||'').replace(/</g,'&lt;')}</b><button data-wk="up" data-i="${i}">↑</button><button data-wk="down" data-i="${i}">↓</button><button data-wk="vis" data-i="${i}" title="Ẩn / hiện trên web">${p.published===false?'👁‍🗨':'👁'}</button></div><div style="color:var(--muted);font-size:11.5px">${(p.category||'—').replace(/</g,'&lt;')} · ${p.year||''}</div></div>`).join('');
+}
+$('#workList').onclick=e=>{const t=e.target.closest('[data-wk]');if(!t)return;const i=+t.dataset.i,a=clone(state.projects),act=t.dataset.wk;
+  if(act==='open'){fillPicker(i);showPage(String(i));return}
+  const step=d=>{let j=i+d;while(j>=0&&j<a.length&&a[j].kind==='journal')j+=d;if(j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];setVal('projects',a)};
+  if(act==='up')step(-1);if(act==='down')step(1);
+  if(act==='vis'){a[i].published=a[i].published===false;setVal('projects',a)}};
 function renderProject(keepScroll){
   const p=proj();if(!p)return;
   const y=keepScroll&&frame.contentWindow?frame.contentWindow.scrollY:0;

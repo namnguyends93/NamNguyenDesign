@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Demo — Liên hệ & Chân trang</title>
+<style>
+body{margin:0;background:#0b0b0b;color:#eee;font:15px/1.5 Inter,Arial,sans-serif;padding:32px}
+h1{font-size:26px;margin:0 0 6px}h2{font-size:18px;margin:46px 0 14px;color:#8ea1ff}
+p.n{color:#999;margin:0 0 20px;max-width:760px}
+.row{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{background:#151515;border:1px solid #262626;border-radius:16px;overflow:hidden}
+.card b{display:block;padding:12px 16px;font-size:14px}.card small{display:block;padding:0 16px 12px;color:#888}
+.vp{position:relative;height:var(--h);overflow:hidden;background:#fff}
+.vp iframe{position:absolute;left:0;top:0;width:1440px;height:calc(var(--h) / var(--s));border:0;transform:scale(var(--s));transform-origin:0 0;pointer-events:none}
+</style></head><body>
+<h1>Demo — Khung Liên hệ & Chân trang</h1>
+<p class="n">Mỗi ô là trang chủ thật ở bề ngang 1440px, thu nhỏ lại. Chọn kiểu ưng ý trong trang chỉnh sửa: mục <b>Liên hệ</b> → "Kiểu khung liên hệ", mục <b>Chân trang</b> → "Kiểu chân trang".</p>
+<h2>Khung Liên hệ</h2><div class="row" id="c"></div>
+<h2>Chân trang</h2><div class="row" id="f"></div>
+<script>
+const C=[['full','1 · Đầy đủ (hiện tại)','Ảnh nền lớn, đoạn mô tả, khung QR Zalo kính mờ.'],['compact','2 · Gọn','Không ảnh nền: khung tối, tiêu đề + email bấm được, QR nhỏ bên phải.'],['line','3 · Tối giản','Một dải: tiêu đề lớn + email + nút CV, bỏ QR và mô tả.']];
+const F=[['full','1 · Đầy đủ (hiện tại)','Câu giới thiệu, lưới link đánh số, chữ tên lớn.'],['compact','2 · Gọn','Một thanh tối: tên + link trên một hàng, dòng bản quyền.'],['line','3 · Tối giản','Một dòng chữ nhỏ trên nền trắng: © bên trái, link bên phải.']];
+function card(host,[k,t,n],q,target){const s=Math.min(1,(host.clientWidth/3-12)/1440),h=Math.round(820*s);const d=document.createElement('div');d.className='card';
+  d.innerHTML='<div class="vp" style="--s:'+s+';--h:'+h+'px"><iframe loading="lazy" src="/?'+q+'='+k+'#'+target+'"></iframe></div><b>'+t+'</b><small>'+n+'</small>';host.appendChild(d)}
+const c=document.getElementById('c'),f=document.getElementById('f');
+C.forEach(x=>card(c,x,'contact','contact'));F.forEach(x=>card(f,x,'footer','fdemo'));
+// footer: scroll each frame to the bottom once loaded
+f.querySelectorAll('iframe').forEach(fr=>fr.addEventListener('load',()=>{try{const w=fr.contentWindow;setTimeout(()=>w.scrollTo(0,w.document.documentElement.scrollHeight),1500)}catch(e){}}));
+c.querySelectorAll('iframe').forEach(fr=>fr.addEventListener('load',()=>{try{const w=fr.contentWindow,el=w.document.getElementById('contact');setTimeout(()=>{el.scrollIntoView({block:'center'})},1500)}catch(e){}}));
+</script></body></html>

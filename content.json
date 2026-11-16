@@ -27,7 +27,10 @@
     },
     "sectionHover": {
       "clients": "glow"
-    }
+    },
+    "shellStyle": "open",
+    "contactStyle": "line",
+    "footerStyle": "line"
   },
   "navigation": {
     "visible": true,
@@ -408,7 +411,7 @@
         },
         {
           "type": "gallery",
-          "style": "mix",
+          "style": "grid2",
           "images": [
             "https://framerusercontent.com/images/BYTBcqFikmPNhvjQYU7pi3ciyI.jpg?width=1600",
             "https://framerusercontent.com/images/r1Q4APz4TNMV5x9oKRYscAL06c.jpg?width=1600",
@@ -418,6 +421,15 @@
         {
           "type": "statement",
           "text": "Beauty communication can feel premium without becoming predictable."
+        },
+        {
+          "type": "gallery",
+          "style": "grid3",
+          "images": [
+            "https://pub-5947827bb4ba488e9292f97b6e5a045a.r2.dev/1794714139055_2082015516654326971_5864110009430055998_984b569b742963c3b6523810c7-1794849215741-a20ef0.jpg",
+            "https://pub-5947827bb4ba488e9292f97b6e5a045a.r2.dev/1794714139076_2082015516654326971_5864110009430055998_565e195f7f9a571f5034425653-1794849218005-49c440.jpg",
+            "https://pub-5947827bb4ba488e9292f97b6e5a045a.r2.dev/1794714139097_2082015516654326971_5864110009430055998_181b204397623e5c2a21988303-1794849220432-49ff6f.jpg"
+          ]
         }
       ],
       "password": ""
@@ -953,7 +965,8 @@
       "Image viewer": "Xem ảnh",
       "Close": "Đóng",
       "Previous": "Ảnh trước",
-      "Next": "Ảnh sau"
+      "Next": "Ảnh sau",
+      "Hey, I'm Nam": "Chào, mình là Nam"
     }
   },
   "layout": {
@@ -978,7 +991,7 @@
       },
       "#home section.hero div.hero-card div.hero-bg": {
         "wp": 100,
-        "h": 1080
+        "h": 1410
       },
       "#about div.about": {
         "h": 1013

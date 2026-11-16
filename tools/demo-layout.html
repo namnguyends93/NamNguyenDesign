@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Demo — Bố cục trang chủ</title>
+<style>
+body{margin:0;background:#0b0b0b;color:#eee;font:15px/1.5 Inter,Arial,sans-serif;padding:28px}
+h1{font-size:26px;margin:0 0 6px}p.n{color:#999;margin:0 0 22px;max-width:820px}
+.row{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;align-items:start}
+.col b{display:block;font-size:16px;margin-bottom:2px}.col small{display:block;color:#888;margin-bottom:12px;min-height:40px}
+.vp{position:relative;overflow:hidden;border-radius:12px;border:1px solid #262626;background:#fff;height:var(--h)}
+.vp iframe{position:absolute;left:0;top:0;width:1440px;border:0;transform:scale(var(--s));transform-origin:0 0;pointer-events:none}
+</style></head><body>
+<h1>Demo — Bố cục trang chủ</h1>
+<p class="n">Mỗi cột là cả trang chủ thật (bề ngang 1440px, thu nhỏ), từ Intro xuống tới chân trang. Cuộn trang này để so sánh. Chọn trong trang chỉnh sửa: <b>🎨 Giao diện chung → Bố cục trang chủ</b>.</p>
+<div class="row" id="r"></div>
+<script>
+const V=[['cards','1 · Ô bo tròn (hiện tại)','Mỗi mục là một ô bo góc lớn, cách nhau bởi khe trắng.'],
+         ['bleed','2 · Tràn viền','Các mục chạy sát mép màn hình, không bo, không khe — liền nhau như từng dải màu.'],
+         ['open','3 · Mở thoáng','Nền tối liền một mạch, bỏ hết khung nền; chỉ ảnh bo nhẹ 24px, các mục cách nhau bằng đường kẻ mảnh.']];
+const r=document.getElementById('r'),SPOTS=[['.intro-grid','Intro'],['#about','Giới thiệu'],['#experience','Kinh nghiệm'],['#projects','Dự án'],['#journal','Nhật ký'],['#contact','Liên hệ + chân trang']];
+V.forEach(([k,t,n])=>{const c=document.createElement('div');c.className='col';const s=(r.clientWidth/3-12)/1440;
+  c.innerHTML='<b>'+t+'</b><small>'+n+'</small>'+SPOTS.map(([sel,lab])=>'<div style="font-size:11px;color:#777;margin:10px 0 4px">'+lab+'</div><div class="vp" style="--s:'+s+';--h:'+Math.round(900*s)+'px"><iframe loading="lazy" style="height:900px" data-sel="'+sel+'" src="/?shell='+k+'"></iframe></div>').join('');r.appendChild(c);
+  c.querySelectorAll('iframe').forEach(fr=>fr.addEventListener('load',()=>setTimeout(()=>{try{const w=fr.contentWindow,el=w.document.querySelector(fr.dataset.sel);if(el)w.scrollTo(0,el.getBoundingClientRect().top+w.scrollY-4)}catch(e){}},1800)));
+});
+</script></body></html>
