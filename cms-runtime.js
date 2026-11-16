@@ -25,7 +25,7 @@ window.__CMS_DONE__=(async function(){
     let meta=q('meta[name="description"]');if(meta&&c.site?.seoDescription)meta.content=c.site.seoDescription;
     if(c.site?.accent)document.documentElement.style.setProperty('--accent',c.site.accent);
     // Effects switched on in the editor → <html data-fx> (assets/fx.js); intro screen text
-    {const ef=c.site?.effects||{};document.documentElement.setAttribute('data-fx',['intro','transitions','reveal','count'].filter(k=>ef[k]!==false).join(' '));
+    {const ef=c.site?.effects||{};document.documentElement.setAttribute('data-fx',['intro','transitions','reveal','count','smooth'].filter(k=>ef[k]!==false).join(' '));
       const nm=q('.fx-intro-name > span'),br=q('.fx-intro-brand');if(nm)nm.textContent=c.site?.introText||c.site?.cursorText||'Nam Nguyen';if(br)br.textContent=c.site?.name||'Nam Nguyen Design'}
     // Cursor ring text (motion.js reads these attributes)
     if(c.site?.cursorText)document.documentElement.dataset.cursorText=c.site.cursorText;
@@ -53,20 +53,47 @@ window.__CMS_DONE__=(async function(){
     {const layoutCss=L=>{const px=n=>Math.round(+n||0)+'px';
         const one=m=>Object.entries(m||{}).map(([s,v])=>{if(!v||/[{}<;]/.test(s))return'';const d=[];
           if(v.d==='inline-block'||v.d==='block')d.push('display:'+v.d);
-          if(v.w!=null&&v.w!=='')d.push('width:'+px(v.w),'max-width:100%','flex:none');
+          // wp = width in % of the container, xp = horizontal shift in % of the block itself: both scale with the screen.
+          // w / x (px) are the old format, still read until the editor converts them.
+          if(v.wp!=null&&v.wp!=='')d.push('width:'+Math.min(100,Math.max(1,+v.wp))+'%','max-width:100%','min-width:0','flex:none');
+          else if(v.w!=null&&v.w!=='')d.push('width:'+px(v.w),'max-width:100%','flex:none');
           if(v.h!=null&&v.h!=='')d.push('height:'+px(v.h),'min-height:0');
-          if((v.w!=null&&v.w!=='')||(v.h!=null&&v.h!==''))d.push('object-fit:cover');
+          if((v.w!=null&&v.w!=='')||(v.wp!=null&&v.wp!=='')||(v.h!=null&&v.h!==''))d.push('object-fit:cover');
           if(v.r!=null&&v.r!=='')d.push('border-radius:'+px(v.r),'overflow:hidden');
-          if(+v.x||+v.y)d.push('translate:'+px(v.x)+' '+px(v.y));
+          if(+v.xp||+v.x||+v.y)d.push('translate:'+(+v.xp?(Math.round(+v.xp*10)/10)+'%':px(v.x))+' '+px(v.y));
           if(v.pt!=null&&v.pt!=='')d.push('padding-top:'+px(v.pt));if(v.pb!=null&&v.pb!=='')d.push('padding-bottom:'+px(v.pb));
           return d.length?s+'{'+d.map(x=>x+'!important').join(';')+'}':''}).join('');
-        const a=one(L&&L.desktop),b=one(L&&L.mobile);return (a?'@media (min-width:701px){'+a+'}':'')+(b?'@media (max-width:700px){'+b+'}':'')};
+        // gc = column shares of a grid dragged in the editor (fr numbers). Only from 1101px, so the site's own tablet / phone stacking stays.
+        const cols=m=>Object.entries(m||{}).map(([s,v])=>{const g=v&&Array.isArray(v.gc)?v.gc.map(Number).filter(n=>n>0&&n<1000):[];if(g.length<2||/[{}<;]/.test(s))return'';return s+'{grid-template-columns:'+g.map(n=>'minmax(0,'+(Math.round(n*10)/10)+'fr)').join(' ')+'!important}'}).join('');
+        const a=one(L&&L.desktop),b=one(L&&L.mobile),gc=cols(L&&L.desktop);return (a?'@media (min-width:701px){'+a+'}':'')+(gc?'@media (min-width:1101px){'+gc+'}':'')+(b?'@media (max-width:700px){'+b+'}':'')};
       window.__cmsLayoutCss=layoutCss;
       if(isHome){const css=layoutCss(raw.layout);let st=q('#cms-layout');if(css){if(!st){st=document.createElement('style');st.id='cms-layout';document.head.appendChild(st)}st.textContent=css}else if(st)st.remove()}}
     // TEXT COLOURS picked in the editor (textColors = { selector: '#hex' }, every screen size)
     {const tcCss=tc=>Object.entries(tc||{}).filter(([s,v])=>s&&!/[{}<;]/.test(s)&&/^#[0-9a-f]{3,8}$/i.test(v||'')).map(([s,v])=>s+'{color:'+v+'!important}').join('');
       window.__cmsTextCss=tcCss;
       if(isHome){const css=tcCss(raw.textColors);let st=q('#cms-text');if(css){if(!st){st=document.createElement('style');st.id='cms-text';document.head.appendChild(st)}st.textContent=css}else if(st)st.remove()}}
+    // CHARACTER STYLES picked in the editor (textStyles = { selector: { ff, fs, fw, lh, ls, ta, tt, fi } }) → <style id="cms-type"> + Google fonts.
+    // Same rules as typeDecl() in project-template.js.
+    {const TYPE_FONTS = {'Space Grotesk':'Space+Grotesk:wght@300..700','Inter':'Inter:ital,wght@0,300..800;1,300..800','Syne':'Syne:wght@400..800','Archivo':'Archivo:ital,wght@0,300..800;1,300..800','Unbounded':'Unbounded:wght@300..800','Bricolage Grotesque':'Bricolage+Grotesque:wght@300..800','Playfair Display':'Playfair+Display:ital,wght@0,400..900;1,400..900','DM Serif Display':'DM+Serif+Display:ital@0;1','Anton':'Anton','Be Vietnam Pro':'Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,700'};
+function typeDecl(o) {
+  if (!o || typeof o !== 'object') return [];
+  const d = [], n = v => v !== '' && v != null && isFinite(+v);
+  if (o.ff && TYPE_FONTS[o.ff]) d.push('font-family:"' + o.ff + '",Inter,sans-serif');
+  if (n(o.fs) && +o.fs > 0) { const s = Math.round(+o.fs * 10) / 10; d.push('font-size:' + (s <= 14 ? s + 'px' : 'clamp(14px,' + (s / 14.4).toFixed(3) + 'vw,' + s + 'px)')); }
+  if (n(o.fw)) d.push('font-weight:' + Math.round(+o.fw));
+  if (n(o.lh) && +o.lh > 0) d.push('line-height:' + +o.lh);
+  if (n(o.ls)) d.push('letter-spacing:' + (+o.ls / 1000) + 'em');
+  if (/^(left|center|right|justify)$/.test(o.ta || '')) d.push('text-align:' + o.ta);
+  if (/^(none|uppercase|lowercase|capitalize)$/.test(o.tt || '')) d.push('text-transform:' + o.tt);
+  if (o.fi === true) d.push('font-style:italic');
+  return d;
+}
+const typeFontsHref = fams => { const f = [...new Set(fams)].filter(x => TYPE_FONTS[x]); return f.length ? 'https://fonts.googleapis.com/css2?' + f.map(x => 'family=' + TYPE_FONTS[x]).join('&') + '&display=swap' : ''; };
+      const tyCss=ts=>Object.entries(ts||{}).filter(([s])=>s&&!/[{}<;]/.test(s)).map(([s,o])=>{const d=typeDecl(o);return d.length?s+'{'+d.map(x=>x+'!important').join(';')+'}':''}).join('');
+      const tyFonts=ts=>typeFontsHref(Object.values(ts||{}).map(o=>o&&o.ff).filter(Boolean));
+      window.__cmsTypeCss=tyCss;window.__cmsTypeFonts=tyFonts;window.__cmsTypeDecl=typeDecl;
+      if(isHome){const css=tyCss(raw.textStyles);let st=q('#cms-type');if(css){if(!st){st=document.createElement('style');st.id='cms-type';document.head.appendChild(st)}st.textContent=css}else if(st)st.remove();
+        const href=tyFonts(raw.textStyles);let ln=q('link[data-cms-type]');if(href){if(!ln){ln=document.createElement('link');ln.rel='stylesheet';ln.dataset.cmsType='1';document.head.appendChild(ln)}if(ln.getAttribute('href')!==href)ln.href=href}else if(ln)ln.remove()}}
 
     // NAV: logo badge, links and the button are built from navigation.*
     {const n=c.navigation||{},nav=q('nav.nav');if(nav){
@@ -81,7 +108,15 @@ window.__CMS_DONE__=(async function(){
     {const h1=q('.hero-copy h1');if(h1&&c.home?.hero?.title)h1.innerHTML=lines(c.home.hero.title)}
     {const t=String(c.home?.hero?.title||'').replace(/\s+/g,' ').trim().toUpperCase();if(t)qa('.project-top span:first-child').forEach(s=>{s.textContent=t})}
     replaceExact('Brand identities, campaign visuals and digital experiences built with clarity, edge and intent.',c.home?.hero?.description);
-    if(isHome&&c.home?.hero?.image){const hero=q('.hero-bg img')||q('.hero img');if(hero)hero.src=c.home.hero.image}
+    // Big home images (hero, intro, about, contact) may be a video: a muted looped <video class="vid vid-bg"> sits next to the <img>, which is hidden and loses its src
+    const isVidU=u=>/\.(mp4|webm|mov)([?#]|$)/i.test(String(u||''));
+    const setMedia=(box,url)=>{box=typeof box==='string'?q(box):box;if(!box)return;const im=box.querySelector(':scope>img');let v=box.querySelector(':scope>video.vid-bg');
+      if(url&&isVidU(url)){if(!v){v=document.createElement('video');v.className='vid vid-bg';['muted','loop','playsinline'].forEach(a=>v.setAttribute(a,''));v.setAttribute('preload','none');v.setAttribute('aria-hidden','true');box.insertBefore(v,im?im.nextSibling:null)}
+        if(v.dataset.src!==url){v.dataset.src=url;v.removeAttribute('src');v._fx=0}if(im){im.removeAttribute('src');im.removeAttribute('srcset');im.hidden=true}}
+      else{if(v)v.remove();if(im&&url){im.hidden=false;im.removeAttribute('srcset');im.src=url}}
+      if(window.__nndFx)window.__nndFx.refresh()};
+    window.__cmsSetMedia=setMedia;
+    if(isHome&&c.home?.hero?.image)setMedia('.hero-bg',c.home.hero.image);
     hideByIdOrText('home','Independent Visual Designer',c.home?.hero?.visible);
 
     // INTRO / CLEAR IDEAS
@@ -90,14 +125,21 @@ window.__CMS_DONE__=(async function(){
     {const m=qa('.intro-meta span'),it=c.home?.intro||{};
       if(m[0]&&Array.isArray(it.services))m[0].innerHTML=it.services.filter(Boolean).map(E).join('<br>');
       if(m[1]&&it.location)m[1].innerHTML=lines(String(it.location).replace(/,\s*/,'\n'))}
-    if(isHome&&c.home?.intro?.image){const target=q('.intro-panel.image img');if(target)target.src=c.home.intro.image}
+    if(isHome&&c.home?.intro?.image)setMedia('.intro-panel.image',c.home.intro.image);
+    // Section effects chosen in the editor: site.sectionFx (on scroll) → data-sfx, site.sectionHover (mouse) → data-shov (assets/fx.js)
+    if(isHome){const SFX={hero:'.hero',intro:'.intro-grid',about:'#about',experience:'#experience',clients:'#clients',projects:'#projects',marquee:'.big-marquee',journal:'#journal',contact:'#contact',footer:'footer.footer'},OK=['curtain','rise','tilt'],HV=['hover3d','spotlight','depth','glow','scatter'],m=c.site?.sectionFx||{},h=c.site?.sectionHover||{};
+      for(const [k,sel] of Object.entries(SFX)){const el=q(sel);if(!el)continue;if(OK.includes(m[k]))el.setAttribute('data-sfx',m[k]);else el.removeAttribute('data-sfx');if(HV.includes(h[k]))el.setAttribute('data-shov',h[k]);else el.removeAttribute('data-shov')}}
+    // Intro: share of the width for the image column (home.intro.split, 20–80 %). Used from 1101px; 901–1100px = half / half; ≤900px stacked.
+    if(isHome){const sp=Math.round(+c.home?.intro?.split||0);let st=q('#cms-intro');
+      if(sp>=20&&sp<=80&&sp!==50){if(!st){st=document.createElement('style');st.id='cms-intro';document.head.appendChild(st)}st.textContent='@media (min-width:1101px){.intro-grid{grid-template-columns:minmax(0,'+sp+'fr) minmax(0,'+(100-sp)+'fr)!important}}'}
+      else if(st)st.remove()}
     hideByIdOrText('intro','Clear ideas. Bold visual direction.',c.home?.intro?.visible);
 
     // ABOUT
     replaceExact('Profile.26',c.home?.about?.eyebrow);
     replaceExact('About',c.home?.about?.title);
     replaceExact('Nam Nguyen Design is an independent visual design practice focused on brand identity, campaign systems and art direction. Every project is shaped around a clear idea, a strong visual point of view and execution that feels precise, contemporary and memorable.',c.home?.about?.description);
-    if(isHome&&c.home?.about?.image){const target=q('.about-bg img');if(target)target.src=c.home.about.image}
+    if(isHome&&c.home?.about?.image)setMedia('.about-bg',c.home.about.image);
     hideByIdOrText('about','Profile.26',c.home?.about?.visible);
 
     // SKILLSET (About) — app icons: Adobe-style letter tiles + Simple Icons glyphs (CC0)
@@ -192,7 +234,7 @@ window.__CMS_DONE__=(async function(){
         if(t&&xp.title)t.textContent=xp.title;if(d){d.textContent=xp.description||'';d.style.display=xp.description?'':'none'}
         if(ol)ol.innerHTML=(xp.items||[]).filter(x=>x&&x.visible!==false&&(x.role||x.company)).map(x=>'<li class="xp-item"><span class="xp-years mono">'+e(x.years)+'</span><div><h3 class="xp-role">'+e(x.role)+'</h3><span class="xp-company">'+e(x.company)+'</span></div><p class="xp-note">'+e(x.note)+'</p></li>').join('')}}}
     // CV download buttons (About + Contact)
-    {const cv=c.site?.cvUrl;qa('.cv-btn').forEach(a=>{if(cv){a.href=cv;a.textContent=c.site?.cvLabel||'Download CV ↓';a.hidden=false}else a.hidden=true})}
+    {const cv=c.site?.cvUrl,lab=String(c.site?.cvLabel||'').replace(/\s*[↓⬇↘]\s*$/,'')||'Get CV';qa('.cv-btn').forEach(a=>{if(cv){a.href=cv;const l=a.querySelector('.cv-label');if(l)l.textContent=lab;else a.textContent=lab;a.hidden=false}else a.hidden=true})}
     // "See all work" link under the project numbers
     {const al=q('.all-work-link'),ps=c.home?.projectsSection||{};if(al){if(ps.allVisible===false)al.hidden=true;else{al.hidden=false;if(ps.allLabel)al.textContent=ps.allLabel;al.href=BASE+'projects/index.html'}}}
     // Background colour per section while scrolling (motion.js does the switching)
@@ -205,7 +247,7 @@ window.__CMS_DONE__=(async function(){
     replaceExact('Start a Project.26',c.home?.contact?.eyebrow);
     replaceExact('Get in touch',c.home?.contact?.title);
     replaceExact('If you are building a brand, campaign or visual system and need a clear creative direction, send over the brief. I am open to selected freelance and collaborative projects.',c.home?.contact?.description);
-    if(isHome&&c.home?.contact?.image){const target=q('.contact-bg img');if(target)target.src=c.home.contact.image}
+    if(isHome&&c.home?.contact?.image)setMedia('.contact-bg',c.home.contact.image);
     if(c.home?.contact?.email)replaceExact('hello@namnguyen.design',c.home.contact.email,true);
     // Zalo QR frame: image, caption and phone come from home.contact
     const qrBox=q('#contact .contact-qr');

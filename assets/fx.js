@@ -35,7 +35,7 @@
     each('video[data-src]', function (v) {
       if (v._fx) return; v._fx = 1;
       if (v.dataset.mode === 'player') { v.controls = true; v.muted = false; v.preload = 'metadata'; }
-      else { v.muted = true; v.loop = true; v.playsInline = true; if (reduce || edit) v.controls = true; }
+      else { v.muted = true; v.loop = true; v.playsInline = true; if ((reduce || edit) && !v.classList.contains('vid-bg')) v.controls = true; }
       if (edit) loadVid(v);
       if (vio) vio.observe(v); else loadVid(v);
     });
@@ -178,9 +178,122 @@
     setTimeout(finish, 3500);   // safety net
   }
 
+  /* ---------------- section effects (home) ----------------
+     On scroll (site.sectionFx → data-sfx): curtain = wipes up like a curtain · rise = texts, pictures and cards fly up
+     one after another · tilt = tips back in 3D and stands up.
+     With the mouse (site.sectionHover → data-shov), on the section's main card:
+       hover3d = the card tilts towards the pointer with a moving glare · spotlight = a soft light follows the pointer, the
+       rest dims · depth = titles, texts and buttons float on layers that drift with the pointer · glow = a light runs
+       along the card's edge next to the pointer · scatter = the big title's letters dodge the pointer.
+     Off in the editor and with reduced motion; mouse effects only with a real mouse. The editor plays samples with
+     __nndSfxPlay / __nndHoverPlay. */
+  var SFX_KIDS = 'h1,h2,h3,h4,p,li,.chip,figure,img,video,.btn,.stat,.article,.client-card,.app-icon,.project-showcase,.qr-frame,.glass';
+  var sfxWait = [], sfxBound = 0;
+  function sfxKids(el) {
+    var all = [].slice.call(el.querySelectorAll(SFX_KIDS)).filter(function (x) { var r = x.getBoundingClientRect(); return r.width > 0 && r.height > 0; }).slice(0, 160);
+    all = all.filter(function (x) { return !all.some(function (y) { return y !== x && y.contains(x); }); }).slice(0, 48);
+    all.forEach(function (x, i) { x.classList.add('sfx-k'); x.style.setProperty('--sfx-d', Math.min(i * 70, 980) + 'ms'); });
+  }
+  // entrance starts when the section's top passes 88% of the screen (checked on scroll: an observer never fires for the
+  // curtain, whose clip-path hides the section until it opens)
+  function sfxScroll() {
+    var vh = innerHeight;
+    sfxWait = sfxWait.filter(function (el) { var r = el.getBoundingClientRect(); if (r.top < vh * 0.88 && r.bottom > 0) { setTimeout(function () { el.classList.add('sfx-in'); }, 80); return false; } return true; });
+  }
+  function initSfx() {
+    if (edit || reduce) return;
+    var list = [].slice.call(document.querySelectorAll('[data-sfx]')).filter(function (el) { return !el._sfx; });
+    if (list.length) {
+      doc.classList.add('sfx-on', 'sfx-noanim'); void doc.offsetWidth; setTimeout(function () { doc.classList.remove('sfx-noanim'); }, 50);
+      list.forEach(function (el) { el._sfx = 1; var k = el.getAttribute('data-sfx'); if (k === 'rise') sfxKids(el); if (k === 'curtain' || k === 'rise' || k === 'tilt') sfxWait.push(el); });
+      if (!sfxBound) { sfxBound = 1; addEventListener('scroll', sfxScroll, { passive: true }); addEventListener('resize', sfxScroll); }
+      sfxScroll();
+    }
+    if (window.matchMedia && matchMedia('(hover: hover) and (pointer: fine)').matches)
+      each('[data-shov]', function (el) { if (!el._shov) { el._shov = 1; hoverBind(el, el.getAttribute('data-shov')); } });
+  }
+  function sfxPlay(el, k) {   // editor sample of an entrance effect
+    if (!el) return; var had = doc.classList.contains('sfx-on');
+    el.classList.remove('sfx-in'); el.setAttribute('data-sfx', k); doc.classList.add('sfx-on', 'sfx-noanim');
+    if (k === 'rise') { el.querySelectorAll('.sfx-k').forEach(function (x) { x.classList.remove('sfx-k'); }); sfxKids(el); }
+    void el.offsetWidth; doc.classList.remove('sfx-noanim');
+    setTimeout(function () { el.classList.add('sfx-in'); }, 120);
+    setTimeout(function () { el.removeAttribute('data-sfx'); el.classList.remove('sfx-in'); el.querySelectorAll('.sfx-k').forEach(function (x) { x.classList.remove('sfx-k'); x.style.removeProperty('--sfx-d'); }); if (!had) doc.classList.remove('sfx-on'); }, 2600);
+  }
+
+  /* ---- mouse effects ---- */
+  function mainCard(sec) {   // the big visible card of a section (its rounded box), else the section itself
+    var r0 = sec.getBoundingClientRect(), best = null, area = 0;
+    [].slice.call(sec.querySelectorAll(':scope > *, :scope > * > *')).forEach(function (c) {
+      var r = c.getBoundingClientRect(), a = r.width * r.height, cs = getComputedStyle(c);
+      if (a > area && a > r0.width * r0.height * 0.35 && cs.position !== 'fixed' && cs.display !== 'none') { best = c; area = a; }
+    });
+    return best || sec;
+  }
+  function mk(cls, host) { var d = document.createElement('div'); d.className = cls; d.setAttribute('aria-hidden', 'true'); host.appendChild(d); return d; }
+  function hoverBind(sec, k) {
+    var card = mainCard(sec), cs = getComputedStyle(card), parts = [], on = false;
+    if (cs.position === 'static') { card.style.position = 'relative'; parts.push(function () { card.style.position = ''; }); }
+    card.classList.add('shov-card', 'shov-' + k); parts.push(function () { card.classList.remove('shov-card', 'shov-' + k, 'shov-on'); });
+    var layer = null, chars = [], deps = [];
+    if (k === 'hover3d') layer = mk('shovl-glare', card);
+    if (k === 'spotlight') layer = mk('shovl-spot', card);
+    if (k === 'glow') layer = mk('shovl-glow', card);
+    if (layer) parts.push(function () { layer.remove(); });
+    if (k === 'depth') {
+      var picks = [].slice.call(card.querySelectorAll('h1,h2,h3,.display,.big-title,p,li,.btn,a,.chip,.stat,.glass,.mono,.qr-frame,.app-icon,.intro-meta > span'))
+        .filter(function (x) { var r = x.getBoundingClientRect(); return r.width > 0 && r.height > 0 && !x.closest('.nav-wrap'); });
+      picks = picks.filter(function (x) { return !picks.some(function (y) { return y !== x && y.contains(x); }); }).slice(0, 30);
+      picks.forEach(function (x) { var z = /^H[1-3]$/.test(x.tagName) || x.classList.contains('display') || x.classList.contains('big-title') ? 26 : x.classList.contains('glass') ? -14 : x.tagName === 'P' ? 10 : 18;
+        deps.push(x); x.classList.add('shov-dep'); x.style.setProperty('--z', z); });
+      parts.push(function () { deps.forEach(function (x) { x.classList.remove('shov-dep'); x.style.removeProperty('--z'); }); });
+    }
+    if (k === 'scatter') {
+      var h = card.querySelector('.big-title, h1, h2, .display');
+      if (h) {
+        chars = [].slice.call(h.querySelectorAll('.c'));
+        if (!chars.length) {   // not split by motion.js: wrap each letter once
+          var walk = document.createTreeWalker(h, NodeFilter.SHOW_TEXT), nodes = [], n; while ((n = walk.nextNode())) nodes.push(n);
+          nodes.forEach(function (t) { var f = document.createDocumentFragment(); t.textContent.split('').forEach(function (ch) { if (/\s/.test(ch)) { f.appendChild(document.createTextNode(ch)); return; } var sp = document.createElement('span'); sp.className = 'shov-ch'; sp.textContent = ch; f.appendChild(sp); }); t.parentNode.replaceChild(f, t); });
+          chars = [].slice.call(h.querySelectorAll('.shov-ch'));
+        }
+        chars.forEach(function (c) { c.classList.add('shov-c'); });
+        parts.push(function () { chars.forEach(function (c) { c.classList.remove('shov-c'); c.style.transform = ''; }); });
+      }
+    }
+    function apply(px, py, inside, cx, cy) {
+      if (inside !== on) { on = inside; card.classList.toggle('shov-on', inside); }
+      card.style.setProperty('--mx', (px * 100).toFixed(2) + '%'); card.style.setProperty('--my', (py * 100).toFixed(2) + '%');
+      var dx = inside ? px - 0.5 : 0, dy = inside ? py - 0.5 : 0;
+      if (k === 'hover3d') card.style.transform = inside ? 'perspective(1600px) rotateX(' + (-dy * 9).toFixed(2) + 'deg) rotateY(' + (dx * 11).toFixed(2) + 'deg) scale(1.012)' : '';
+      if (k === 'depth') { card.style.setProperty('--dx', dx.toFixed(3)); card.style.setProperty('--dy', dy.toFixed(3)); }
+      if (k === 'scatter') chars.forEach(function (c) {
+        if (!inside) { c.style.transform = ''; return; }
+        var r = c.getBoundingClientRect(), ex = r.left + r.width / 2 - cx, ey = r.top + r.height / 2 - cy, d = Math.sqrt(ex * ex + ey * ey), R = 170;
+        if (d >= R) { c.style.transform = ''; return; }
+        var f = (1 - d / R), m = f * f * 46; c.style.transform = 'translate(' + (ex / (d || 1) * m).toFixed(1) + 'px,' + (ey / (d || 1) * m).toFixed(1) + 'px) rotate(' + (ex / (d || 1) * f * 14).toFixed(1) + 'deg)';
+      });
+    }
+    function move(e) { var r = card.getBoundingClientRect(); apply((e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height, true, e.clientX, e.clientY); }
+    function leave() { apply(0.5, 0.5, false, 0, 0); }
+    card.addEventListener('pointermove', move); card.addEventListener('pointerleave', leave);
+    parts.push(function () { card.removeEventListener('pointermove', move); card.removeEventListener('pointerleave', leave); card.style.transform = ''; ['--mx', '--my', '--dx', '--dy'].forEach(function (v) { card.style.removeProperty(v); }); });
+    return { apply: apply, card: card, destroy: function () { parts.reverse().forEach(function (f) { f(); }); } };
+  }
+  function hoverPlay(sec, k) {   // editor sample: a pretend pointer draws a loop over the card for 3 seconds
+    if (!sec) return; var b = hoverBind(sec, k), t0 = Date.now();
+    var tm = setInterval(function () {
+      var t = (Date.now() - t0) / 3000, a = t * Math.PI * 2, px = 0.5 + Math.cos(a) * 0.32, py = 0.5 + Math.sin(a * 2) * 0.22, r = b.card.getBoundingClientRect();
+      b.apply(px, py, true, r.left + px * r.width, r.top + py * r.height);
+      if (t >= 1) { clearInterval(tm); b.apply(0.5, 0.5, false, 0, 0); setTimeout(b.destroy, 700); }
+    }, 16);
+  }
+
   /* ---------------- start ---------------- */
-  function refresh() { initVideos(); initReveal(); initCount(); }
+  function refresh() { initVideos(); initReveal(); initCount(); initSfx(); }
   window.__nndFx = { refresh: refresh, refreshVideos: refreshVideos };
+  window.__nndSfxPlay = sfxPlay;
+  window.__nndHoverPlay = hoverPlay;
   function start() { liftCurtain(); runIntro(); refresh(); }
   var go = function () { (window.__CMS_DONE__ && window.__CMS_DONE__.then ? window.__CMS_DONE__ : Promise.resolve()).then(start, start); };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();

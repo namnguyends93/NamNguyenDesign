@@ -30,12 +30,23 @@ const MEDIA_CONFIG=path.join(ROOT,'media.config.json');
 const R2_MANIFEST=path.join(ROOT,'media-r2.json');
 function r2Config(){try{const c=JSON.parse(fs.readFileSync(MEDIA_CONFIG,'utf8')).r2;return c&&c.bucket&&c.publicUrl?c:null}catch{return null}}
 function wranglerBin(){const bin=path.join(ROOT,'node_modules','wrangler','bin','wrangler.js');return fs.existsSync(bin)?bin:null}
-function wrangler(args){return new Promise((resolve,reject)=>{const bin=wranglerBin();if(!bin)return reject(new Error('Chưa cài wrangler: chạy npm install'));execFile(process.execPath,[bin,...args],{cwd:ROOT,timeout:120000,windowsHide:true},(err,stdout,stderr)=>{if(err){const msg=(stderr||stdout||err.message).toString();return reject(new Error(/login|auth|token/i.test(msg)?'Wrangler chưa đăng nhập Cloudflare: chạy npx wrangler login':msg.split('\n').filter(Boolean).slice(-3).join(' ')))}resolve(stdout)})})}
+// Runs Wrangler. On failure the full output goes to .wrangler/last-error.log and the message names the real cause:
+// only Wrangler's own [ERROR] lines decide "not logged in", so a word like "token" elsewhere in the output can't trigger it.
+function wrangler(args,timeout=120000){return new Promise((resolve,reject)=>{const bin=wranglerBin();if(!bin)return reject(new Error('Chưa cài wrangler: chạy npm install'));execFile(process.execPath,[bin,...args],{cwd:ROOT,timeout,windowsHide:true,maxBuffer:20*1024*1024},(err,stdout,stderr)=>{if(err){
+  const out=[stdout,stderr,err.message].map(x=>String(x||'').replace(/\x1b\[[0-9;]*m/g,'')).join('\n');
+  try{fs.mkdirSync(path.join(ROOT,'.wrangler'),{recursive:true});fs.writeFileSync(path.join(ROOT,'.wrangler','last-error.log'),new Date().toISOString()+'\nwrangler '+args.join(' ')+'\n\n'+out)}catch{}
+  const errLines=out.split('\n').filter(l=>/\[ERROR\]|^\s*Error\b|ERR_/i.test(l)).map(l=>l.trim());
+  const reason=(errLines.length?errLines:out.split('\n').filter(l=>l.trim())).slice(-3).join(' ').slice(0,400);
+  let msg;
+  if(err.killed||err.signal)msg='Tải lên quá '+Math.round(timeout/60000)+' phút nên bị dừng (file lớn hoặc mạng chậm). Thử lại, hoặc nén video nhỏ hơn.';
+  else if(/not logged in|wrangler login|not authenticated|authentication error|invalid (api )?token|token.*expired|\[code: 10000\]|non-interactive environment|CLOUDFLARE_API_TOKEN/i.test(errLines.join('\n')))msg='Wrangler (công cụ dòng lệnh) chưa đăng nhập Cloudflare — đăng nhập trên trang web Cloudflare là chưa đủ. Mở PowerShell trong thư mục dự án, chạy  npx.cmd wrangler login , bấm Allow trong trình duyệt, đợi báo Successfully logged in, rồi tải lại.';
+  else msg='Wrangler báo lỗi: '+reason+' (xem đầy đủ trong .wrangler/last-error.log)';
+  return reject(new Error(msg))}resolve(stdout)})})}
 async function readManifest(){try{return JSON.parse(await fsp.readFile(R2_MANIFEST,'utf8'))}catch{return []}}
 async function writeManifest(list){await atomicWrite(R2_MANIFEST,JSON.stringify(list,null,2)+'\n')}
 async function uploadToR2(cfg,name,buf,type){
   const tmp=path.join(require('os').tmpdir(),'nnd-'+name);await fsp.writeFile(tmp,buf);
-  try{await wrangler(['r2','object','put',`${cfg.bucket}/${name}`,'--file',tmp,'--content-type',type,'--cache-control','public, max-age=31536000, immutable','--remote'])}
+  try{await wrangler(['r2','object','put',`${cfg.bucket}/${name}`,'--file',tmp,'--content-type',type,'--cache-control','public, max-age=31536000, immutable','--remote'],15*60000)}
   finally{await fsp.unlink(tmp).catch(()=>{})}
   const item={name,url:cfg.publicUrl.replace(/\/$/,'')+'/'+encodeURIComponent(name),size:buf.length,modified:new Date().toISOString(),storage:'r2'};
   const list=await readManifest();list.unshift(item);await writeManifest(list);return item}
@@ -46,9 +57,10 @@ function send(res,status,body,type='text/plain; charset=utf-8'){const b=Buffer.i
 function sendJSON(res,status,obj){send(res,status,JSON.stringify(obj,null,2),'application/json; charset=utf-8')}
 async function ensureDirs(){await fsp.mkdir(UPLOADS,{recursive:true});await fsp.mkdir(BACKUPS,{recursive:true})}
 async function readContent(){return JSON.parse(await fsp.readFile(CONTENT,'utf8'))}
+function contentVersion(c){const o={...c};delete o._v;return crypto.createHash('sha1').update(JSON.stringify(o)).digest('hex').slice(0,16)}
 async function atomicWrite(file,data){const tmp=file+'.tmp';await fsp.writeFile(tmp,data,'utf8');await fsp.rename(tmp,file)}
 async function backupCurrent(){try{const raw=await fsp.readFile(CONTENT,'utf8');const stamp=new Date().toISOString().replace(/[:.]/g,'-');await fsp.writeFile(path.join(BACKUPS,stamp+'.json'),raw,'utf8');const files=(await fsp.readdir(BACKUPS)).filter(x=>x.endsWith('.json')).sort().reverse();for(const old of files.slice(40))await fsp.unlink(path.join(BACKUPS,old)).catch(()=>{})}catch{}}
-async function saveContent(obj){await backupCurrent();await atomicWrite(CONTENT,JSON.stringify(obj,null,2))}
+async function saveContent(obj){const o={...obj};delete o._v;await backupCurrent();await atomicWrite(CONTENT,JSON.stringify(o,null,2))}
 async function readJSONBody(req,max=MAX_BODY){return new Promise((resolve,reject)=>{const chunks=[];let size=0;req.on('data',c=>{size+=c.length;if(size>max){reject(new Error('Payload too large'));req.destroy();return}chunks.push(c)});req.on('end',()=>{try{resolve(JSON.parse(Buffer.concat(chunks).toString('utf8')||'{}'))}catch{reject(new Error('Invalid JSON'))}});req.on('error',reject)})}
 function cleanName(name='file'){const ext=path.extname(name).toLowerCase();const base=path.basename(name,ext).normalize('NFKD').replace(/[^\w-]+/g,'-').replace(/^-+|-+$/g,'').slice(0,80)||'file';return `${base}-${Date.now()}-${crypto.randomBytes(3).toString('hex')}${ext}`}
 function safePath(urlPath){let d;try{d=decodeURIComponent(urlPath)}catch{return null}if(d==='/')d='/index.html';const full=path.resolve(ROOT,'.'+d);return full===ROOT||full.startsWith(ROOT+path.sep)?full:null}
@@ -79,7 +91,7 @@ async function serveStatic(res,pathname){
 // ---- Publish jobs (Admin → Xuất bản): build + Cloudflare, or commit + push to GitHub ----
 const {spawn}=require('child_process');
 let job=null;   // one job at a time: {id,kind,done,ok,log}
-function runStep(cmd,args,log){return new Promise(resolve=>{log.push('$ '+[cmd==process.execPath?'node':cmd,...args].join(' '));const p=spawn(cmd,args,{cwd:ROOT,windowsHide:true,env:{...process.env,FORCE_COLOR:'0',GIT_TERMINAL_PROMPT:'0'}});const add=d=>{for(const l of d.toString().replace(/\x1b\[[0-9;]*m/g,'').split(/\r?\n/))if(l.trim())log.push(l)};p.stdout.on('data',add);p.stderr.on('data',add);p.on('error',e=>{log.push('Lỗi: '+e.message);resolve(1)});p.on('close',code=>resolve(code))})}
+function runStep(cmd,args,log,env){return new Promise(resolve=>{log.push('$ '+[cmd==process.execPath?'node':cmd,...args].join(' '));const p=spawn(cmd,args,{cwd:ROOT,windowsHide:true,env:{...process.env,FORCE_COLOR:'0',GIT_TERMINAL_PROMPT:'0',...(env||{})}});const add=d=>{for(const l of d.toString().replace(/\x1b\[[0-9;]*m/g,'').split(/\r?\n/))if(l.trim())log.push(l)};p.stdout.on('data',add);p.stderr.on('data',add);p.on('error',e=>{log.push('Lỗi: '+e.message);resolve(1)});p.on('close',code=>resolve(code))})}
 async function startJob(kind,message){
   const log=[];job={id:Date.now().toString(36),kind,done:false,ok:false,log};
   try{
@@ -87,8 +99,22 @@ async function startJob(kind,message){
       if(await runStep(process.execPath,['build.js'],log))throw new Error('Build lỗi, xem log phía trên.');
     }else if(kind==='cloudflare'){
       const bin=wranglerBin();if(!bin)throw new Error('Chưa cài wrangler: chạy npm install');
-      if(await runStep(process.execPath,['build.js'],log))throw new Error('Build lỗi, xem log phía trên.');
-      if(await runStep(process.execPath,[bin,'deploy'],log))throw new Error('Đưa lên Cloudflare lỗi. Nếu log báo chưa đăng nhập: mở cửa sổ lệnh trong thư mục dự án, chạy  npx.cmd wrangler login  rồi thử lại.');
+      const LOGIN='Wrangler chưa đăng nhập Cloudflare. Mở PowerShell trong thư mục dự án, chạy  npx.cmd wrangler login , bấm Allow trong trình duyệt, đợi "Successfully logged in" rồi bấm lại.';
+      // 1. login check first (a few seconds) instead of failing after a long build
+      log.push('— Kiểm tra đăng nhập Cloudflare…');const n0=log.length;
+      await runStep(process.execPath,[bin,'whoami'],log);
+      if(log.slice(n0).some(l=>/not authenticated|not logged in|non-interactive environment|CLOUDFLARE_API_TOKEN/i.test(l)))throw new Error(LOGIN);
+      // 2. build with a stamp, 3. deploy
+      const id=new Date().toISOString();
+      log.push('— Build…');
+      if(await runStep(process.execPath,['build.js'],log,{NND_BUILD_ID:id}))throw new Error('Build lỗi, xem log phía trên.');
+      log.push('— Đưa lên Cloudflare…');const n1=log.length;
+      if(await runStep(process.execPath,[bin,'deploy'],log)){if(log.slice(n1).some(l=>/non-interactive|CLOUDFLARE_API_TOKEN|not authenticated|wrangler login/i.test(l)))throw new Error(LOGIN);throw new Error('Đưa lên Cloudflare lỗi, xem log phía trên.')}
+      // 4. read the stamp back from the live address (site.siteUrl) to be sure the right site got the new version
+      const site=String((await readContent()).site?.siteUrl||'').replace(/\/?$/,'/');job.url=site;
+      if(/^https?:\/\//.test(site)){log.push('— Kiểm tra web thật: '+site);let okLive=false;
+        for(let i=0;i<8&&!okLive;i++){try{const r=await fetch(site+'version.txt?t='+Date.now(),{cache:'no-store'});okLive=r.ok&&(await r.text()).trim()===id}catch(_){}if(!okLive)await new Promise(r=>setTimeout(r,2500))}
+        log.push(okLive?'✓ Web '+site+' đang chạy đúng bản vừa build.':'! Chưa đọc được bản mới ở '+site+' (có thể do bộ nhớ đệm, đợi 1 phút rồi mở lại). Nếu vẫn là bản cũ: kiểm tra Cài đặt chung → Địa chỉ web.')}
     }else if(kind==='github'){
       await runStep('git',['add','-A'],log);
       const msg=String(message||'').trim()||('Update portfolio '+new Date().toISOString().slice(0,16).replace('T',' '));
@@ -105,11 +131,16 @@ function gitInfo(){return new Promise(resolve=>{execFile('git',['status','--porc
 async function handleAPI(req,res,u){
   // Only this admin page may change things: block requests sent from other websites
   if(req.method!=='GET'){const o=req.headers.origin;if(o&&!/^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(o))return sendJSON(res,403,{ok:false,error:'Forbidden origin'})}
-  if(u.pathname==='/api/publish/status'&&req.method==='GET')return sendJSON(res,200,{ok:true,git:await gitInfo(),job:job&&{id:job.id,kind:job.kind,done:job.done,ok:job.ok,log:job.log}});
+  if(u.pathname==='/api/publish/status'&&req.method==='GET')return sendJSON(res,200,{ok:true,git:await gitInfo(),job:job&&{id:job.id,kind:job.kind,done:job.done,ok:job.ok,log:job.log,url:job.url}});
   const pj=u.pathname.match(/^\/api\/publish\/(build|cloudflare|github)$/);
   if(pj&&req.method==='POST'){if(job&&!job.done)return sendJSON(res,409,{ok:false,error:'Đang có một lần xuất bản chạy, đợi xong đã.'});const body=await readJSONBody(req).catch(()=>({}));startJob(pj[1],body.message);return sendJSON(res,202,{ok:true,id:job.id})}
-  if(u.pathname==='/api/content'&&req.method==='GET')return sendJSON(res,200,await readContent());
-  if(u.pathname==='/api/content'&&req.method==='PUT'){const body=await readJSONBody(req);await saveContent(body);return sendJSON(res,200,{ok:true,content:body})}
+  // Stale-tab guard: every copy of the content handed out carries _v (a hash of the file). A save must send back the _v
+  // it was loaded with; if the file changed since (another tab, the admin, Claude), the save is refused instead of
+  // silently overwriting newer work. _v is never written to content.json.
+  if(u.pathname==='/api/content'&&req.method==='GET'){const c=await readContent();return sendJSON(res,200,{...c,_v:contentVersion(c)})}
+  if(u.pathname==='/api/content'&&req.method==='PUT'){const body=await readJSONBody(req);const cur=await readContent();
+    if(body._v!==contentVersion(cur))return sendJSON(res,409,{ok:false,stale:true,error:'Dữ liệu đã được lưu ở nơi khác (tab khác, trang Admin hoặc Claude) sau khi trang này được mở. Để không ghi đè mất bản mới hơn, lần lưu này bị chặn: tải lại trang (F5) rồi sửa lại.'});
+    delete body._v;await saveContent(body);return sendJSON(res,200,{ok:true,content:{...body,_v:contentVersion(body)}})}
   if(u.pathname==='/api/media'&&req.method==='GET')return sendJSON(res,200,{ok:true,media:await listMedia()});
   if(u.pathname==='/api/media/upload'&&req.method==='POST'){
     const body=await readJSONBody(req);const type=String(body.type||'');

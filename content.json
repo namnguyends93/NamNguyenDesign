@@ -4,7 +4,7 @@
     "role": "Design Leader",
     "location": "Ho Chi Minh City, Vietnam",
     "email": "namnguyen.thietketkm@gmail.com",
-    "siteUrl": "https://namnguyends93.github.io/NamNguyenDesign/",
+    "siteUrl": "https://namnguyendesign.namnguyen-thietketkm.workers.dev/",
     "accent": "#4c6fff",
     "seoTitle": "Nam Nguyen Design — Design Leader",
     "seoDescription": "Nam Nguyen — Design Leader at Ngoc Dung Beauty Center, leading campaign key visuals, art direction and brand content in Ho Chi Minh City.",
@@ -21,7 +21,13 @@
     },
     "scrollColor": false,
     "personName": "Nam Nguyen",
-    "organization": "Ngoc Dung Beauty Center"
+    "organization": "Ngoc Dung Beauty Center",
+    "sectionFx": {
+      "intro": "recede"
+    },
+    "sectionHover": {
+      "clients": "glow"
+    }
   },
   "navigation": {
     "visible": true,
@@ -60,17 +66,17 @@
   "home": {
     "hero": {
       "visible": true,
-      "eyebrow": "Design Leader",
-      "indexLabel": "2026",
-      "title": "Nam Nguyen\nDesign",
-      "description": "Design Leader at Ngoc Dung Beauty Center. 20 campaigns led in 2026, from the first key visual to every touchpoint.",
-      "image": "/uploads/ava-1787077972159-488571.jpg",
+      "eyebrow": "VISUAL DESIGN",
+      "indexLabel": "PORTFOLIO 2026",
+      "title": "Nam Nguyen Design",
+      "description": "Graphic designer in Ho Chi Minh City. Campaign key visuals, brand identity and AI Artist",
+      "image": "https://pub-5947827bb4ba488e9292f97b6e5a045a.r2.dev/IMG_21311-1794719184810-07f6c8.png",
       "ctaLabel": "Tìm hiểu thêm",
       "ctaHref": "#projects"
     },
     "intro": {
       "visible": true,
-      "eyebrow": "Design Leader / Art Direction",
+      "eyebrow": "Visual Designer / Art Direction",
       "title": "Clear ideas. Bold visual direction.",
       "description": "",
       "services": [
@@ -78,15 +84,16 @@
         "Art Direction",
         "Beauty Branding"
       ],
-      "location": "Ho Chi Minh City, Vietnam",
-      "image": "/uploads/554572611_1893148574968600_5562284692063288802_n-1787077987020-e5bd75.jpg"
+      "location": "Ho Chi Minh City\nVietnam",
+      "image": "https://pub-5947827bb4ba488e9292f97b6e5a045a.r2.dev/1113-2-1794713269324-a2d811.mp4",
+      "split": 26
     },
     "about": {
       "visible": true,
       "eyebrow": "Profile.26",
       "title": "About",
       "description": "I'm Nam Nguyen, a designer since 2019 and now Design Leader at Ngoc Dung Beauty Center, where I have led 20 campaigns this year, from concept and key visual to social, print and in-store rollout. Before that I designed for Seedcom (Juno, Hnoss), the real-estate brands LinkHouse and Maple Land, and the beauty brands Tu Trinh Spa and Zema. Every project starts from a clear idea and ends in work that feels precise and memorable.",
-      "image": "",
+      "image": "https://pub-5947827bb4ba488e9292f97b6e5a045a.r2.dev/magnific_giu-nguyen-character_8aN6c9TIrU-1794719905770-3e7017.png",
       "skills": {
         "visible": true,
         "eyebrow": "Skillset.26",
@@ -109,42 +116,60 @@
         "tools": [
           {
             "name": "Photoshop",
-            "icon": "ps"
+            "icon": "ps",
+            "image": "/uploads/tool-ps.png",
+            "visible": true
           },
           {
             "name": "Illustrator",
-            "icon": "ai"
+            "icon": "ai",
+            "image": "/uploads/tool-ai.png",
+            "visible": true
           },
           {
             "name": "Figma",
-            "icon": "figma"
+            "icon": "figma",
+            "image": "/uploads/tool-figma.png",
+            "visible": true
           },
           {
             "name": "After Effects",
-            "icon": "ae"
+            "icon": "ae",
+            "image": "/uploads/tool-ae.png",
+            "visible": true
           },
           {
             "name": "Premiere Pro",
-            "icon": "pr"
+            "icon": "pr",
+            "image": "/uploads/tool-pr.png",
+            "visible": true
           },
           {
             "name": "CapCut",
-            "icon": ""
+            "icon": "other",
+            "image": "/uploads/tool-capcut.png",
+            "visible": true
           }
         ],
         "aiTitle": "AI Tools",
         "aiTools": [
           {
             "name": "Higgsfield",
-            "icon": "",
-            "image": "",
+            "icon": "other",
+            "image": "/uploads/tool-higgsfield.png",
             "visible": true
           },
           {
             "name": "Magnific",
-            "icon": "",
-            "image": "",
+            "icon": "other",
+            "image": "/uploads/tool-magnific.png",
             "visible": true
+          },
+          {
+            "name": "Claude AI",
+            "icon": "other",
+            "visible": true,
+            "image": "/uploads/tool-claude.png"
           }
         ]
       }
@@ -156,7 +181,7 @@
       "items": [
         {
           "name": "NGOC DUNG",
-          "logo": "",
+          "logo": "https://pub-5947827bb4ba488e9292f97b6e5a045a.r2.dev/OBC_duong-ban-1794674169516-3b07f1.png",
           "href": "",
           "visible": true
         },
@@ -282,6 +307,13 @@
           "visible": true
         },
         {
+          "years": "2026",
+          "role": "New role",
+          "company": "Company",
+          "note": "",
+          "visible": true
+        },
+        {
           "years": "2023 — 2025",
           "role": "Graphic Designer",
           "company": "Ngoc Dung Beauty Center & Zema Beauty More",
@@ -387,7 +419,8 @@
           "type": "statement",
           "text": "Beauty communication can feel premium without becoming predictable."
         }
-      ]
+      ],
+      "password": ""
     },
     {
       "id": "beauty-visual-system",
@@ -422,7 +455,8 @@
           "type": "statement",
           "text": "A strong visual system gives every execution room to change without losing the brand."
         }
-      ]
+      ],
+      "password": ""
     },
     {
       "id": "future-campaign",
@@ -457,7 +491,8 @@
           "type": "statement",
           "text": "Future-facing design works best when the concept stays simple and the execution stays precise."
         }
-      ]
+      ],
+      "password": ""
     },
     {
       "id": "article-ai-brief-to-key-visual",
@@ -503,7 +538,9 @@
           "type": "statement",
           "text": "AI speeds up the making. The idea still has to come first."
         }
-      ]
+      ],
+      "password": "",
+      "thumbnail": ""
     },
     {
       "id": "article-magnific-for-beauty",
@@ -542,7 +579,9 @@
           "type": "statement",
           "text": "Sharper is not the goal. Believable is."
         }
-      ]
+      ],
+      "password": "",
+      "thumbnail": ""
     },
     {
       "id": "article-higgsfield-still-to-motion",
@@ -582,7 +621,9 @@
           "type": "statement",
           "text": "Motion makes people stop. The key visual makes them remember."
         }
-      ]
+      ],
+      "password": "",
+      "thumbnail": ""
     },
     {
       "id": "article-ai-rules-beauty-brand",
@@ -615,7 +656,9 @@
           "type": "statement",
           "text": "Use AI for the scene, never for the promise."
         }
-      ]
+      ],
+      "password": "",
+      "thumbnail": ""
     },
     {
       "id": "article-behind-a-summer-key-visual",
@@ -662,7 +705,9 @@
           "type": "statement",
           "text": "One idea, carried from the first sketch to every branch."
         }
-      ]
+      ],
+      "password": "",
+      "thumbnail": ""
     },
     {
       "id": "article-leading-20-campaigns",
@@ -695,7 +740,9 @@
           "type": "statement",
           "text": "A good system lets a team move fast without losing the brand."
         }
-      ]
+      ],
+      "password": "",
+      "thumbnail": ""
     }
   ],
   "i18n": {
@@ -908,5 +955,62 @@
       "Previous": "Ảnh trước",
       "Next": "Ảnh sau"
     }
+  },
+  "layout": {
+    "desktop": {
+      "#home section.intro-grid": {
+        "h": 856
+      },
+      "#clients": {
+        "h": 790
+      },
+      "#projects div.projects div.project-info div.stats": {
+        "wp": 71.6
+      },
+      "#projects div.projects": {
+        "gc": [
+          35.4,
+          64.6
+        ]
+      },
+      "#home section.hero div.hero-card div.hero-copy": {
+        "y": 351
+      },
+      "#home section.hero div.hero-card div.hero-bg": {
+        "wp": 100,
+        "h": 1080
+      },
+      "#about div.about": {
+        "h": 1013
+      },
+      "#about div.about div.about-box": {
+        "gc": [
+          36,
+          64
+        ],
+        "wp": 63.3,
+        "r": 77
+      },
+      "#home section.intro-grid div.image img:nth-child(1)": {
+        "wp": 100
+      },
+      "#about div.about div.about-bg": {
+        "wp": 100,
+        "h": 1337
+      },
+      "#about div.about div.about-box div.skills div.skill-rows div:nth-child(2) ul:nth-child(2) li:nth-child(1) span.app-icon b:nth-child(1)": {
+        "r": 0
+      },
+      "#home section.intro-grid div.text div:nth-child(1) h2.display": {
+        "y": 26,
+        "h": 181
+      }
+    }
+  },
+  "textColors": {
+    "#home section.hero div.hero-card div.hero-kicker": "#ffffff",
+    "#home section.hero div.hero-card div.hero-index": "#ffffff",
+    "#home section.intro-grid div.text div:nth-child(1) span.mono": "#080808",
+    "#experience div.experience ol.xp-list li:nth-child(1) div:nth-child(2) h3.xp-role": "#4c6fff"
   }
 }

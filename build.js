@@ -99,7 +99,7 @@ const pageUrl = rel => SITE_URL + (rel === 'index.html' ? '' : rel);
 // 1200x630 JPEG for link previews (JPEG is the safest format for every chat app)
 const ogJobs = new Map();
 function ogImage(src, pageFile, name) {
-  if (!src) return null;
+  if (!src || /\.(mp4|webm|mov)([?#]|$)/i.test(src)) return null;   // videos can't be a share image
   if (!ogJobs.has(name)) ogJobs.set(name, (async () => {
     const source = await loadSource(/^https?:/i.test(src) ? canonicalRemote(src) : src, pageFile);
     if (!source) return null;
@@ -224,7 +224,7 @@ async function addHeadMeta(doc, relPath, base, file) {
   const project = slug && (content.projects || []).find(p => (p.slug || p.id) === slug);
   const title = doc.title || content.site?.seoTitle || '';
   const desc = doc.querySelector('meta[name="description"]')?.getAttribute('content') || content.site?.seoDescription || '';
-  const imgRel = await ogImage(project ? project.cover : content.home?.hero?.image, file, slug || 'home');
+  const imgRel = await ogImage(project ? project.cover : ['hero', 'intro', 'about', 'contact'].map(k => content.home?.[k]?.image).find(u => u && !/\.(mp4|webm|mov)([?#]|$)/i.test(u)), file, slug || 'home');
   const url = pageUrl(relPath);
 
   if (favicons.svg) add('link', { rel: 'icon', type: 'image/svg+xml', href: base + 'favicon.svg' });
@@ -280,6 +280,8 @@ async function writeSeoFiles(pages) {
   const today = new Date().toISOString().slice(0, 10);
   const urls = pages.map(rel => `  <url><loc>${pageUrl(rel)}</loc><lastmod>${today}</lastmod></url>`).join('\n');
   await fsp.writeFile(path.join(DIST, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`);
+  // build stamp: the publish job reads it back from the live site to confirm the new version is online
+  await fsp.writeFile(path.join(DIST, 'version.txt'), (process.env.NND_BUILD_ID || new Date().toISOString()) + '\n');
   await fsp.writeFile(path.join(DIST, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${SITE_URL}sitemap.xml\n`);
 }
 

@@ -40,6 +40,8 @@
 }
 @media (prefers-reduced-motion:reduce){
   .split .c>i{transform:none;transition:none}
-  .motion .hero-bg img,.motion .hero-copy.reveal.in,.motion [data-par] img{transform:none!important;opacity:1!important}
+  .motion .hero-bg img,.motion .hero-bg video,.motion .hero-copy.reveal.in,.motion [data-par] img,.motion [data-par] video{transform:none!important;opacity:1!important}
   .cursor-tag{display:none}
 }
+/* videos show their whole frame: no zoom or parallax (same as in the editor) */
+.motion .hero-bg video,.motion [data-par] video{transform:none!important}

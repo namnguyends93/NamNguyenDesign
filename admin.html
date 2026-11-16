@@ -164,7 +164,7 @@ input,textarea,select{width:100%;background:var(--panel2);color:#fff;border:1px 
 </div>
 </section>
 <section class="tab" id="tab-media">
-<div class="card"><strong>Media Library</strong><div style="color:#777;font-size:12px;margin:5px 0 12px">Upload ảnh một lần, sau đó chọn trực tiếp từ mọi image field.</div><input id="mediaUpload" type="file" accept="image/*" multiple><button class="primary" id="uploadMediaBtn" style="margin-top:10px">Upload Selected</button></div>
+<div class="card"><strong>Media Library</strong><div style="color:#777;font-size:12px;margin:5px 0 12px">Upload ảnh một lần, sau đó chọn trực tiếp từ mọi image field.</div><input id="mediaUpload" type="file" accept="image/*,video/mp4,video/webm,video/quicktime" multiple><button class="primary" id="uploadMediaBtn" style="margin-top:10px">Upload Selected</button></div>
 <div id="mediaGrid" class="media-grid"></div>
 </section>
 
@@ -208,7 +208,7 @@ function fill(){
 }
 function collect(){
   const h=state.home||(state.home={});
-  h.hero={...(h.hero||{}),visible:$("#heroVisible").checked,eyebrow:$("#heroEyebrow").value,indexLabel:$("#heroIndex").value,title:$("#heroTitle").value,description:$("#heroDesc").value,image:$("#heroImage").value,ctaLabel:$("#heroCTA").value};
+  h.hero={...(h.hero||{}),visible:$("#heroVisible").checked,eyebrow:$("#heroEyebrow").value,indexLabel:$("#heroIndex").value,title:(t=>{const o=state.home?.hero?.title||"";return o.replace(/\n/g,"")===t?o:t})($("#heroTitle").value),description:$("#heroDesc").value,image:$("#heroImage").value,ctaLabel:$("#heroCTA").value};
   h.intro={...(h.intro||{}),visible:$("#introVisible").checked,eyebrow:$("#introEyebrow").value,title:$("#introTitle").value,description:$("#introDesc").value,services:$("#introServices").value.split("\n").map(x=>x.trim()).filter(Boolean),location:$("#introLocation").value,image:$("#introImage").value};
   h.about={...(h.about||{}),visible:$("#aboutVisible").checked,eyebrow:$("#aboutEyebrow").value,title:$("#aboutTitle").value,description:$("#aboutDesc").value,image:$("#aboutImage").value,skills:{...(h.about?.skills||{}),visible:$("#skillsVisible").checked,eyebrow:$("#skillsEyebrow").value,label:$("#skillsLabel").value,disciplinesTitle:$("#skillsDiscTitle").value,toolsTitle:$("#skillsToolsTitle").value,disciplines:$("#skillsDisciplines").value.split("\n").map(x=>x.trim()).filter(Boolean),tools:collectGeneric("#toolItems",["name","icon","image"],["visible"]),aiTitle:$("#skillsAiTitle").value,aiTools:collectGeneric("#aiToolItems",["name","icon","image"],["visible"])}};
   h.clients={...(h.clients||{}),visible:$("#clientsVisible").checked,eyebrow:$("#clientsEyebrow").value,title:$("#clientsTitle").value,items:collectGeneric("#clientItems",["name","logo","href"],["visible"])};
@@ -253,7 +253,12 @@ ${p.kind==="journal"?`<div class="field"><label>Ảnh thẻ Nhật ký (không b
 <div class="blocks">${blocks.map((b,bi)=>blockHTML(b,bi,blocks.length)).join("")}</div>
 <div class="add-block"><select class="add-block-type">${Object.entries(PT.BLOCKS).map(([k,d])=>`<option value="${k}">${esc(d.label)}</option>`).join("")}</select><button class="add-block-btn">+ Thêm module</button></div></div>
 </div></div>`}).join("")}
-function collectProjects(){state.projects=$$("#projectItems .project").map((el,i)=>{const p={...(state.projects[i]||{})};el.querySelectorAll("[data-k]").forEach(f=>{const k=f.dataset.k;p[k]=f.type==="checkbox"?f.checked:f.value});p.blocks=[...el.querySelectorAll(".block")].map(b=>{const o={type:b.dataset.type};b.querySelectorAll("[data-bk]").forEach(f=>{o[f.dataset.bk]=f.dataset.list?f.value.split("\n").map(x=>x.trim()).filter(Boolean):f.value});return o});for(const k of ["gallery","layout","statement","challenge","approach","result"])delete p[k];return p})}
+// Guard (2026-11-15): an image / link box the owner did not touch never blanks a value that is already saved
+// (a save on 14/11 wiped every cover and link). Boxes the owner edits or clears are marked data-touched.
+const KEEP_IF_UNTOUCHED=["cover","thumbnail","coverVideo","link"];
+document.addEventListener("input",e=>{if(e.target&&e.target.dataset)e.target.dataset.touched="1"},true);
+document.addEventListener("change",e=>{if(e.target&&e.target.dataset)e.target.dataset.touched="1"},true);
+function collectProjects(){state.projects=$$("#projectItems .project").map((el,i)=>{const p={...(state.projects[i]||{})};el.querySelectorAll("[data-k]").forEach(f=>{const k=f.dataset.k;if(f.type!=="checkbox"&&f.value===""&&p[k]&&KEEP_IF_UNTOUCHED.includes(k)&&!f.dataset.touched)return;p[k]=f.type==="checkbox"?f.checked:f.value});p.blocks=[...el.querySelectorAll(".block")].map(b=>{const o={type:b.dataset.type};b.querySelectorAll("[data-bk]").forEach(f=>{o[f.dataset.bk]=f.dataset.list?f.value.split("\n").map(x=>x.trim()).filter(Boolean):f.value});return o});for(const k of ["gallery","layout","statement","challenge","approach","result"])delete p[k];return p})}
 document.addEventListener("click",e=>{const t=e.target.closest("button");if(!t)return;const pe=t.closest(".project");if(!pe)return;const pi=Number(pe.dataset.i);
   const bl=t.closest(".block");const bi=bl?[...pe.querySelectorAll(".block")].indexOf(bl):-1;
   const mut=fn=>{collectProjects();const p=state.projects[pi];p.blocks=p.blocks||[];fn(p);renderProjects()};
@@ -266,7 +271,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("button");if(!t)r
   if(t.classList.contains("block-upload")){const up=$("#hiddenUpload");const inp=t.closest(".field").querySelector("[data-bk]");up.multiple=t.dataset.mode==="many";up.onchange=async()=>{const files=[...up.files];up.value="";up.multiple=false;try{for(const f of files){status("Uploading "+f.name+"…");const d=await uploadFile(f);if(t.dataset.mode==="many")inp.value+=(inp.value.trim()?"\n":"")+d.url;else inp.value=d.url}status("Uploaded "+files.length+" ảnh — nhớ bấm Save.")}catch(err){status("Upload lỗi: "+err.message)}mut(()=>{})};up.click()}
 });
 
-async function save(){collect();const d=await api("/api/content",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(state)});state=d.content;status("Saved. Backup created.");refreshPreview()}
+async function save(){collect();try{const d=await api("/api/content",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(state)});state=d.content;status("Saved. Backup created.");refreshPreview()}catch(e){status("Chưa lưu: "+e.message);alert("⚠ Chưa lưu.\n\n"+e.message)}}
 $("#saveBtn").onclick=()=>save().catch(e=>status("Error: "+e.message));$("#reloadBtn").onclick=()=>load().catch(e=>status("Error: "+e.message));
 
 $$(".nav button").forEach(b=>b.onclick=async()=>{$$(".nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");$$(".tab").forEach(x=>x.classList.remove("active"));$("#tab-"+b.dataset.tab).classList.add("active");$("#title").textContent=b.textContent;if(b.dataset.tab==="media")await loadMedia();if(b.dataset.tab==="publish")await loadPub();if(b.dataset.tab==="i18n"&&!i18nScanned)await scanI18n();if(b.dataset.tab==="backup")await loadBackups();if(b.dataset.tab==="preview")refreshPreview()});

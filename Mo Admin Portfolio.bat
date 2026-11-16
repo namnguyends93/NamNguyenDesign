@@ -7,10 +7,12 @@ if not exist node_modules (
   call npm.cmd install
 )
 echo.
-echo  Admin:  http://127.0.0.1:3000/admin
 echo  Chinh sua truc tiep:  http://127.0.0.1:3000/edit
+echo  Admin (xuat ban, sao luu):  http://127.0.0.1:3000/admin
+echo  Web that:  https://namnguyendesign.namnguyen-thietketkm.workers.dev/
 echo  Giu cua so nay mo trong luc chinh sua. Dong cua so = tat admin.
 echo.
-start "" /min cmd /c "timeout /t 2 /nobreak >nul && explorer http://127.0.0.1:3000/admin"
+rem Opens the visual editor in Chrome (falls back to the default browser if Chrome is not found)
+start "" /min cmd /c "timeout /t 2 /nobreak >nul && (start "" chrome "http://127.0.0.1:3000/edit" || explorer "http://127.0.0.1:3000/edit")"
 node server.js
 pause

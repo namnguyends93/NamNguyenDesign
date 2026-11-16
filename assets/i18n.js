@@ -132,6 +132,29 @@
     addSwitch(lang);
   };
 
+  // Visual editor: show the page in Vietnamese with the editor's (unsaved) dictionary, mark texts without a
+  // translation, and put the English back. Each text node keeps its English in node.__en.
+  var SKIP = 'script,style,noscript,[data-no-i18n],.ve-layer,.ve-rulers';
+  function textNodes() { var w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT), n, list = []; while ((n = w.nextNode())) list.push(n); return list; }
+  window.__nndI18nPreview = function (dict) {
+    var t = makeLookup(dict || {}), done = 0, miss = 0;
+    document.querySelectorAll('.ve-vi-miss').forEach(function (e) { e.classList.remove('ve-vi-miss'); });
+    textNodes().forEach(function (node) {
+      var p = node.parentElement; if (!p || p.closest(SKIP)) return;
+      var raw = node.__en != null ? node.__en : node.nodeValue;
+      if (!norm(raw) || !/[A-Za-z]/.test(raw)) return;
+      node.__en = raw; var v = t(raw);
+      if (v) { node.nodeValue = raw.replace(raw.trim(), v); done++; } else { node.nodeValue = raw; p.classList.add('ve-vi-miss'); miss++; }
+    });
+    root.lang = 'vi'; return { done: done, miss: miss };
+  };
+  window.__nndI18nRestore = function () {
+    textNodes().forEach(function (node) { if (node.__en != null) { node.nodeValue = node.__en; delete node.__en; } });
+    document.querySelectorAll('.ve-vi-miss').forEach(function (e) { e.classList.remove('ve-vi-miss'); });
+    root.lang = 'en';
+  };
+  window.__nndI18nNorm = norm;
+
   function run() {
     if (/[?&]edit=1/.test(location.search) || window.__VE_EDIT__) { root.classList.remove('i18n-wait'); return; }   // visual editor edits the English page
     if (/[?&]i18nscan=1/.test(location.search)) { scan(); root.classList.remove('i18n-wait'); return; }
