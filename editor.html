@@ -193,6 +193,7 @@ textarea{min-height:84px;resize:vertical}
       <h3>Thẻ dự án trên trang</h3>
       <p style="color:var(--muted);font-size:12px;margin:0 0 8px">Ảnh, tên, hạng mục lấy từ từng dự án. Thứ tự = thứ tự dự án (dùng ↑ ↓). Nút lọc tự tạo theo Hạng mục. Bấm vào thẻ trên trang để mở dự án đó.</p>
       <div id="workList"></div>
+      <button id="workAdd" type="button" class="addbtn" style="margin-top:10px">+ Thêm dự án mới</button>
     </div>
     <div id="projPanel" hidden>
       <h3 id="projName">Project</h3>
@@ -683,15 +684,20 @@ function setupWorkFrame(){
   status('Trang Tất cả dự án: bấm tiêu đề / mô tả để sửa, bấm thẻ để mở dự án đó.');
 }
 function fillWorkPanel(){
-  const host=$('#workFields');host.innerHTML='';[T('workPage.title','Tiêu đề (mặc định: ALL WORK)'),A('workPage.description','Mô tả')].forEach(f=>host.appendChild(ctl(f,f.p)));
+  const host=$('#workFields');host.innerHTML='';[S('workPage.style','Kiểu trang (template)',[['grid','1 · Lưới 2 cột (như cũ)'],['stack','2 · Xếp chồng: 1 thẻ lớn mỗi hàng, thẻ sau trượt đè thẻ trước'],['stack2','3 · Xếp chồng 2 cột: 2 thẻ mỗi hàng, cả hàng trượt đè (hiện được nhiều dự án)']],'grid',{noteHtml:'Khung xem chỉ hiện bố cục; hiệu ứng cuộn chạy trên web. Xem thử từng kiểu: <a href="/projects/index.html?work=grid" target="_blank">1</a> · <a href="/projects/index.html?work=stack" target="_blank">2</a> · <a href="/projects/index.html?work=stack2" target="_blank">3</a>'}),T('workPage.title','Tiêu đề (mặc định: ALL WORK)'),A('workPage.description','Mô tả')].forEach(f=>host.appendChild(ctl(f,f.p)));
   const a=state.projects||[];
-  $('#workList').innerHTML=a.map((p,i)=>p.kind==='journal'?'':`<div class="mod"><div class="mod-head"><b data-wk="open" data-i="${i}" title="Mở trang dự án này">${p.published===false?'(ẩn) ':''}${(p.title||p.slug||'').replace(/</g,'&lt;')}</b><button data-wk="up" data-i="${i}">↑</button><button data-wk="down" data-i="${i}">↓</button><button data-wk="vis" data-i="${i}" title="Ẩn / hiện trên web">${p.published===false?'👁‍🗨':'👁'}</button></div><div style="color:var(--muted);font-size:11.5px">${(p.category||'—').replace(/</g,'&lt;')} · ${p.year||''}</div></div>`).join('');
+  $('#workList').innerHTML=a.map((p,i)=>p.kind==='journal'?'':`<div class="mod"><div class="mod-head"><b data-wk="open" data-i="${i}" title="Mở trang dự án này">${p.published===false?'(ẩn) ':''}${(p.title||p.slug||'').replace(/</g,'&lt;')}</b><button data-wk="up" data-i="${i}">↑</button><button data-wk="down" data-i="${i}">↓</button><button data-wk="dup" data-i="${i}" title="Nhân bản thẻ / trang này (bản sao đang ẩn)">⧉</button><button data-wk="vis" data-i="${i}" title="Ẩn / hiện trên web">${p.published===false?'👁‍🗨':'👁'}</button></div><div style="color:var(--muted);font-size:11.5px">${(p.category||'—').replace(/</g,'&lt;')} · ${p.year||''}</div></div>`).join('');
 }
 $('#workList').onclick=e=>{const t=e.target.closest('[data-wk]');if(!t)return;const i=+t.dataset.i,a=clone(state.projects),act=t.dataset.wk;
   if(act==='open'){fillPicker(i);showPage(String(i));return}
   const step=d=>{let j=i+d;while(j>=0&&j<a.length&&a[j].kind==='journal')j+=d;if(j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];setVal('projects',a)};
   if(act==='up')step(-1);if(act==='down')step(1);
-  if(act==='vis'){a[i].published=a[i].published===false;setVal('projects',a)}};
+  if(act==='vis'){a[i].published=a[i].published===false;setVal('projects',a)}
+  if(act==='dup'){const id=Date.now().toString(36),src=a[i];a.splice(i+1,0,{...clone(src),id:'project-'+id,slug:(src.slug||'project')+'-copy-'+id,title:(src.title||'')+' (copy)',published:false});setVal('projects',a);status('Đã nhân bản "'+(src.title||src.slug)+'" (bản sao đang ẩn: bấm 👁 để hiện, bấm tên để sửa).')}};
+// "+ Thêm dự án mới" on the All-work panel: same new project as Projects → "+ Dự án mới", then opens it to fill in
+$('#workAdd').onclick=()=>{const a=clone(state.projects),y=String(new Date().getFullYear()),id=Date.now().toString(36);
+  a.push({id:'project-'+id,slug:'new-project-'+id,title:'NEW PROJECT',category:'ART DIRECTION',year:y,client:'',role:'',cover:'',description:'',published:false,featured:false,link:'',headline:'',scope:'',...(PT.presetBlocks?PT.presetBlocks('standard'):{blocks:[]})});
+  setVal('projects',a);fillPicker(a.length-1);showPage(String(a.length-1));status('Đã tạo dự án mới (đang ẩn). Thêm ảnh bìa, tên, hạng mục; xong bật "Hiện trên web" rồi Lưu — thẻ sẽ hiện ở trang Tất cả dự án.')};
 function renderProject(keepScroll){
   const p=proj();if(!p)return;
   const y=keepScroll&&frame.contentWindow?frame.contentWindow.scrollY:0;

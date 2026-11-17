@@ -517,12 +517,20 @@ function renderWork(content) {
     <a class="work-card" data-cat="${esc(key(p.category))}" href="${esc((p.slug || p.id) + '.html')}"${VE ? ` data-ve-card="${(content.projects || []).indexOf(p)}"` : ''}>
       <div class="wc-media">${p.cover ? img(p.cover, String(p.title || '').trim(), base) : ''}${blank(p.password) ? '' : '<span class="lock">🔒 PRIVATE</span>'}</div>
       <div class="wc-row"><b>${esc(String(p.title || '').trim())}</b><span>${esc(p.category || '')}${p.year ? ' · ' + esc(p.year) : ''}</span></div>
+      <div class="wc-info">
+        <small>${esc(p.year || '')}${p.year && p.category ? ' · ' : ''}${esc(p.category || '')}</small>
+        <h2>${esc(String(p.title || '').trim())}</h2>
+        <span class="wc-see">See project <i aria-hidden="true">↗</i></span>
+        ${blank(p.description) ? '' : `<p>${esc(String(p.description).trim())}</p>`}
+      </div>
     </a>`).join('');
+  const workStyle = /^(grid|stack|stack2)$/.test(wp.style) ? wp.style : 'grid';
   return `<!DOCTYPE html>
-<html lang="en"${fxAttr(content)}>
+<html lang="en"${fxAttr(content)} data-work="${workStyle}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
+<script>(function(){try{var w=new URLSearchParams(location.search).get('work');if(/^(grid|stack|stack2)$/.test(w))document.documentElement.setAttribute('data-work',w)}catch(e){}})()</script>
 <title>${esc(title)} — ${esc(brand)}</title>
 <meta name="description" content="${esc(desc)}">
 ${FX_HEAD}
@@ -634,7 +642,35 @@ const PAGE_JS = `
 const WORK_JS = `
 document.addEventListener('click',function(e){var b=e.target.closest('[data-filter]');if(!b)return;var f=b.getAttribute('data-filter');
   [].forEach.call(document.querySelectorAll('[data-filter]'),function(x){x.setAttribute('aria-pressed',String(x===b))});
-  [].forEach.call(document.querySelectorAll('.work-card'),function(c){c.hidden=f!=='*'&&c.getAttribute('data-cat')!==f})});`;
+  [].forEach.call(document.querySelectorAll('.work-card'),function(c){c.hidden=f!=='*'&&c.getAttribute('data-cat')!==f});
+  if(window.__nndWorkStack)window.__nndWorkStack()});
+// Stack style (like neu-bento /all-projects): cards stick under the nav, the next card slides over;
+// the covered card shrinks and dims (--cv), the incoming card's text and photo settle in (--in).
+(function(){
+  var d=document.documentElement,raf=0;
+  function on(){return /^stack/.test(d.getAttribute('data-work')||'')&&!matchMedia('(prefers-reduced-motion: reduce)').matches}
+  function upd(){raf=0;var cs=[].filter.call(document.querySelectorAll('.work-card'),function(c){return !c.hidden});
+    var g=document.querySelector('.work-grid'),k=g?Math.max(1,getComputedStyle(g).gridTemplateColumns.split(' ').filter(Boolean).length):1;
+    if(d.getAttribute('data-work')==='stack')k=1;
+    cs.forEach(function(c,i){c.style.setProperty('--i',Math.floor(i/k))});
+    if(!on()){cs.forEach(function(c){c.style.removeProperty('--cv');c.style.removeProperty('--in')});return}
+    var vh=innerHeight;
+    cs.forEach(function(c,i){var r=c.getBoundingClientRect(),st=parseFloat(getComputedStyle(c).top)||0;
+      var inn=Math.max(0,Math.min(1,(vh-r.top)/Math.max(1,vh-st)));
+      var cv=0,n=cs[(Math.floor(i/k)+1)*k];if(n){var nr=n.getBoundingClientRect();cv=Math.max(0,Math.min(1,(r.top+r.height-nr.top)/r.height))}
+      c.style.setProperty('--in',inn.toFixed(3));c.style.setProperty('--cv',cv.toFixed(3))})}
+  // Hold: each card (row) stays still for HOLD px of scrolling (≈ 3 wheel steps) before the next one shows up:
+  // gap under a row = the part of the screen it leaves empty + HOLD. Set on load / resize / filter, never on scroll.
+  function lay(){var st=/^stack/.test(d.getAttribute('data-work')||''),cs=[].filter.call(document.querySelectorAll('.work-card'),function(c){return !c.hidden});
+    var g=document.querySelector('.work-grid'),k=g?Math.max(1,getComputedStyle(g).gridTemplateColumns.split(' ').filter(Boolean).length):1;if(d.getAttribute('data-work')==='stack')k=1;
+    var vh=innerHeight,hold=vh<700?260:320;
+    cs.forEach(function(c,i){if(!st){c.style.marginBottom='';return}var r=Math.floor(i/k),row=cs.slice(r*k,r*k+k),last=(r+1)*k>=cs.length;
+      var h=Math.max.apply(null,row.map(function(x){return x.offsetHeight})),top=parseFloat(getComputedStyle(c).top)||0;
+      c.style.marginBottom=last?'':Math.round(Math.max(0,vh-top-h)+hold)+'px'})}
+  function q(){if(!raf)raf=requestAnimationFrame(upd)}
+  function all(){lay();q()}
+  window.__nndWorkStack=all;addEventListener('scroll',q,{passive:true});addEventListener('resize',all);addEventListener('load',all);all();
+})();`;
 
 const CSS = `
 :root{--black:#080808;--dark:#141414;--white:#f7f5ef;--soft:#ebe8e1;--muted:#9a9a96;--accent:#4c6fff;--accent-soft:#8ea1ff}
@@ -1031,6 +1067,48 @@ img.px{transform:scale(1.14);will-change:transform}
   .pn{padding:72px 4px 24px;gap:32px}.pn-next{text-align:left;align-items:flex-start}
   .footer{margin:0 12px}
 }
+/* all-work page, "stack" styles (neu-bento /all-projects): <html data-work="stack|stack2">, ?work=… previews it. stack = one big card per row, stack2 = two cards per row */
+.wc-info{display:none}
+html[data-work^=stack] .work-grid{display:block;padding-bottom:10vh}
+html[data-work^=stack] .work-card{--top:88px;--hold:40vh;position:sticky;top:var(--top);display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:clamp(20px,2.6vw,44px);height:min(calc(100vh - var(--top) - 40px),760px);min-height:460px;margin:0 0 var(--hold);padding:14px;border-radius:36px;
+  background:linear-gradient(160deg,#181818,#0f0f0f);border:1px solid rgba(255,255,255,.06);box-shadow:0 -24px 60px -18px rgba(0,0,0,.95),inset 0 1px 0 rgba(255,255,255,.06);}
+html[data-work^=stack] .work-card:hover{background:linear-gradient(160deg,#1c1c1c,#121212)}
+html[data-work^=stack] .work-card:after,html[data-work^=stack] .wc-row{display:none}
+html[data-work^=stack] .wc-media{height:100%;aspect-ratio:auto;padding:6px;border-radius:28px;background:#0a0a0a;box-shadow:inset 0 3px 10px rgba(0,0,0,.85),inset 0 -1px 0 rgba(255,255,255,.05)}
+html[data-work^=stack] .wc-media img,html[data-work^=stack] .wc-media video{position:absolute;inset:6px;width:calc(100% - 12px);height:calc(100% - 12px);object-fit:cover;border-radius:22px;transition:transform .9s cubic-bezier(.2,.7,.2,1)}
+html[data-work^=stack] .work-card:hover .wc-media img{transform:scale(1.04)}
+html[data-work^=stack] .lock{top:22px;left:22px}
+html[data-work^=stack] .wc-info{display:flex;flex-direction:column;min-width:0;padding:18px 18px 18px 0}
+html[data-work^=stack] .wc-info>*{opacity:calc(.25 + .75*var(--in,1))}
+html[data-work^=stack] .wc-info small{color:var(--muted);font:500 13px "Geist Mono",monospace;text-transform:uppercase;letter-spacing:.04em}
+html[data-work^=stack] .wc-info h2{margin:10px 0 0;font:500 clamp(34px,4.2vw,72px)/1.02 Inter,sans-serif;letter-spacing:-.045em;text-transform:none;overflow-wrap:anywhere;transition:color .3s}
+html[data-work^=stack] .work-card:hover .wc-info h2{color:var(--accent-soft)}
+html[data-work^=stack] .wc-see{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;margin-top:auto;padding:12px 18px;border-radius:999px;background:#1d1d1d;box-shadow:0 8px 20px -8px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.08);font:500 13px Inter,sans-serif;transition:background .3s,color .3s}
+html[data-work^=stack] .wc-see i{font-style:normal;transition:transform .3s}
+html[data-work^=stack] .work-card:hover .wc-see{background:var(--white);color:var(--black)}
+html[data-work^=stack] .work-card:hover .wc-see i{transform:translate(2px,-2px)}
+html[data-work^=stack] .wc-info p{margin:22px 0 0;padding-top:20px;border-top:1px dashed rgba(255,255,255,.18);color:#bdbdb8;font-size:15px;line-height:1.55;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+@media(max-width:850px){
+  html[data-work^=stack] .work-card{--top:68px;top:var(--top);grid-template-columns:1fr;grid-template-rows:auto auto;height:auto;min-height:0;gap:14px;padding:10px;border-radius:24px;margin-bottom:var(--hold);--hold:32vh}
+  html[data-work^=stack] .wc-media{height:auto;aspect-ratio:4/3;border-radius:18px}
+  html[data-work^=stack] .wc-media img,html[data-work^=stack] .wc-media video{border-radius:14px}
+  html[data-work^=stack] .wc-info{padding:4px 8px 10px}
+  html[data-work^=stack] .wc-info h2{font-size:clamp(28px,8vw,40px)}
+  html[data-work^=stack] .wc-see{margin-top:18px}
+  html[data-work^=stack] .wc-info p{margin-top:16px;padding-top:14px;-webkit-line-clamp:3}
+}
+@media(min-width:851px){
+  html[data-work=stack2] .work-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:24px;align-items:start}
+  html[data-work=stack2] .work-card{display:flex;flex-direction:column;align-items:stretch;gap:0;height:auto;min-height:0;padding:12px;border-radius:30px;margin-bottom:var(--hold)}
+  html[data-work=stack2] .wc-media{height:auto;aspect-ratio:16/10;border-radius:22px}
+  html[data-work=stack2] .wc-media img,html[data-work=stack2] .wc-media video{border-radius:17px}
+  html[data-work=stack2] .wc-info{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;column-gap:18px;padding:18px 10px 8px}
+  html[data-work=stack2] .wc-info small{grid-column:1/-1}
+  html[data-work=stack2] .wc-info h2{margin-top:8px;font-size:clamp(26px,2.5vw,44px)}
+  html[data-work=stack2] .wc-see{margin:0;align-self:end;padding:10px 15px}
+  html[data-work=stack2] .wc-info p{grid-column:1/-1;margin-top:16px;padding-top:14px;font-size:14px;-webkit-line-clamp:2;min-height:calc(2*1.55em + 14px)}
+}
+@media (prefers-reduced-motion:reduce){html[data-work^=stack] .work-card,html[data-work^=stack] .wc-media img,html[data-work^=stack] .wc-info>*{transform:none;filter:none;opacity:1}}
 `;
 
 const TRANSITION_JS = `

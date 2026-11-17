@@ -507,6 +507,42 @@
       "password": ""
     },
     {
+      "id": "project-mwk5d0he",
+      "slug": "future-campaign-copy-mwk5d0he",
+      "title": "FUTURE CAMPAIGN (copy)",
+      "category": "CAMPAIGN DESIGN",
+      "year": "2026",
+      "client": "",
+      "role": "Campaign Design / Creative Direction",
+      "cover": "https://framerusercontent.com/images/r1Q4APz4TNMV5x9oKRYscAL06c.jpg?width=1600",
+      "description": "A concept-driven campaign exploring a more futuristic visual tone through bold composition, clean typography and controlled image treatment.",
+      "published": true,
+      "featured": true,
+      "link": "projects/future-campaign.html",
+      "headline": "Direction\n& System",
+      "scope": "Concept / Key Visual / System",
+      "heroSize": "full",
+      "blocks": [
+        {
+          "type": "overview"
+        },
+        {
+          "type": "gallery",
+          "style": "mix",
+          "images": [
+            "https://framerusercontent.com/images/H3KNH97QuI3MqCMMrAfkRwWSDAc.jpg?width=1600",
+            "https://framerusercontent.com/images/BYTBcqFikmPNhvjQYU7pi3ciyI.jpg?width=1600",
+            "https://framerusercontent.com/images/ZNnj2toPGisdyf6eClzPnuV72fM.jpg?width=1600"
+          ]
+        },
+        {
+          "type": "statement",
+          "text": "Future-facing design works best when the concept stays simple and the execution stays precise."
+        }
+      ],
+      "password": ""
+    },
+    {
       "id": "article-ai-brief-to-key-visual",
       "kind": "journal",
       "slug": "ai-brief-to-key-visual",
