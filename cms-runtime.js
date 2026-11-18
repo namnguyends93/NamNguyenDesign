@@ -45,7 +45,7 @@ window.__CMS_DONE__=(async function(){
       const FONTS={'Space Grotesk':'','Inter':'','Syne':'Syne:wght@600;700','Archivo':'Archivo:wght@600;800','Unbounded':'Unbounded:wght@500;700','Bricolage Grotesque':'Bricolage+Grotesque:wght@600;700','Playfair Display':'Playfair+Display:wght@600;700','DM Serif Display':'DM+Serif+Display','Anton':'Anton','Be Vietnam Pro':'Be+Vietnam+Pro:wght@600;700'};
       let css='';const f=t.headingFont;
       if(f&&f!=='Space Grotesk'&&f in FONTS){if(FONTS[f]&&!q('link[data-cms-font]')){const l=document.createElement('link');l.rel='stylesheet';l.dataset.cmsFont='1';l.href='https://fonts.googleapis.com/css2?family='+FONTS[f]+'&display=swap';document.head.appendChild(l)}
-        css+='.display,.big-title,.bm-track span,.qr-phone,.footer-word,.project-info-showcase h2{font-family:"'+f+'",Inter,sans-serif!important}'}
+        css+='.display,.big-title,.bm-track span,.qr-phone,.footer-word,.fg-word,.project-info-showcase h2{font-family:"'+f+'",Inter,sans-serif!important}'}
       const s=parseFloat(t.radius);if(s>=0&&s!==1)css+=':root{--radius-xl:'+Math.round(156*s)+'px;--radius-lg:'+Math.round(72*s)+'px;--radius-md:'+Math.round(46*s)+'px}@media(max-width:900px){:root{--radius-xl:'+Math.round(106*s)+'px}}';
       let st=q('#cms-theme');if(css){if(!st){st=document.createElement('style');st.id='cms-theme';document.head.appendChild(st)}st.textContent=css}else if(st)st.remove()}
 
@@ -246,7 +246,7 @@ const typeFontsHref = fams => { const f = [...new Set(fams)].filter(x => TYPE_FO
     // CV download buttons (About + Contact)
     {const cv=c.site?.cvUrl,lab=String(c.site?.cvLabel||'').replace(/\s*[↓⬇↘]\s*$/,'')||'Get CV';qa('.cv-btn').forEach(a=>{if(cv){a.href=cv;const l=a.querySelector('.cv-label');if(l)l.textContent=lab;else a.textContent=lab;a.hidden=false}else a.hidden=true})}
     // "See all work" link under the project numbers
-    {const al=q('.all-work-link'),ps=c.home?.projectsSection||{};if(al){if(ps.allVisible===false)al.hidden=true;else{al.hidden=false;if(ps.allLabel)al.textContent=ps.allLabel;al.href=BASE+'projects/index.html'}}}
+    {const al=q('.all-work-link'),ps=c.home?.projectsSection||{};if(al){if(ps.allVisible===false)al.hidden=true;else{al.hidden=false;if(ps.allLabel)al.textContent=String(ps.allLabel).replace(/\s*[→↗↘›>]+\s*$/,'');al.href=BASE+'projects/index.html'}}}
     // Background colour per section while scrolling (motion.js does the switching)
     if(c.site?.scrollColor===true){document.documentElement.dataset.scrollColor='on';
       const pick=v=>/^#[0-9a-f]{6}$/i.test(v||'')&&!/^#0{6}$/i.test(v)?v:'';
@@ -262,7 +262,9 @@ const typeFontsHref = fams => { const f = [...new Set(fams)].filter(x => TYPE_FO
     // Contact + footer style (full · compact · line); ?contact=…&footer=… previews another one
     {const sh=new URLSearchParams(location.search).get('shell')||c.site?.shellStyle;document.documentElement.setAttribute('data-shell',['bleed','open'].includes(sh)?sh:'cards')}
     {const P=new URLSearchParams(location.search),ok=['full','compact','line'],cs=P.get('contact')||c.site?.contactStyle,fs=P.get('footer')||c.site?.footerStyle;
-      document.documentElement.setAttribute('data-contact',ok.includes(cs)?cs:'full');document.documentElement.setAttribute('data-footer',ok.includes(fs)?fs:'full');
+      document.documentElement.setAttribute('data-contact',ok.includes(cs)?cs:'full');document.documentElement.setAttribute('data-footer',ok.concat(['giant','giant-light']).includes(fs)?fs:'full');
+      // nav style: notch (tai thỏ when scrolling, default) or float (always full) — assets/nav-notch.js
+      if(!P.get('nav'))document.documentElement.setAttribute('data-nav',c.site?.navStyle==='float'?'float':'notch');
       const ml=q('#contact .contact-mail'),em=c.home?.contact?.email;if(ml&&em){ml.href='mailto:'+em;ml.textContent=em+' ↗'}}
     // Zalo QR frame: image, caption and phone come from home.contact
     const qrBox=q('#contact .contact-qr');
@@ -282,6 +284,12 @@ const typeFontsHref = fams => { const f = [...new Set(fams)].filter(x => TYPE_FO
     const footer=q('footer.footer');if(footer){const f=c.footer||{},set=(s,v,html)=>{const el=q(s,footer);if(el&&v!=null&&v!=='')html?el.innerHTML=lines(v):el.textContent=v};
       set('.footer-top .mono',f.brand);set('.footer-top h3',f.description,1);set('.footer-top p.copy',f.tagline,1);
       set('.footer-word',f.bigWord||f.brand);
+      // footer style giant / giant-light: email + phone from home.contact, name from footer.giantWord
+      {const ct=c.home?.contact||{},gm=q('.fg-mail',footer),gp=q('.fg-phone',footer),gw=q('.fg-word span',footer);
+        if(gm&&ct.email){gm.href='mailto:'+ct.email;gm.textContent=ct.email}
+        if(gp){if(ct.phone){gp.textContent=ct.phone;gp.href='tel:'+String(ct.phone).replace(/[^+\d]/g,'');gp.hidden=false}else gp.hidden=true}
+        if(gw)gw.textContent=f.giantWord||'NAMNGUYEN FOLIO';
+        if(window.__nndFitGiant)setTimeout(window.__nndFitGiant,0)}
       const bs=qa('.footer-bottom span',footer);if(bs[0]&&f.copyright)bs[0].textContent=f.copyright;if(bs[1]&&f.note!=null)bs[1].textContent=f.note;
       const box=q('.footer-links',footer);if(box&&Array.isArray(f.links))box.innerHTML=f.links.filter(x=>x&&x.label&&x.visible!==false).map((it,i)=>'<a href="'+E(link(it.href||'#'))+'"'+(ext(it.href)?' target="_blank" rel="noopener"':'')+'><span>'+E(it.label)+'</span><span>'+(/^#./.test(it.href||'')?String(i+1).padStart(2,'0'):'↗')+'</span></a>').join('');
       if(f.visible===false)footer.style.display='none';

@@ -29,7 +29,15 @@ function embedUrl(u) {
   return '';
 }
 // Effects switched on in the editor (site.effects) → <html data-fx="…"> read by assets/fx.js
-const fxAttr = content => { const e = (content.site && content.site.effects) || {}; return ' data-fx="' + ['intro', 'transitions', 'reveal', 'count', 'smooth'].filter(k => e[k] !== false).join(' ') + '"'; };
+// Floating nav for project / work pages, built from content.navigation like the home page (paths made relative to /projects/)
+const navStyle = content => (content.site && content.site.navStyle === 'float') ? 'float' : 'notch';
+const pageNav = content => { const n = content.navigation || {}; if (n.visible === false) return '';
+  const fix = h => { h = String(h || '#'); if (/^#/.test(h)) return '../index.html' + h; if (/^(https?:|mailto:|tel:|\/|\.\.\/)/i.test(h)) return h; return '../' + h; };
+  const items = (n.items || []).filter(x => x && x.label && x.visible !== false).map(x => `<a href="${esc(fix(x.href))}">${esc(x.label)}</a>`).join('');
+  const badge = n.badgeVisible === false ? '' : `<a class="brand-badge" href="../index.html">${esc(n.badge || 'NAM\nNGUYEN').replace(/\n/g, '<br>')}</a>`;
+  const cta = n.ctaVisible === false ? '' : `<a class="nav-contact" href="${esc(fix(n.ctaHref || '#contact'))}">${esc(n.ctaLabel || 'Start a Project +')}</a>`;
+  return `<div class="nav-wrap"><nav class="nav">${badge}<div class="nav-links">${items}</div>${cta}</nav></div>`; };
+const fxAttr = content => { const e = (content.site && content.site.effects) || {}; return ' data-fx="' + ['intro', 'transitions', 'reveal', 'count', 'smooth'].filter(k => e[k] !== false).join(' ') + '" data-nav="' + navStyle(content) + '"'; };
 const FX_HEAD = "<script>(function(){try{var d=document.documentElement,q=location.search,a=d.getAttribute('data-fx'),on=function(k){return a==null?k!=='intro':(' '+a+' ').indexOf(' '+k+' ')>=0},rm=matchMedia('(prefers-reduced-motion: reduce)').matches;if(/[?&](edit|i18nscan)=1/.test(q)||rm)return;if(on('transitions')&&!('onpagereveal' in window)&&sessionStorage.getItem('nnd-curtain'))d.classList.add('fx-curtain-in');if(on('intro')&&document.querySelector&&!sessionStorage.getItem('nnd-intro')&&/(^|\\/)(index\\.html)?$/.test(location.pathname))d.classList.add('fx-intro-on')}catch(e){}})()</script>";
 
 // ---------- visual editor (/edit) ----------
@@ -445,6 +453,15 @@ function renderPage(content, slug) {
   const prev = all.length > 1 ? all[(idx - 1 + all.length) % all.length] : null;
   const nxt = all.length > 1 ? all[(idx + 1) % all.length] : null;
   const pnLink = (o, cls, word, small) => `<a class="${cls}" href="${esc((o.slug || o.id) + '.html')}"><small>${small}</small><b>${word}</b><span>${esc(String(o.title || '').trim())}${blank(o.password) ? '' : ' 🔒'}</span></a>`;
+  // Contact panel at the end (2026-11-18, owner: "bảng liên hệ giống như trang chủ"): same texts as the home contact
+  // (home.contact eyebrow / title / email), same look as the home "line" contact style; hidden when home.contact.visible is false
+  const hc = (content.home && content.home.contact) || {};
+  const contactBlock = hc.visible === false ? '' : `
+  <section class="p-contact" aria-label="Contact">
+    <span class="mono">${esc(hc.eyebrow || 'Start a Project.26')}</span>
+    <h2>${esc(hc.title || 'Get in touch')}</h2>${hc.email ? `
+    <a class="p-contact-mail" href="mailto:${esc(hc.email)}">${esc(hc.email)} ↗</a>` : ''}
+  </section>`;
   const nextBlock = nxt ? `
   <nav class="pn" aria-label="More ${isArticle ? 'articles' : 'projects'}">${pnLink(prev, 'pn-prev', '← Prev', isArticle ? 'Previous article' : 'Previous project')}${pnLink(nxt, 'pn-next', 'Next →', isArticle ? 'Next article' : 'Next project')}</nav>` : '';
 
@@ -474,11 +491,12 @@ ${VE ? '' : FX_HEAD}${priv ? '\n<meta name="robots" content="noindex">' : ''}
 <style>${CSS}${accent}</style>
 </head>
 <body>
+${VE ? '' : pageNav(content)}
 <nav class="project-nav">
   ${isArticle ? '<a href="../index.html#journal">← BACK TO JOURNAL</a>' : '<a href="../index.html#projects">← BACK TO WORK</a>'}
   <a href="../index.html#contact">START A PROJECT +</a>
 </nav>
-<main class="project-page"${priv ? ' data-private="1"' : ''}>${body}${nextBlock}
+<main class="project-page"${priv ? ' data-private="1"' : ''}>${body}${contactBlock}${nextBlock}
 </main>
 <footer class="footer">
   <span>${esc(copyright).toUpperCase()}</span>
@@ -489,6 +507,7 @@ ${VE ? '' : `<script>${PAGE_JS}</script>`}
 ${VE ? '' : '<script src="../assets/smooth.js" defer></script>'}
 ${i18nData(content)}
 <script src="../assets/to-top.js" defer></script>
+${VE ? '' : '<script src="../assets/nav-notch.js" defer></script>'}
 <script src="../assets/i18n.js" defer></script>
 </body>
 </html>
@@ -542,6 +561,7 @@ ${FX_HEAD}
 <style>${CSS}${accent}</style>
 </head>
 <body>
+${VE ? '' : pageNav(content)}
 <nav class="project-nav">
   <a href="../index.html">← HOME</a>
   <a href="../index.html#contact">START A PROJECT +</a>
@@ -566,6 +586,7 @@ ${VE ? '' : `<script>${WORK_JS}</script>`}
 ${VE ? '' : '<script src="../assets/smooth.js" defer></script>'}
 ${i18nData(content)}
 <script src="../assets/to-top.js" defer></script>
+${VE ? '' : '<script src="../assets/nav-notch.js" defer></script>'}
 <script src="../assets/i18n.js" defer></script>
 </body>
 </html>
@@ -584,10 +605,33 @@ const PAGE_JS = `
     lb.addEventListener('click',function(e){var c=e.target.classList;if(e.target===lb||c.contains('lb-x'))close();else if(c.contains('lb-p'))go(-1);else if(c.contains('lb-n'))go(1)});
     var sx=null;lb.addEventListener('touchstart',function(e){sx=e.touches[0].clientX},{passive:true});
     lb.addEventListener('touchend',function(e){if(sx==null)return;var dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>50)go(dx<0?1:-1);sx=null})}
-  function show(){var im=imgs[cur],el=lb.querySelector('img');el.src=big(im);el.alt=im.alt||'';lb.querySelector('.lb-c').textContent=(cur+1)+' / '+imgs.length;lb.classList.toggle('single',imgs.length<2)}
-  function open(i){if(!lb)build();last=document.activeElement;cur=i;show();lb.classList.add('on');document.documentElement.style.overflow='hidden';lb.querySelector('.lb-x').focus()}
-  function close(){lb.classList.remove('on');document.documentElement.style.overflow='';if(last&&last.focus)last.focus()}
-  function go(d){cur=(cur+d+imgs.length)%imgs.length;show()}
+  // the viewer shows the already-loaded picture at once, then swaps in the biggest size when it has loaded
+  function show(){var im=imgs[cur],el=lb.querySelector('img'),b=big(im);el.src=im.currentSrc||im.src;el.alt=im.alt||'';
+    if(b&&b!==el.src){var pre=new Image();pre.onload=function(){if(imgs[cur]===im)el.src=b};pre.src=b}
+    lb.querySelector('.lb-c').textContent=(cur+1)+' / '+imgs.length;lb.classList.toggle('single',imgs.length<2)}
+  // Fly (2026-11-18, owner: "nhanh xong chậm lại"): the picture flies from its spot on the page to full view and back,
+  // ease-out (fast, then slowing down). Same scale both ways (no stretching) + a clip that matches the cropped frame.
+  var EZ='cubic-bezier(.16,1,.3,1)',busy=false;
+  function fly(src,inn,done){var el=lb.querySelector('img'),ui=[].slice.call(lb.querySelectorAll('button,.lb-c'));
+    var ended=false;function end(){if(ended)return;ended=true;busy=false;if(src)src.style.visibility='';if(done)done()}
+    if(RM||!el.animate||!src){end();return}
+    busy=true;setTimeout(end,1500);   // safety net: never stuck if the animation is paused (hidden tab)
+    function run(){var a=src.getBoundingClientRect(),b=el.getBoundingClientRect(),dur=inn?820:620;
+      lb.animate([{backgroundColor:'rgba(5,5,5,0)'},{backgroundColor:'rgba(5,5,5,.94)'}],{duration:inn?520:460,easing:inn?'ease-out':'ease-in',direction:inn?'normal':'reverse',fill:inn?'none':'forwards'});
+      ui.forEach(function(u){u.animate([{opacity:0},{opacity:1}],{duration:inn?360:200,delay:inn?320:0,easing:'ease-out',direction:inn?'normal':'reverse',fill:'both'})});
+      if(!b.width||!a.width||a.bottom<0||a.top>innerHeight){                      // picture not on screen: fade only
+        el.animate([{opacity:0,transform:'scale(.96)'},{opacity:1,transform:'none'}],{duration:dur*.7,easing:EZ,direction:inn?'normal':'reverse',fill:inn?'none':'forwards'}).onfinish=end;return}
+      var k=Math.max(a.width/b.width,a.height/b.height),w=a.width/k,h=a.height/k,ix=Math.max(0,(b.width-w)/2),iy=Math.max(0,(b.height-h)/2),
+        dx=a.left+a.width/2-(b.left+b.width/2),dy=a.top+a.height/2-(b.top+b.height/2),r=parseFloat(getComputedStyle(src.parentNode).borderTopLeftRadius)||0;
+      var from={transform:'translate('+dx+'px,'+dy+'px) scale('+k+')',clipPath:'inset('+iy+'px '+ix+'px round '+(r/k)+'px)'},to={transform:'none',clipPath:'inset(0px 0px round 18px)'};
+      src.style.visibility='hidden';
+      el.animate(inn?[from,to]:[to,from],{duration:dur,easing:EZ,fill:inn?'none':'forwards'}).onfinish=end}
+    if(el.complete&&el.naturalWidth)run();else{var t=setTimeout(run,350);el.onload=function(){clearTimeout(t);el.onload=null;run()}}}
+  function open(i){if(busy)return;if(!lb)build();last=document.activeElement;cur=i;show();lb.classList.add('on');document.documentElement.style.overflow='hidden';lb.querySelector('.lb-x').focus({preventScroll:true});fly(imgs[i],true)}
+  function close(){if(busy||!lb.classList.contains('on'))return;fly(imgs[cur],false,function(){lb.classList.remove('on');document.documentElement.style.overflow='';
+    lb.getAnimations({subtree:true}).forEach(function(a){a.cancel()});if(last&&last.focus)last.focus({preventScroll:true})})}
+  function go(d){if(busy)return;cur=(cur+d+imgs.length)%imgs.length;show();var el=lb.querySelector('img');
+    if(!RM&&el.animate)el.animate([{opacity:0,transform:'translateX('+(d*48)+'px)'},{opacity:1,transform:'none'}],{duration:560,easing:EZ})}
   document.addEventListener('keydown',function(e){if(!lb||!lb.classList.contains('on'))return;if(e.key==='Escape')close();else if(e.key==='ArrowRight')go(1);else if(e.key==='ArrowLeft')go(-1)});
   function initLB(){imgs=[].slice.call(document.querySelectorAll('.gallery img, .bleed img, .chapter-media img, .bgrid img'));
     imgs.forEach(function(im){if(im._lb)return;im._lb=1;im.tabIndex=0;im.setAttribute('role','button');
@@ -1109,6 +1153,39 @@ html[data-work^=stack] .wc-info p{margin:22px 0 0;padding-top:20px;border-top:1p
   html[data-work=stack2] .wc-info p{grid-column:1/-1;margin-top:16px;padding-top:14px;font-size:14px;-webkit-line-clamp:2;min-height:calc(2*1.55em + 14px)}
 }
 @media (prefers-reduced-motion:reduce){html[data-work^=stack] .work-card,html[data-work^=stack] .wc-media img,html[data-work^=stack] .wc-info>*{transform:none;filter:none;opacity:1}}
+/* contact panel at the end of project / article pages (same look as the home contact, "line" style) */
+.p-contact{display:flex;flex-direction:column;align-items:center;text-align:center;margin:96px 0 0;padding:96px 6vw 88px;border-radius:48px;background:#0d0d0d;border:1px solid rgba(255,255,255,.06)}
+.p-contact .mono{font:500 12px "Geist Mono",monospace;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.p-contact h2{margin:10px 0 6px;font:600 clamp(48px,7vw,110px)/.9 "Space Grotesk",Inter,sans-serif;letter-spacing:-.06em;text-transform:uppercase}
+.p-contact-mail{display:inline-block;margin-top:18px;font:600 clamp(20px,2vw,30px)/1.2 "Space Grotesk",Inter,sans-serif;letter-spacing:-.03em;color:#fff;border-bottom:1px solid rgba(255,255,255,.3);padding-bottom:4px;transition:color .3s,border-color .3s}
+.p-contact-mail:hover{color:var(--accent-soft);border-color:var(--accent-soft)}
+@media(max-width:850px){.p-contact{margin-top:48px;padding:64px 22px;border-radius:32px}}
+/* floating nav like the home page (2026-11-18): same markup / look; badge → home; tai thỏ when scrolling (data-nav) */
+.nav-wrap{position:fixed;z-index:100;left:50%;bottom:32px;transform:translateX(-50%);width:min(760px,calc(100vw - 32px))}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:34px;background:rgba(0,0,0,.34);backdrop-filter:blur(38px);-webkit-backdrop-filter:blur(38px);color:#fff;border:1px solid rgba(255,255,255,.08)}
+.brand-badge{width:95px;height:52px;border-radius:25px;display:flex;align-items:center;justify-content:center;background:var(--white);color:var(--black);font-family:"Geist Mono",monospace;font-size:11px;text-align:center;line-height:1.05}
+.nav-links{display:flex;gap:8px;align-items:center}
+.nav-links a{padding:14px 10px;font-family:"Geist Mono",monospace;font-size:12px;text-transform:uppercase;opacity:.9}
+.nav-links a:hover{opacity:1}
+.nav-contact{padding:13px 18px;border-radius:22px;background:var(--accent);color:#fff;font-family:"Geist Mono",monospace;font-size:12px;text-transform:uppercase;transition:background .25s,color .25s}
+.nav-contact:hover{background:var(--white);color:var(--black)}
+.nav-notch{display:none}
+html[data-nav="notch"] .nav-wrap{transition:transform .55s cubic-bezier(.2,.8,.2,1),opacity .35s ease}
+html[data-nav="notch"] .nav-notch{display:grid;place-content:center;gap:5px;position:fixed;z-index:101;left:50%;bottom:0;width:96px;height:38px;padding:0;border:0;border-radius:16px 16px 0 0;background:#0b0b0b;color:#fff;cursor:pointer;
+  transform:translate(-50%,120%);transition:transform .5s cubic-bezier(.2,.8,.2,1) .08s,width .3s ease}
+html[data-nav="notch"] .nav-notch::before,html[data-nav="notch"] .nav-notch::after{content:"";position:absolute;bottom:0;width:16px;height:16px;pointer-events:none}
+html[data-nav="notch"] .nav-notch::before{left:-16px;background:radial-gradient(circle at 0 0,transparent 15.5px,#0b0b0b 16px)}
+html[data-nav="notch"] .nav-notch::after{right:-16px;background:radial-gradient(circle at 100% 0,transparent 15.5px,#0b0b0b 16px)}
+html[data-nav="notch"] .nav-notch i{display:block;width:22px;height:2px;border-radius:2px;background:currentColor;transition:width .3s ease}
+html[data-nav="notch"] .nav-notch:hover{width:108px}
+html[data-nav="notch"] .nav-notch:hover i:last-child{width:14px}
+html.nav-mini .nav-wrap{transform:translate(-50%,calc(100% + 48px)) scale(.55);opacity:0;pointer-events:none}
+html.nav-mini .nav-notch{transform:translate(-50%,0)}
+html.nav-mini.nav-open .nav-wrap{transform:translateX(-50%);opacity:1;pointer-events:auto}
+html.nav-mini.nav-open .nav-notch{transform:translate(-50%,120%);transition-delay:0s}
+@media (prefers-reduced-motion:reduce){html[data-nav="notch"] .nav-wrap,html[data-nav="notch"] .nav-notch{transition:none}}
+.nav-wrap ~ .footer,.nav-wrap ~ main + .footer{padding-bottom:120px}
+@media(max-width:900px){.nav-wrap{bottom:16px}.nav-links{display:none}.nav{padding:8px}}
 `;
 
 const TRANSITION_JS = `

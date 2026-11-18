@@ -317,7 +317,7 @@ function bindings(d){
   img(q('.qr-frame'),'home.contact.qrImage','Mã QR Zalo',HINT.qr,(el,u)=>{const i=el.querySelector('.qr-img'),e=el.querySelector('.qr-empty');if(i){i.src=u;i.hidden=!u;i.removeAttribute('srcset')}if(e)e.hidden=!!u});
   text(q('.footer-top .mono'),'footer.brand');text(q('.footer-top h3'),'footer.description',1);text(q('.footer-top p.copy'),'footer.tagline',1);
   {const ix=visIdx(state.footer?.links);qa('.footer-links a').forEach((a,k)=>{if(ix[k]==null)return;text(a.querySelector('span'),'footer.links.'+ix[k]+'.label');del(a,'footer.links',ix[k],a.querySelector('span')?.textContent)})}
-  text(q('.footer-word'),'footer.bigWord');const fb=qa('.footer-bottom span');text(fb[0],'footer.copyright');text(fb[1],'footer.note');
+  text(q('.footer-word'),'footer.bigWord');text(q('.fg-word span'),'footer.giantWord');const fb=qa('.footer-bottom span');text(fb[0],'footer.copyright');text(fb[1],'footer.note');
   return B;
 }
 
@@ -515,7 +515,7 @@ const SECS=[
   {id:'nav',n:'Menu',sel:'.nav-wrap',vis:'navigation.visible',f:[
     A('navigation.badge','Logo chữ tròn (Enter = xuống dòng)'),Bo('navigation.badgeVisible','Hiện logo chữ'),
     IT('navigation.items','Các link trong menu',[T('label','Chữ'),U('href','Link tới'),Bo('visible','Hiện')],()=>({label:'New',href:'#contact',visible:true}),'label'),
-    T('navigation.ctaLabel','Chữ nút bên phải'),U('navigation.ctaHref','Link nút'),Bo('navigation.ctaVisible','Hiện nút')]},
+    T('navigation.ctaLabel','Chữ nút bên phải'),U('navigation.ctaHref','Link nút'),Bo('navigation.ctaVisible','Hiện nút'),S('site.navStyle','Khi lướt xuống',[['notch','Thu nhỏ thành tai thỏ ở đáy màn hình (rê / bấm để mở)'],['float','Luôn hiện đầy đủ']],'notch')]},
   {id:'hero',n:'Hero',sel:'.hero',vis:'home.hero.visible',f:[
     S('site.heroStyle','Kiểu hero',[['name','Tên lớn + nhân vật chuyển động (kiểu Hana)'],['card','Thẻ bo góc (kiểu cũ)']],'name'),
     T('home.hero.name','Chữ tên lớn (mặc định: Nam Nguyen)',{note:'Chữ tự giãn cho vừa đúng bề ngang màn hình.'}),T('home.hero.tipTitle',"Thẻ theo chuột — dòng chào (mặc định: Hey, I'm Nam)",{note:'Đoạn mô tả bên dưới lấy từ ô Đoạn mô tả.'}),
@@ -561,10 +561,10 @@ const SECS=[
     T('home.contact.zalo','Zalo: số điện thoại hoặc link zalo.me',{note:'Hiện nút "Nhắn Zalo" bấm được (người xem trên điện thoại không tự quét được màn hình). Để trống = dùng số điện thoại ở trên.'}),T('home.contact.zaloLabel','Chữ trên nút Zalo (mặc định: Message on Zalo ↗)'),
     C('home.contact.scrollBg','Màu nền khi cuộn tới mục Liên hệ','#000000')]},
   {id:'footer',n:'Chân trang',sel:'footer.footer',vis:'footer.visible',f:[
-    S('site.footerStyle','Kiểu chân trang',[['full','1 · Đầy đủ (câu lớn + lưới link + chữ tên)'],['compact','2 · Gọn (một thanh tối)'],['line','3 · Tối giản (một dòng chữ nhỏ)']],'full',{noteHtml:'Xem trước cả 3 kiểu: <a href="/tools/demo-contact-footer.html" target="_blank" style="color:#8ea1ff">mở trang demo ↗</a>.'}),
+    S('site.footerStyle','Kiểu chân trang',[['full','1 · Đầy đủ (câu lớn + lưới link + chữ tên)'],['compact','2 · Gọn (một thanh tối)'],['line','3 · Tối giản (một dòng chữ nhỏ)'],['giant','4 · Chữ tên khổng lồ (nền tối): email + số điện thoại ở giữa, tên tràn hết bề ngang'],['giant-light','5 · Chữ tên khổng lồ (nền trắng, như ảnh mẫu)']],'full',{noteHtml:'Xem trước cả 3 kiểu: <a href="/tools/demo-contact-footer.html" target="_blank" style="color:#8ea1ff">mở trang demo ↗</a>.'}),
     T('footer.brand','Chữ nhỏ trên cùng'),A('footer.description','Câu lớn'),A('footer.tagline','Dòng phụ'),
     IT('footer.links','Các link',[T('label','Chữ'),U('href','Link tới'),Bo('visible','Hiện')],()=>({label:'New link',href:'https://',visible:true}),'label'),
-    T('footer.bigWord','Chữ khổng lồ'),T('footer.copyright','Bản quyền (dưới trái)'),T('footer.note','Dòng dưới phải')]}
+    T('footer.bigWord','Chữ khổng lồ (kiểu 1)'),T('footer.giantWord','Chữ tên khổng lồ (kiểu 4, 5; font = font chính trang đầu). Email / số điện thoại lấy ở mục Liên hệ'),T('footer.copyright','Bản quyền (dưới trái)'),T('footer.note','Dòng dưới phải')]}
 ];
 let curSec='site';const openItems=new Set();
 const curPage=()=>mode==='home'?'home':mode==='work'?'work':projIdx;

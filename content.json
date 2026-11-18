@@ -48,7 +48,7 @@
       },
       {
         "label": "Projects",
-        "href": "#projects",
+        "href": "projects/index.html",
         "visible": true
       },
       {
@@ -225,7 +225,8 @@
           "visible": true
         }
       ],
-      "description": "Working with brands and creative teams that value sharp thinking, strong systems and visuals with a clear point of view."
+      "description": "Working with brands and creative teams that value sharp thinking, strong systems and visuals with a clear point of view.",
+      "speed": 18.3
     },
     "projectsSection": {
       "visible": true,
@@ -386,7 +387,8 @@
     ],
     "tagline": "Brand Identity · Campaign Design · Art Direction · Visual Systems",
     "bigWord": "Nam Nguyen Design",
-    "note": "Independent · Ho Chi Minh City"
+    "note": "Independent · Ho Chi Minh City",
+    "giantWord": "NAMNGUYEN FOLIO"
   },
   "projects": [
     {
@@ -1002,7 +1004,8 @@
       "Close": "Đóng",
       "Previous": "Ảnh trước",
       "Next": "Ảnh sau",
-      "Hey, I'm Nam": "Chào, mình là Nam"
+      "Hey, I'm Nam": "Chào, mình là Nam",
+      "See all work": "Xem tất cả dự án"
     }
   },
   "layout": {
