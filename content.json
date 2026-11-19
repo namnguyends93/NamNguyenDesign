@@ -287,7 +287,66 @@
       "ctaLabel": "Start a Project +",
       "ctaHref": "mailto:namnguyen.thietketkm@gmail.com",
       "qrImage": "/uploads/qr-zalo-demo.png",
-      "qrCaption": "Scan to message me on Zalo"
+      "qrCaption": "Scan to message me on Zalo",
+      "faqTitle": "Frequently asked questions.",
+      "faq": [
+        {
+          "q": "What kind of projects do you take on?",
+          "a": "Campaign key visuals and their rollout for social, print and in-store, brand identity and visual systems, packaging, art direction, and AI-assisted visuals and motion. Most of my work is in beauty, retail and real estate, but I'm happy to look at any brief.",
+          "visible": true
+        },
+        {
+          "q": "How do we get started?",
+          "a": "Send me a short brief: what you need, where it will be used, your deadline, a budget range and a few references. I'll reply within one to two working days with questions or a proposal covering scope, timeline and price. Work starts once we agree and the deposit is paid.",
+          "visible": true
+        },
+        {
+          "q": "How long does a project take?",
+          "a": "It depends on the scope. A campaign key visual usually takes one to two weeks; a full rollout or a brand identity, three to six weeks. Clear feedback and one main contact on your side keep things on schedule.",
+          "visible": true
+        },
+        {
+          "q": "How much does it cost?",
+          "a": "Every project is quoted on its own, based on the deliverables, the timeline and how the work will be used. If you share a budget range, I can suggest the scope that gets the most out of it.",
+          "visible": true
+        },
+        {
+          "q": "How many revisions are included?",
+          "a": "Each stage includes two rounds of revisions, which is usually enough when the brief is clear. Extra rounds, or a change of direction after approval, are quoted separately.",
+          "visible": true
+        },
+        {
+          "q": "What files will I receive?",
+          "a": "Final files in the formats you need: print-ready PDF, PNG / JPG / MP4 for digital, and the source files (AI, PSD or Figma) when they are part of the agreement. Identity projects come with a short guideline.",
+          "visible": false
+        },
+        {
+          "q": "Do you work remotely?",
+          "a": "Yes. I'm based in Ho Chi Minh City and work with clients anywhere by email, Zalo and video call, in Vietnamese or English.",
+          "visible": false
+        },
+        {
+          "q": "Do you use AI in your work?",
+          "a": "Yes: to explore ideas faster, and for AI visuals and motion when they suit the brief. Every final piece is art directed and finished by hand, and I'll tell you up front where AI was used.",
+          "visible": false
+        },
+        {
+          "q": "How does payment work?",
+          "a": "Usually a 50% deposit to book the work and 50% on final delivery, by bank transfer. Longer projects can be split by milestone.",
+          "visible": true
+        },
+        {
+          "q": "Who owns the final designs?",
+          "a": "Once the project is fully paid, you get the rights to use the final designs for the agreed purposes. I may show the work in my portfolio unless we agree otherwise, for example under an NDA.",
+          "visible": false
+        },
+        {
+          "q": "Can you take urgent jobs?",
+          "a": "Sometimes, depending on my schedule. Rush timelines may carry an extra fee; send me the deadline and I'll tell you honestly whether it's doable.",
+          "visible": false
+        }
+      ],
+      "faqDescription": "Every project is different, so here are answers to what clients usually ask before we start."
     },
     "marquee": {
       "visible": true,
@@ -1005,7 +1064,33 @@
       "Previous": "Ảnh trước",
       "Next": "Ảnh sau",
       "Hey, I'm Nam": "Chào, mình là Nam",
-      "See all work": "Xem tất cả dự án"
+      "See all work": "Xem tất cả dự án",
+      "What kind of projects do you take on?": "Bạn nhận làm những dự án nào?",
+      "Campaign key visuals and their rollout for social, print and in-store, brand identity and visual systems, packaging, art direction, and AI-assisted visuals and motion. Most of my work is in beauty, retail and real estate, but I'm happy to look at any brief.": "Mình nhận key visual và triển khai chiến dịch cho social, in ấn và tại điểm bán; nhận diện thương hiệu và hệ thống hình ảnh; bao bì; định hướng nghệ thuật; và hình ảnh, chuyển động có ứng dụng AI. Phần lớn dự án của mình thuộc mảng làm đẹp, bán lẻ và bất động sản, nhưng brief nào mình cũng sẵn lòng xem qua.",
+      "How do we get started?": "Làm sao để bắt đầu?",
+      "Send me a short brief: what you need, where it will be used, your deadline, a budget range and a few references. I'll reply within one to two working days with questions or a proposal covering scope, timeline and price. Work starts once we agree and the deposit is paid.": "Bạn gửi mình một brief ngắn: cần làm gì, dùng ở đâu, hạn chót, khoảng ngân sách và vài hình tham khảo. Trong 1–2 ngày làm việc mình sẽ phản hồi bằng câu hỏi hoặc đề xuất gồm phạm vi, tiến độ và chi phí. Hai bên thống nhất và đặt cọc xong là mình bắt đầu.",
+      "How long does a project take?": "Một dự án mất bao lâu?",
+      "It depends on the scope. A campaign key visual usually takes one to two weeks; a full rollout or a brand identity, three to six weeks. Clear feedback and one main contact on your side keep things on schedule.": "Tuỳ phạm vi công việc. Một key visual chiến dịch thường mất 1–2 tuần; triển khai trọn bộ hoặc làm nhận diện thương hiệu khoảng 3–6 tuần. Góp ý rõ ràng và có một đầu mối chính bên bạn sẽ giúp dự án đúng tiến độ.",
+      "How much does it cost?": "Chi phí bao nhiêu?",
+      "Every project is quoted on its own, based on the deliverables, the timeline and how the work will be used. If you share a budget range, I can suggest the scope that gets the most out of it.": "Mỗi dự án được báo giá riêng, dựa trên hạng mục, tiến độ và phạm vi sử dụng. Nếu bạn chia sẻ khoảng ngân sách, mình sẽ đề xuất phạm vi phù hợp nhất với mức đó.",
+      "How many revisions are included?": "Được chỉnh sửa mấy lần?",
+      "Each stage includes two rounds of revisions, which is usually enough when the brief is clear. Extra rounds, or a change of direction after approval, are quoted separately.": "Mỗi giai đoạn gồm 2 lần chỉnh sửa, thường là đủ khi brief rõ ràng. Chỉnh thêm, hoặc đổi hướng sau khi đã duyệt, sẽ được báo giá riêng.",
+      "What files will I receive?": "Mình sẽ nhận những file gì?",
+      "Final files in the formats you need: print-ready PDF, PNG / JPG / MP4 for digital, and the source files (AI, PSD or Figma) when they are part of the agreement. Identity projects come with a short guideline.": "File hoàn chỉnh theo định dạng bạn cần: PDF in ấn, PNG / JPG / MP4 cho kênh số, và file gốc (AI, PSD hoặc Figma) nếu có trong thoả thuận. Dự án nhận diện có kèm hướng dẫn sử dụng ngắn.",
+      "Do you work remotely?": "Bạn có làm việc từ xa không?",
+      "Yes. I'm based in Ho Chi Minh City and work with clients anywhere by email, Zalo and video call, in Vietnamese or English.": "Có. Mình ở TP. Hồ Chí Minh và làm việc với khách ở mọi nơi qua email, Zalo và gọi video, bằng tiếng Việt hoặc tiếng Anh.",
+      "Do you use AI in your work?": "Bạn có dùng AI không?",
+      "Yes: to explore ideas faster, and for AI visuals and motion when they suit the brief. Every final piece is art directed and finished by hand, and I'll tell you up front where AI was used.": "Có: để thử ý tưởng nhanh hơn, và làm hình ảnh, chuyển động AI khi phù hợp với brief. Mọi sản phẩm cuối đều được định hướng và hoàn thiện thủ công, và mình sẽ nói rõ từ đầu chỗ nào có dùng AI.",
+      "How does payment work?": "Thanh toán thế nào?",
+      "Usually a 50% deposit to book the work and 50% on final delivery, by bank transfer. Longer projects can be split by milestone.": "Thường là đặt cọc 50% để giữ lịch và thanh toán 50% còn lại khi bàn giao, qua chuyển khoản. Dự án dài có thể chia theo từng giai đoạn.",
+      "Who owns the final designs?": "Ai sở hữu thiết kế cuối cùng?",
+      "Once the project is fully paid, you get the rights to use the final designs for the agreed purposes. I may show the work in my portfolio unless we agree otherwise, for example under an NDA.": "Sau khi thanh toán đủ, bạn có quyền sử dụng thiết kế cuối cho các mục đích đã thoả thuận. Mình có thể đưa sản phẩm vào portfolio, trừ khi hai bên thoả thuận khác, ví dụ có ký NDA.",
+      "Can you take urgent jobs?": "Bạn có nhận việc gấp không?",
+      "Sometimes, depending on my schedule. Rush timelines may carry an extra fee; send me the deadline and I'll tell you honestly whether it's doable.": "Có thể, tuỳ lịch của mình lúc đó. Việc gấp có thể tính thêm phí; bạn nhắn hạn chót, mình sẽ trả lời thẳng là có kịp hay không.",
+      "FAQs": "FAQs",
+      "Frequently asked": "Câu hỏi",
+      "questions.": "thường gặp.",
+      "Every project is different, so here are answers to what clients usually ask before we start.": "Mỗi dự án một khác, đây là câu trả lời cho những điều khách hàng thường hỏi trước khi bắt đầu."
     }
   },
   "layout": {

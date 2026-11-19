@@ -559,7 +559,9 @@ const SECS=[
     T('home.contact.eyebrow','Chữ nhỏ'),T('home.contact.title','Tiêu đề'),A('home.contact.description','Đoạn mô tả'),I('home.contact.image','Ảnh / video nền',HINT.contact+VID_OK,{accept:'both'}),
     I('home.contact.qrImage','Mã QR Zalo',HINT.qr),A('home.contact.qrCaption','Chữ cạnh QR'),T('home.contact.phone','Số điện thoại (hiện dưới QR, để trống = ẩn)'),
     T('home.contact.zalo','Zalo: số điện thoại hoặc link zalo.me',{note:'Hiện nút "Nhắn Zalo" bấm được (người xem trên điện thoại không tự quét được màn hình). Để trống = dùng số điện thoại ở trên.'}),T('home.contact.zaloLabel','Chữ trên nút Zalo (mặc định: Message on Zalo ↗)'),
-    C('home.contact.scrollBg','Màu nền khi cuộn tới mục Liên hệ','#000000')]},
+    C('home.contact.scrollBg','Màu nền khi cuộn tới mục Liên hệ','#000000'),
+    T('home.contact.faqTitle','Tiêu đề phần FAQ (chữ cuối hiện màu xám)'),A('home.contact.faqDescription','Câu mô tả dưới tiêu đề FAQ'),
+    IT('home.contact.faq','Câu hỏi thường gặp (FAQ) — bấm câu hỏi trên web để mở câu trả lời',[T('q','Câu hỏi'),A('a','Trả lời'),Bo('visible','Hiện')],()=>({q:'New question',a:'',visible:true}),'q')]},
   {id:'footer',n:'Chân trang',sel:'footer.footer',vis:'footer.visible',f:[
     S('site.footerStyle','Kiểu chân trang',[['full','1 · Đầy đủ (câu lớn + lưới link + chữ tên)'],['compact','2 · Gọn (một thanh tối)'],['line','3 · Tối giản (một dòng chữ nhỏ)'],['giant','4 · Chữ tên khổng lồ (nền tối): email + số điện thoại ở giữa, tên tràn hết bề ngang'],['giant-light','5 · Chữ tên khổng lồ (nền trắng, như ảnh mẫu)']],'full',{noteHtml:'Xem trước cả 3 kiểu: <a href="/tools/demo-contact-footer.html" target="_blank" style="color:#8ea1ff">mở trang demo ↗</a>.'}),
     T('footer.brand','Chữ nhỏ trên cùng'),A('footer.description','Câu lớn'),A('footer.tagline','Dòng phụ'),

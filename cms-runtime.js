@@ -277,6 +277,25 @@ const typeFontsHref = fams => { const f = [...new Set(fams)].filter(x => TYPE_FO
       const qz=q('.qr-zalo',qrBox),zl=String(ct.zalo||ct.phone||'').trim();
       if(qz){const url=/^https?:\/\//i.test(zl)?zl:(zl.replace(/\D/g,'')?'https://zalo.me/'+zl.replace(/\D/g,''):'');if(url){qz.href=url;qz.textContent=ct.zaloLabel||'Message on Zalo ↗';qz.hidden=false}else qz.hidden=true}
     }
+    // FAQ under the contact (home.contact.faq = [{q,a,visible}], faqTitle) — 2026-11-18. <details> so it works without JS;
+    // the hold wrapper of hscroll.js is re-measured when an answer opens / closes (the section changes height).
+    {const sec=q('#contact'),card=q('#contact .contact'),ct=c.home?.contact||{},items=(Array.isArray(ct.faq)?ct.faq:[]).filter(x=>x&&x.visible!==false&&String(x.q||'').trim());
+      const old=q('#contact .contact-faq');if(old)old.remove();
+      if(sec&&card&&items.length){const E2=v=>String(v).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+        // title: the last word is grey (each half is its own text, so the VI dictionary translates both halves)
+        const t=String(ct.faqTitle||'Frequently asked questions.').trim(),cut=t.lastIndexOf(' '),t1=cut>0?t.slice(0,cut):t,t2=cut>0?t.slice(cut+1):'';
+        const box=document.createElement('div');box.className='contact-faq';
+        box.innerHTML='<div class="faq-intro"><span class="faq-eyebrow">FAQs</span><h3><span>'+E2(t1)+'</span>'+(t2?' <span class="faq-dim">'+E2(t2)+'</span>':'')+'</h3>'+
+          (ct.faqDescription?'<p>'+E2(ct.faqDescription)+'</p>':'')+'</div><div class="faq-list">'+
+          items.map(x=>'<details><summary><span>'+E2(String(x.q).trim())+'</span><i aria-hidden="true"></i></summary><div class="faq-a"><p>'+E2(String(x.a||'').trim())+'</p></div></details>').join('')+'</div>';
+        card.after(box);
+        // When an answer opens / closes the contact section changes height. Only its own hold wrapper (hscroll.js) is resized,
+        // keeping the same hold length: a full __nndHsSetup() unwraps every section and made the page jump up (2026-11-18 fix).
+        // (hold length = half the screen, as in hscroll.js hold())
+        const fixHold=()=>{const w=sec.parentElement,h=sec.offsetHeight;if(!w||!w.classList.contains('hs-hold')||!h)return;
+          w.style.height=(h+Math.round(innerHeight*0.5))+'px';sec.style.top=(h<=innerHeight?Math.max(0,(innerHeight-h)/2):0)+'px'};
+        if(window.ResizeObserver)new ResizeObserver(fixHold).observe(sec);
+        box.addEventListener('toggle',()=>{fixHold();setTimeout(fixHold,560)},true)}}
     hideByIdOrText('contact','Start a Project.26',c.home?.contact?.visible);
 
     // FOOTER

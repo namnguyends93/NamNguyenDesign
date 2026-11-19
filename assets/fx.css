@@ -107,3 +107,19 @@ html.fx-intro-out .fx-intro { transform: translateY(-100%); }
 .shov-depth.shov-on .shov-dep { transition: transform .25s ease-out; }
 .shov-c { display: inline-block; transition: transform .45s cubic-bezier(.2, .9, .3, 1.4); will-change: transform; }
 @media (prefers-reduced-motion: reduce) { .shov-card, .shov-dep, .shov-c { transform: none !important; } .shovl-glare, .shovl-spot, .shovl-glow { display: none; } }
+
+/* "glow" on a section made of tiles (Brand Connect) — 2026-11-18, owner: the light should run around each tile, not along
+   the whole strip. The strip-wide layer is hidden; the tile under the mouse gets a light that circles its rounded border. */
+@property --nnd-ga { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+@keyframes nnd-glow-spin { to { --nnd-ga: 360deg; } }
+[data-shov="glow"] .client-track ~ .shovl-glow, #clients[data-shov="glow"] .shovl-glow { display: none; }
+#clients[data-shov="glow"] .client-card { position: relative; }
+#clients[data-shov="glow"] .client-card::after { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 2px; pointer-events: none;
+  background: conic-gradient(from var(--nnd-ga), transparent 0 50%, var(--accent, #4c6fff) 66% 84%, transparent 96%);   /* accent blue only (owner: no blue → white gradient) */
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+  filter: drop-shadow(0 0 8px var(--accent, #4c6fff)) drop-shadow(0 0 18px rgba(76, 111, 255, .55));
+  opacity: 0; transition: opacity .4s ease; animation: nnd-glow-spin 2.2s linear infinite; animation-play-state: paused; }
+@media (hover: hover) and (pointer: fine) {
+  #clients[data-shov="glow"] .client-card:hover::after { opacity: 1; animation-play-state: running; }
+}
+@media (prefers-reduced-motion: reduce) { #clients[data-shov="glow"] .client-card::after { animation: none; background: var(--accent, #4c6fff); } }
